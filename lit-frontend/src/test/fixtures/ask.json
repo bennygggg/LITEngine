@@ -1,0 +1,170 @@
+[
+ {
+  "v": 1,
+  "seq": 1,
+  "t": 0,
+  "event": "message_start",
+  "run_id": "r_beb4dadc",
+  "message_id": "m_b856643963",
+  "conversation_id": "fx6",
+  "mode": "deterministic",
+  "model": null,
+  "prompt_version": null,
+  "schema_version": 1,
+  "server_version": "0.2.0",
+  "case_known": true
+ },
+ {
+  "v": 1,
+  "seq": 2,
+  "t": 0,
+  "event": "step",
+  "step_id": "s_7dfa363f92",
+  "phase": "start",
+  "tool": "ask_case",
+  "label": "Searching the document",
+  "origin": "forced",
+  "depends_on": [],
+  "args_preview": {
+   "question": "What does the judgment say about the delay in lodging the FIR?"
+  },
+  "produces_card": true,
+  "message": null,
+  "pct": null,
+  "status": null,
+  "duration_ms": null,
+  "summary": null
+ },
+ {
+  "v": 1,
+  "seq": 3,
+  "t": 29,
+  "event": "step",
+  "step_id": "s_7dfa363f92",
+  "phase": "end",
+  "tool": "ask_case",
+  "label": "Searching the document",
+  "origin": "forced",
+  "depends_on": [],
+  "args_preview": {},
+  "produces_card": false,
+  "message": null,
+  "pct": null,
+  "status": "ok",
+  "duration_ms": 29,
+  "summary": "2 passages"
+ },
+ {
+  "v": 1,
+  "seq": 4,
+  "t": 30,
+  "event": "card",
+  "card_id": "card_d7803546bb",
+  "part_id": "p1",
+  "step_id": "s_7dfa363f92",
+  "schema_ver": 1,
+  "supersedes": null,
+  "payload": {
+   "card_id": "card_d7803546bb",
+   "schema_ver": 1,
+   "title": "Sources in the document",
+   "subtitle": "2 excerpts",
+   "artifact_key": null,
+   "provenance": {
+    "engine": "doc-retrieval",
+    "engine_version": "1",
+    "index_version": null,
+    "computed_ms": 0,
+    "inputs": {},
+    "cached": false
+   },
+   "disclaimer": null,
+   "type": "sources",
+   "question": "What does the judgment say about the delay in lodging the FIR?",
+   "excerpts": [
+    {
+     "ref": "S1",
+     "text": "with a delay of eleven hours without satisfactory explanation. The recovery of the weapon under Section 27 of the Indian Evidence Act was not corroborated by an independent panch witness. The trial court failed to consider the accused's defence of grave and sudden provocation arising from the land dispute. The Sessions Court convicted the accused and sentenced him to life imprisonment under Section 302 IPC.\n\nThe following questions arise for consideration before this Court:\n\nWhether the conviction under Section 302 IPC can be sustained solely on the testimony of interested eyewitnesses, in the absence of independent corroboration?\nWhether the delay of eleven hours in lodging the FIR is fatal to the prosecution's case?\nWhether the facts as proved make out an offence under Section 304 Part I IPC rather than Section 302 IPC?\n\nThe appellant respectfully prays that this Hon'ble Court set aside the conviction under Section 302 IPC and instead convict him under Section 304 Part I IPC, or in the alternative, acquit him of all charges.",
+     "cosine": 0.436,
+     "chunk_index": 1,
+     "char_start": 826,
+     "char_end": 1868
+    },
+    {
+     "ref": "S2",
+     "text": "IN THE BOMBAY HIGH COURT, NAGPUR BENCH\nCriminal Appeal No. 482 of 2021 (under Section 374 of the Code of Criminal Procedure)\n\nRamesh Kumar\nVersus\nState of Maharashtra\n\nCORAM: Hon'ble Mr Justice AK Sharma.\n\nThe appellant was convicted by the Sessions Court, Nagpur under Section 302 read with Section 34 of the Indian Penal Code for the murder of the deceased, Suresh Patil, on 14 March 2019, following a dispute over a land boundary between the two families. The prosecution's case rested primarily on the testimony of two eyewitnesses, PW-1 and PW-2, who claimed to have seen the appellant assault the deceased with a wooden log. No independent corroborating witness was examined at trial. The post-mortem report confirmed death due to blunt force trauma to the skull, consistent with the alleged weapon.\n\nThe FIR was lodged with a delay of eleven hours without satisfactory explanation. The recovery of the weapon under Section 27 of the Indian Evidence Act was not corroborated by an independent panch witness.",
+     "cosine": 0.356,
+     "chunk_index": 0,
+     "char_start": 0,
+     "char_end": 1013
+    }
+   ],
+   "method": "extractive",
+   "coverage": null
+  }
+ },
+ {
+  "v": 1,
+  "seq": 5,
+  "t": 30,
+  "event": "artifact_update",
+  "kind": "excerpts",
+  "key": "3f22ce52588affc0",
+  "card_id": "card_d7803546bb",
+  "implicit": false
+ },
+ {
+  "v": 1,
+  "seq": 6,
+  "t": 30,
+  "event": "text_delta",
+  "message_id": "m_b856643963",
+  "part_id": "p2",
+  "delta": "The most relevant passage [S1]: \u201cwith a delay of eleven hours without satisfactory explanation. The recovery of the weapon under Section 27 of the Indian Evidence Act was not corroborated by an independent panch witness. The trial court failed to consider the accused's defence of grave and sudden provocation arising from the land dispute. The Sessions Court convicted the accused and sentenced him to life imprisonment under Section 302 IPC.  The\u2026\u201d\n\n1 more passage are listed under the sources."
+ },
+ {
+  "v": 1,
+  "seq": 7,
+  "t": 30,
+  "event": "meta",
+  "conversation_title": null,
+  "suggestions": [
+   {
+    "label": "Map the arguments",
+    "prompt": "Map the arguments",
+    "forced_tool": {
+     "name": "build_argument_map",
+     "args": {}
+    }
+   },
+   {
+    "label": "Estimate the outcome",
+    "prompt": "Estimate the outcome",
+    "forced_tool": {
+     "name": "assess_outcome",
+     "args": {}
+    }
+   }
+  ],
+  "case_inputs": null
+ },
+ {
+  "v": 1,
+  "seq": 8,
+  "t": 30,
+  "event": "done",
+  "status": "complete",
+  "message_id": "m_b856643963",
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "llm_calls": 0
+  },
+  "timings": {
+   "ttft_ms": 30,
+   "first_card_ms": 30,
+   "total_ms": 30
+  },
+  "warnings": []
+ }
+]

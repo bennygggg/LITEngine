@@ -4,6 +4,40 @@
  */
 
 export interface paths {
+    "/api/v1/agent/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Chat */
+        post: operations["chat_api_v1_agent_chat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Stop Run */
+        delete: operations["stop_run_api_v1_agent_runs__run_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/agent/schema": {
         parameters: {
             query?: never;
@@ -22,6 +56,44 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status */
+        get: operations["status_api_v1_agent_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cases/{sha}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Put Case
+         * @description Register a case's text in the server's short-lived cache; returns what was detected. Nothing is written to disk.
+         */
+        put: operations["put_case_api_v1_cases__sha__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        /** Head Case */
+        head: operations["head_case_api_v1_cases__sha__head"];
         patch?: never;
         trace?: never;
     };
@@ -257,7 +329,7 @@ export interface paths {
         };
         /**
          * Health Ready
-         * @description Readiness probe — returns readiness of all subsystems.
+         * @description Readiness probe — real state of each subsystem (the old version always said ready).
          */
         get: operations["health_ready_api_v1_health_ready_get"];
         put?: never;
@@ -421,6 +493,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/simulation/scenario": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Scenario
+         * @description Re-score a case under hypothetical changes with the trained model.
+         *
+         *     Each scenario perturbs a real model input (appeal type, supporting facts, statutes, precedent support, court level)
+         *     and is scored by the same code path as the base estimate. Most levers move the estimate by only a point or two —
+         *     the response says so via `effect_class` and `warnings`.
+         */
+        post: operations["scenario_api_v1_simulation_scenario_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -446,8 +542,8 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /** AgentChatRequest */
-        AgentChatRequest: {
-            case?: components["schemas"]["CaseRef"] | null;
+        "AgentChatRequest-Input": {
+            case?: components["schemas"]["CaseRef-Input"] | null;
             client: components["schemas"]["ClientInfo"];
             /** Conversation Id */
             conversation_id: string;
@@ -461,7 +557,25 @@ export interface components {
              * @description Client-generated id; re-POSTing the same run_id with Last-Event-ID resumes
              */
             run_id: string;
-            user_message: components["schemas"]["UserMessage"];
+            user_message: components["schemas"]["UserMessage-Input"];
+        };
+        /** AgentChatRequest */
+        "AgentChatRequest-Output": {
+            case?: components["schemas"]["CaseRef-Output"] | null;
+            client: components["schemas"]["ClientInfo"];
+            /** Conversation Id */
+            conversation_id: string;
+            /** Messages */
+            messages?: components["schemas"]["ChatTurn"][];
+            options?: components["schemas"]["AgentOptions"];
+            /** Retry Of */
+            retry_of?: string | null;
+            /**
+             * Run Id
+             * @description Client-generated id; re-POSTing the same run_id with Last-Event-ID resumes
+             */
+            run_id: string;
+            user_message: components["schemas"]["UserMessage-Output"];
         };
         /** AgentOptions */
         AgentOptions: {
@@ -489,7 +603,7 @@ export interface components {
             case_preview: components["schemas"]["CasePreview"];
             /** Event */
             event: components["schemas"]["MessageStartEvent"] | components["schemas"]["TextDeltaEvent"] | components["schemas"]["StepEvent"] | components["schemas"]["CardEvent"] | components["schemas"]["NeedsInputEvent"] | components["schemas"]["ArtifactUpdateEvent"] | components["schemas"]["MetaEvent"] | components["schemas"]["PingEvent"] | components["schemas"]["ErrorEvent"] | components["schemas"]["DoneEvent"];
-            request: components["schemas"]["AgentChatRequest"];
+            request: components["schemas"]["AgentChatRequest-Output"];
             /**
              * Schema Version
              * @default 1
@@ -675,8 +789,33 @@ export interface components {
              */
             type: "case_profile";
         };
+        /** CasePutRequest */
+        CasePutRequest: {
+            /** Filename */
+            filename?: string | null;
+            /** Text */
+            text: string;
+            /** Title */
+            title?: string | null;
+        };
         /** CaseRef */
-        CaseRef: {
+        "CaseRef-Input": {
+            inputs?: components["schemas"]["CaseInputs"];
+            /** @description Set only if the user edited the profile */
+            profile_override?: components["schemas"]["StructuredCaseProfile"] | null;
+            /**
+             * Ref
+             * @description sha256 of the case text (already PUT to /cases/{sha256})
+             */
+            ref: string;
+            /**
+             * Title
+             * @default
+             */
+            title: string;
+        };
+        /** CaseRef */
+        "CaseRef-Output": {
             inputs?: components["schemas"]["CaseInputs"];
             /** @description Set only if the user edited the profile */
             profile_override?: components["schemas"]["StructuredCaseProfile"] | null;
@@ -706,9 +845,10 @@ export interface components {
             content: string;
             /**
              * Role
-             * @description 'user' or 'assistant'
+             * @description 'user' or 'assistant' — a client cannot inject 'system' turns
+             * @enum {string}
              */
-            role: string;
+            role: "user" | "assistant";
         };
         /** ChatRequest */
         ChatRequest: {
@@ -1514,6 +1654,8 @@ export interface components {
         };
         /** MetaEvent */
         MetaEvent: {
+            /** @description Effective appellant_type/filing_date after this run (from the form or an explicit user statement); the client persists them on the case */
+            case_inputs?: components["schemas"]["CaseInputs"] | null;
             /** Conversation Title */
             conversation_title?: string | null;
             /**
@@ -2064,6 +2206,35 @@ export interface components {
              */
             type: "scenario";
         };
+        /**
+         * ScenarioChanges
+         * @description Levers a user can pull. Each maps onto a real input of the outcome model (see services/scenario.py).
+         */
+        ScenarioChanges: {
+            /** Add Sections */
+            add_sections?: string[];
+            /** Appellant Type */
+            appellant_type?: ("accused_appeal" | "state_appeal" | "unclear") | null;
+            /** Court Level */
+            court_level?: ("Supreme Court" | "High Court" | "District Court") | null;
+            /**
+             * Exclude Precedent Refs
+             * @description P1..Pn: drop these precedents from the support set
+             */
+            exclude_precedent_refs?: string[];
+            /**
+             * Extra Supporting Facts
+             * @default 0
+             */
+            extra_supporting_facts: number;
+            /** Remove Sections */
+            remove_sections?: string[];
+            /**
+             * Resolved Weak Claim Ids
+             * @description Node ids to treat as now supported; only meaningful if the map has weak claims
+             */
+            resolved_weak_claim_ids?: string[];
+        };
         /** ScenarioOutcome */
         ScenarioOutcome: {
             /** Applied */
@@ -2087,6 +2258,50 @@ export interface components {
             p_succeeds: number;
             /** Warnings */
             warnings?: string[];
+        };
+        /** ScenarioRequest */
+        ScenarioRequest: {
+            /**
+             * Appellant Type
+             * @default unclear
+             * @enum {string}
+             */
+            appellant_type: "accused_appeal" | "state_appeal" | "unclear";
+            case_profile: components["schemas"]["StructuredCaseProfile"];
+            /** Graph Stats */
+            graph_stats?: Record<string, never> | null;
+            /**
+             * Include Sensitivity
+             * @default true
+             */
+            include_sensitivity: boolean;
+            /**
+             * Precedents
+             * @description SearchResult-shaped; P1..Pn refer to this order
+             */
+            precedents?: Record<string, never>[];
+            /** Scenarios */
+            scenarios: components["schemas"]["ScenarioSpec"][];
+        };
+        /** ScenarioResponse */
+        ScenarioResponse: {
+            base: components["schemas"]["ScenarioBase"];
+            model: components["schemas"]["ModelFacts"];
+            /** Scenarios */
+            scenarios: components["schemas"]["ScenarioOutcome"][];
+            /** Sensitivity */
+            sensitivity?: components["schemas"]["SensitivityRow"][];
+        };
+        /** ScenarioSpec */
+        ScenarioSpec: {
+            changes: components["schemas"]["ScenarioChanges"];
+            /**
+             * Id
+             * @default
+             */
+            id: string;
+            /** Label */
+            label: string;
         };
         /**
          * ScoreComponent
@@ -2330,6 +2545,12 @@ export interface components {
              */
             phase: "start" | "progress" | "end";
             /**
+             * Produces Card
+             * @description On `start`: a card event for this step will follow — lets the UI show a skeleton in the card's final shape
+             * @default false
+             */
+            produces_card: boolean;
+            /**
              * Seq
              * @description Strictly increasing within a run; used for Last-Event-ID resume
              */
@@ -2529,7 +2750,18 @@ export interface components {
             output_tokens: number;
         };
         /** UserMessage */
-        UserMessage: {
+        "UserMessage-Input": {
+            /** @description Set when the user picked a tool from the + menu or a slash command */
+            forced_tool?: components["schemas"]["ForcedTool"] | null;
+            input_response?: components["schemas"]["InputResponse"] | null;
+            /**
+             * Text
+             * @default
+             */
+            text: string;
+        };
+        /** UserMessage */
+        "UserMessage-Output": {
             /** @description Set when the user picked a tool from the + menu or a slash command */
             forced_tool?: components["schemas"]["ForcedTool"] | null;
             input_response?: components["schemas"]["InputResponse"] | null;
@@ -2557,6 +2789,72 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    chat_api_v1_agent_chat_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "last-event-id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentChatRequest-Input"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stop_run_api_v1_agent_runs__run_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     schema_carrier_api_v1_agent_schema_get: {
         parameters: {
             query?: never;
@@ -2573,6 +2871,92 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AgentSchemaBundle"];
+                };
+            };
+        };
+    };
+    status_api_v1_agent_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    put_case_api_v1_cases__sha__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sha: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CasePutRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CasePreview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    head_case_api_v1_cases__sha__head: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sha: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -3043,6 +3427,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SimulationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    scenario_api_v1_simulation_scenario_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScenarioRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScenarioResponse"];
                 };
             };
             /** @description Validation Error */

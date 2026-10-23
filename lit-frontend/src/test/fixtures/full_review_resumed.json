@@ -1,0 +1,1359 @@
+[
+ {
+  "v": 1,
+  "seq": 1,
+  "t": 0,
+  "event": "message_start",
+  "run_id": "r_f4638fa0",
+  "message_id": "m_0eb948a97f",
+  "conversation_id": "fx1",
+  "mode": "forced",
+  "model": null,
+  "prompt_version": null,
+  "schema_version": 1,
+  "server_version": "0.2.0",
+  "case_known": true
+ },
+ {
+  "v": 1,
+  "seq": 2,
+  "t": 0,
+  "event": "step",
+  "step_id": "s_0d056d87fa",
+  "phase": "start",
+  "tool": "extract_case_facts",
+  "label": "Reading the case",
+  "origin": "forced",
+  "depends_on": [],
+  "args_preview": {
+   "case": ""
+  },
+  "produces_card": false,
+  "message": null,
+  "pct": null,
+  "status": null,
+  "duration_ms": null,
+  "summary": null
+ },
+ {
+  "v": 1,
+  "seq": 3,
+  "t": 0,
+  "event": "step",
+  "step_id": "s_0d056d87fa",
+  "phase": "end",
+  "tool": "extract_case_facts",
+  "label": "Reading the case",
+  "origin": "forced",
+  "depends_on": [],
+  "args_preview": {},
+  "produces_card": false,
+  "message": null,
+  "pct": null,
+  "status": "cached",
+  "duration_ms": 0,
+  "summary": "3 issues, 6 sections"
+ },
+ {
+  "v": 1,
+  "seq": 4,
+  "t": 0,
+  "event": "artifact_update",
+  "kind": "profile",
+  "key": "709296643bf215cc",
+  "card_id": null,
+  "implicit": true
+ },
+ {
+  "v": 1,
+  "seq": 5,
+  "t": 0,
+  "event": "step",
+  "step_id": "s_fbab67bd19",
+  "phase": "start",
+  "tool": "search_precedents",
+  "label": "Searching the precedent library",
+  "origin": "dependency",
+  "depends_on": [],
+  "args_preview": {
+   "query": "Whether the conviction under Section 302 IPC can be sustained solely on the testimony of interested eyewitnesses, in the",
+   "before": "2021-04-12"
+  },
+  "produces_card": true,
+  "message": null,
+  "pct": null,
+  "status": null,
+  "duration_ms": null,
+  "summary": null
+ },
+ {
+  "v": 1,
+  "seq": 6,
+  "t": 1068,
+  "event": "step",
+  "step_id": "s_fbab67bd19",
+  "phase": "end",
+  "tool": "search_precedents",
+  "label": "Searching the precedent library",
+  "origin": "dependency",
+  "depends_on": [],
+  "args_preview": {},
+  "produces_card": false,
+  "message": null,
+  "pct": null,
+  "status": "ok",
+  "duration_ms": 1067,
+  "summary": "5 judgments"
+ },
+ {
+  "v": 1,
+  "seq": 7,
+  "t": 1068,
+  "event": "card",
+  "card_id": "card_0ecc65748f",
+  "part_id": "p1",
+  "step_id": "s_fbab67bd19",
+  "schema_ver": 1,
+  "supersedes": null,
+  "payload": {
+   "card_id": "card_0ecc65748f",
+   "schema_ver": 1,
+   "title": "Closest matches in the library",
+   "subtitle": "Decided before 12 Apr 2021",
+   "artifact_key": null,
+   "provenance": {
+    "engine": "faiss-minilm",
+    "engine_version": "1",
+    "index_version": "v1",
+    "computed_ms": 1067,
+    "inputs": {},
+    "cached": false
+   },
+   "disclaimer": {
+    "level": "info",
+    "text": "Closest matches among 505 indexed judgments \u2014 not an exhaustive search and not a statement that any of them supports the case."
+   },
+   "type": "precedents",
+   "query": "Whether the conviction under Section 302 IPC can be sustained solely on the testimony of interested eyewitnesses, in the absence of independent corroboration? Whether the delay of eleven hours in lodging the FIR is fatal to the prosecution's case? Whether the facts as proved make out an offence under Section 304 Part I IPC rather than Section 302 IPC?",
+   "query_source": "issues",
+   "filter": {
+    "before_date": "2021-04-12",
+    "undated_excluded": 0
+   },
+   "index": {
+    "name": "LIT precedent library",
+    "version": "v1",
+    "docs": 505,
+    "chunks": 13591
+   },
+   "results": [
+    {
+     "ref": "P1",
+     "doc_id": "54915645",
+     "title": "Dalpatsinh vs State",
+     "court": "Gujarat High Court",
+     "court_tier": "HC",
+     "date": "2008-01-31",
+     "url": "https://indiankanoon.org/doc/54915645/",
+     "snippet": "as well as report from the Assistant Professor, Pathology and as sufficient incriminating evidence was found against the nine accused persons, charge-sheet came to be filed against nine accused persons for commission of the offences alleged against them in the complaint in the Court of learned\u2026",
+     "cosine": 0.634,
+     "band": "unranked",
+     "matched_statutes": [
+      "Section 302",
+      "Section 302 IPC"
+     ],
+     "source": "faiss"
+    },
+    {
+     "ref": "P2",
+     "doc_id": "169827402",
+     "title": "Sk. Aziz vs The State",
+     "court": "Calcutta High Court (Appellete Side)",
+     "court_tier": "HC",
+     "date": "2010-12-24",
+     "url": "https://indiankanoon.org/doc/169827402/",
+     "snippet": "no doubt that the framing of a charge properly is vital to a criminal trial. We have very carefully taken into consideration the ruling of the Hon'ble Apex Court reported in AIR 1956 SC 116 ( W. Slaney vs. State of M. P .) and relied upon by Mr. Mukherjee. It is clearly held therein that even the\u2026",
+     "cosine": 0.62,
+     "band": "unranked",
+     "matched_statutes": [
+      "Section 302",
+      "Section 302 IPC"
+     ],
+     "source": "faiss"
+    },
+    {
+     "ref": "P3",
+     "doc_id": "239513",
+     "title": "Dukhmochan Pandey & Ors., Shamsul Mian & ... vs State Of Bihar",
+     "court": "Supreme Court of India",
+     "court_tier": "SC",
+     "date": "1997-09-25",
+     "url": "https://indiankanoon.org/doc/239513/",
+     "snippet": "not conducting the investigation fairly on account of which the investigation was transferred from him to some other man under the orders of the supervising authority and under such circumstances the alleged delay in recording the statement of the witnesses under Section 161 Cr.P.C will not vitiate\u2026",
+     "cosine": 0.59,
+     "band": "unranked",
+     "matched_statutes": [
+      "Section 302",
+      "Section 302 IPC"
+     ],
+     "source": "faiss"
+    },
+    {
+     "ref": "P4",
+     "doc_id": "58651757",
+     "title": "State vs . Kiran & Ors. Cnr ...",
+     "court": "Delhi District Court",
+     "court_tier": "other",
+     "date": "2018-11-02",
+     "url": "https://indiankanoon.org/doc/58651757/",
+     "snippet": "section 302 IPC and held the investigator did not take all the necessary precautions which could be taken to eliminate the possibility of fabrication of this evidence or to dispel suspicion as to its genuineness. Admittedly, he sealed the box with his own seal which thereafter remained with him\u2026",
+     "cosine": 0.583,
+     "band": "unranked",
+     "matched_statutes": [
+      "Section 302",
+      "Section 302 IPC"
+     ],
+     "source": "faiss"
+    },
+    {
+     "ref": "P5",
+     "doc_id": "184424855",
+     "title": "Sharanabasava @ Sharanu S/O Siddappa ... vs The State Of Karnataka",
+     "court": "Karnataka High Court",
+     "court_tier": "HC",
+     "date": "2020-08-12",
+     "url": "https://indiankanoon.org/doc/184424855/",
+     "snippet": "342 , 302 , 201 read with 34 of IPC . The accused persons did not plead guilty. As such, trial was held against them. In order to bring home the guilt of the accused persons, the prosecution proceeded to examine as many as 20 witnesses as P.W.1 to P.W.20. Further, on behalf of the prosecution,\u2026",
+     "cosine": 0.581,
+     "band": "unranked",
+     "matched_statutes": [],
+     "source": "faiss"
+    }
+   ],
+   "used_for_graph": [
+    "P1",
+    "P2",
+    "P3"
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "seq": 8,
+  "t": 1068,
+  "event": "artifact_update",
+  "kind": "precedents",
+  "key": "125bd249b8e076c6",
+  "card_id": "card_0ecc65748f",
+  "implicit": false
+ },
+ {
+  "v": 1,
+  "seq": 9,
+  "t": 1068,
+  "event": "step",
+  "step_id": "s_d971d1baa4",
+  "phase": "start",
+  "tool": "build_argument_map",
+  "label": "Mapping the arguments",
+  "origin": "dependency",
+  "depends_on": [],
+  "args_preview": {},
+  "produces_card": true,
+  "message": null,
+  "pct": null,
+  "status": null,
+  "duration_ms": null,
+  "summary": null
+ },
+ {
+  "v": 1,
+  "seq": 10,
+  "t": 1069,
+  "event": "step",
+  "step_id": "s_d971d1baa4",
+  "phase": "end",
+  "tool": "build_argument_map",
+  "label": "Mapping the arguments",
+  "origin": "dependency",
+  "depends_on": [],
+  "args_preview": {},
+  "produces_card": false,
+  "message": null,
+  "pct": null,
+  "status": "ok",
+  "duration_ms": 0,
+  "summary": "25 elements, 67 links"
+ },
+ {
+  "v": 1,
+  "seq": 11,
+  "t": 1069,
+  "event": "card",
+  "card_id": "card_d0696fa62b",
+  "part_id": "p2",
+  "step_id": "s_d971d1baa4",
+  "schema_ver": 1,
+  "supersedes": null,
+  "payload": {
+   "card_id": "card_d0696fa62b",
+   "schema_ver": 1,
+   "title": "Argument map",
+   "subtitle": "25 elements \u00b7 67 links \u00b7 0 claims lacking evidence",
+   "artifact_key": null,
+   "provenance": {
+    "engine": "graph-rules",
+    "engine_version": "1",
+    "index_version": null,
+    "computed_ms": 0,
+    "inputs": {},
+    "cached": false
+   },
+   "disclaimer": {
+    "level": "info",
+    "text": "Generated structure \u2014 review against the source text. A weak flag means no evidence link was found, not that the claim lacks merit."
+   },
+   "type": "argument_map",
+   "graph": {
+    "nodes": [
+     {
+      "id": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "Whether the conviction under Section 302 IPC can be sustained solely on the test\u2026",
+      "type": "ISSUE",
+      "color": "#1E3A5F",
+      "shape": "round-rectangle",
+      "weight": 0.7,
+      "description": "Whether the conviction under Section 302 IPC can be sustained solely on the testimony of interested eyewitnesses, in the absence of independent corroboration?",
+      "weak": false
+     },
+     {
+      "id": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "Whether the delay of eleven hours in lodging the FIR is fatal to the prosecution\u2026",
+      "type": "ISSUE",
+      "color": "#1E3A5F",
+      "shape": "round-rectangle",
+      "weight": 0.7,
+      "description": "Whether the delay of eleven hours in lodging the FIR is fatal to the prosecution's case?",
+      "weak": false
+     },
+     {
+      "id": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "Whether the facts as proved make out an offence under Section 304 Part I IPC rat\u2026",
+      "type": "ISSUE",
+      "color": "#1E3A5F",
+      "shape": "round-rectangle",
+      "weight": 0.7,
+      "description": "Whether the facts as proved make out an offence under Section 304 Part I IPC rather than Section 302 IPC?",
+      "weak": false
+     },
+     {
+      "id": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "Ramesh Kumar \u2014 criminal claim",
+      "type": "CLAIM",
+      "color": "#1B2A4A",
+      "shape": "rectangle",
+      "weight": 0.8,
+      "description": "Claim asserted by the petitioner: Ramesh Kumar | Relief: this Hon'ble Court set aside the conviction under Section 302 IPC and instead convict him under Section 304 Part I IPC, ",
+      "weak": false
+     },
+     {
+      "id": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "State of Maharashtra \u2014 defense",
+      "type": "CLAIM",
+      "color": "#1B2A4A",
+      "shape": "rectangle",
+      "weight": 0.8,
+      "description": "Defense asserted by the respondent: State of Maharashtra",
+      "weak": false
+     },
+     {
+      "id": "statute:section_27",
+      "label": "Section 27",
+      "type": "STATUTE",
+      "color": "#065F46",
+      "shape": "diamond",
+      "weight": 0.85,
+      "description": "Statutory provision: Section 27",
+      "weak": false
+     },
+     {
+      "id": "statute:section_302",
+      "label": "Section 302",
+      "type": "STATUTE",
+      "color": "#065F46",
+      "shape": "diamond",
+      "weight": 0.85,
+      "description": "Statutory provision: Section 302",
+      "weak": false
+     },
+     {
+      "id": "statute:section_302_ipc",
+      "label": "Section 302 IPC",
+      "type": "STATUTE",
+      "color": "#065F46",
+      "shape": "diamond",
+      "weight": 0.85,
+      "description": "Statutory provision: Section 302 IPC",
+      "weak": false
+     },
+     {
+      "id": "statute:section_304",
+      "label": "Section 304",
+      "type": "STATUTE",
+      "color": "#065F46",
+      "shape": "diamond",
+      "weight": 0.85,
+      "description": "Statutory provision: Section 304",
+      "weak": false
+     },
+     {
+      "id": "statute:section_34",
+      "label": "Section 34",
+      "type": "STATUTE",
+      "color": "#065F46",
+      "shape": "diamond",
+      "weight": 0.85,
+      "description": "Statutory provision: Section 34",
+      "weak": false
+     },
+     {
+      "id": "statute:section_374",
+      "label": "Section 374",
+      "type": "STATUTE",
+      "color": "#065F46",
+      "shape": "diamond",
+      "weight": 0.85,
+      "description": "Statutory provision: Section 374",
+      "weak": false
+     },
+     {
+      "id": "act:code_of_criminal_procedure",
+      "label": "Code of Criminal Procedure",
+      "type": "STATUTE",
+      "color": "#065F46",
+      "shape": "diamond",
+      "weight": 0.6,
+      "description": "Act referenced: Code of Criminal Procedure",
+      "weak": false
+     },
+     {
+      "id": "act:indian_evidence_act",
+      "label": "Indian Evidence Act",
+      "type": "STATUTE",
+      "color": "#065F46",
+      "shape": "diamond",
+      "weight": 0.6,
+      "description": "Act referenced: Indian Evidence Act",
+      "weak": false
+     },
+     {
+      "id": "act:indian_penal_code",
+      "label": "Indian Penal Code",
+      "type": "STATUTE",
+      "color": "#065F46",
+      "shape": "diamond",
+      "weight": 0.6,
+      "description": "Act referenced: Indian Penal Code",
+      "weak": false
+     },
+     {
+      "id": "evidence:fact_0",
+      "label": "The appellant was convicted by the Sessions Court, Nagpur under Section 302 read\u2026",
+      "type": "EVIDENCE",
+      "color": "#374151",
+      "shape": "ellipse",
+      "weight": 0.6,
+      "description": "The appellant was convicted by the Sessions Court, Nagpur under Section 302 read with Section 34 of the Indian Penal Code for the murder of the deceased, Suresh Patil, on 14 March 2019, following a dispute over a land boundary between the two families.",
+      "weak": false
+     },
+     {
+      "id": "evidence:fact_1",
+      "label": "The prosecution's case rested primarily on the testimony of two eyewitnesses, PW\u2026",
+      "type": "EVIDENCE",
+      "color": "#374151",
+      "shape": "ellipse",
+      "weight": 0.6,
+      "description": "The prosecution's case rested primarily on the testimony of two eyewitnesses, PW-1 and PW-2, who claimed to have seen the appellant assault the deceased with a wooden log.",
+      "weak": false
+     },
+     {
+      "id": "evidence:fact_2",
+      "label": "The post-mortem report confirmed death due to blunt force trauma to the skull, c\u2026",
+      "type": "EVIDENCE",
+      "color": "#374151",
+      "shape": "ellipse",
+      "weight": 0.6,
+      "description": "The post-mortem report confirmed death due to blunt force trauma to the skull, consistent with the alleged weapon.",
+      "weak": false
+     },
+     {
+      "id": "evidence:fact_3",
+      "label": "The FIR was lodged with a delay of eleven hours without satisfactory explanation\u2026",
+      "type": "EVIDENCE",
+      "color": "#374151",
+      "shape": "ellipse",
+      "weight": 0.6,
+      "description": "The FIR was lodged with a delay of eleven hours without satisfactory explanation.",
+      "weak": false
+     },
+     {
+      "id": "evidence:fact_4",
+      "label": "The recovery of the weapon under Section 27 of the Indian Evidence Act was not c\u2026",
+      "type": "EVIDENCE",
+      "color": "#374151",
+      "shape": "ellipse",
+      "weight": 0.6,
+      "description": "The recovery of the weapon under Section 27 of the Indian Evidence Act was not corroborated by an independent panch witness.",
+      "weak": false
+     },
+     {
+      "id": "evidence:fact_5",
+      "label": "The trial court failed to consider the accused's defence of grave and sudden pro\u2026",
+      "type": "EVIDENCE",
+      "color": "#374151",
+      "shape": "ellipse",
+      "weight": 0.6,
+      "description": "The trial court failed to consider the accused's defence of grave and sudden provocation arising from the land dispute.",
+      "weak": false
+     },
+     {
+      "id": "evidence:fact_6",
+      "label": "The Sessions Court convicted the accused and sentenced him to life imprisonment \u2026",
+      "type": "EVIDENCE",
+      "color": "#374151",
+      "shape": "ellipse",
+      "weight": 0.6,
+      "description": "The Sessions Court convicted the accused and sentenced him to life imprisonment under Section 302 IPC.",
+      "weak": false
+     },
+     {
+      "id": "evidence:fact_7",
+      "label": "Whether the delay of eleven hours in lodging the FIR is fatal to the prosecution\u2026",
+      "type": "EVIDENCE",
+      "color": "#374151",
+      "shape": "ellipse",
+      "weight": 0.6,
+      "description": "Whether the delay of eleven hours in lodging the FIR is fatal to the prosecution's case?",
+      "weak": false
+     },
+     {
+      "id": "precedent:54915645",
+      "label": "Dalpatsinh vs State",
+      "type": "PRECEDENT",
+      "color": "#92400E",
+      "shape": "hexagon",
+      "weight": 0.57719,
+      "description": "Dalpatsinh vs State | Gujarat High Court | 2008-01-31",
+      "weak": false
+     },
+     {
+      "id": "precedent:169827402",
+      "label": "Sk. Aziz vs The State",
+      "type": "PRECEDENT",
+      "color": "#92400E",
+      "shape": "hexagon",
+      "weight": 0.568462,
+      "description": "Sk. Aziz vs The State | Calcutta High Court (Appellete Side) | 2010-12-24",
+      "weak": false
+     },
+     {
+      "id": "precedent:239513",
+      "label": "Dukhmochan Pandey & Ors., Shamsul Mian & ... vs State Of Bihar",
+      "type": "PRECEDENT",
+      "color": "#92400E",
+      "shape": "hexagon",
+      "weight": 0.549455,
+      "description": "Dukhmochan Pandey & Ors., Shamsul Mian & ... vs State Of Bihar | Supreme Court of India | 1997-09-25",
+      "weak": false
+     }
+    ],
+    "edges": [
+     {
+      "id": "edge_claim:ramesh_kumar_\u2014_criminal_claim_raises_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "raises",
+      "type": "raises",
+      "strength": 0.7
+     },
+     {
+      "id": "edge_claim:ramesh_kumar_\u2014_criminal_claim_raises_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "raises",
+      "type": "raises",
+      "strength": 0.7
+     },
+     {
+      "id": "edge_claim:ramesh_kumar_\u2014_criminal_claim_raises_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "raises",
+      "type": "raises",
+      "strength": 0.7
+     },
+     {
+      "id": "edge_claim:state_of_maharashtra_\u2014_defense_raises_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "claim:state_of_maharashtra_\u2014_defense",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "raises",
+      "type": "raises",
+      "strength": 0.7
+     },
+     {
+      "id": "edge_claim:state_of_maharashtra_\u2014_defense_raises_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "claim:state_of_maharashtra_\u2014_defense",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "raises",
+      "type": "raises",
+      "strength": 0.7
+     },
+     {
+      "id": "edge_claim:state_of_maharashtra_\u2014_defense_raises_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "claim:state_of_maharashtra_\u2014_defense",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "raises",
+      "type": "raises",
+      "strength": 0.7
+     },
+     {
+      "id": "edge_statute:section_27_raises_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "statute:section_27",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_27_raises_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "statute:section_27",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "referenced",
+      "type": "raises",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_statute:section_27_raises_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "statute:section_27",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_27_to_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "statute:section_27",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_27_to_claim:state_of_maharashtra_\u2014_defense",
+      "source": "statute:section_27",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_302_raises_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "statute:section_302",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_302_raises_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "statute:section_302",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "referenced",
+      "type": "raises",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_statute:section_302_raises_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "statute:section_302",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_302_to_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "statute:section_302",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_302_to_claim:state_of_maharashtra_\u2014_defense",
+      "source": "statute:section_302",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_302_ipc_raises_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "statute:section_302_ipc",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_302_ipc_raises_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "statute:section_302_ipc",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "referenced",
+      "type": "raises",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_statute:section_302_ipc_raises_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "statute:section_302_ipc",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_302_ipc_to_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "statute:section_302_ipc",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_302_ipc_to_claim:state_of_maharashtra_\u2014_defense",
+      "source": "statute:section_302_ipc",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_304_raises_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "statute:section_304",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_304_raises_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "statute:section_304",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "referenced",
+      "type": "raises",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_statute:section_304_raises_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "statute:section_304",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_304_to_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "statute:section_304",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_304_to_claim:state_of_maharashtra_\u2014_defense",
+      "source": "statute:section_304",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_34_raises_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "statute:section_34",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_34_raises_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "statute:section_34",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "referenced",
+      "type": "raises",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_statute:section_34_raises_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "statute:section_34",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_34_to_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "statute:section_34",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_34_to_claim:state_of_maharashtra_\u2014_defense",
+      "source": "statute:section_34",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_374_raises_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "statute:section_374",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_374_raises_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "statute:section_374",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "referenced",
+      "type": "raises",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_statute:section_374_raises_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "statute:section_374",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "relates to",
+      "type": "raises",
+      "strength": 0.8
+     },
+     {
+      "id": "edge_statute:section_374_to_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "statute:section_374",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_statute:section_374_to_claim:state_of_maharashtra_\u2014_defense",
+      "source": "statute:section_374",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.6
+     },
+     {
+      "id": "edge_act:code_of_criminal_procedure_to_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "act:code_of_criminal_procedure",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "cited by",
+      "type": "supports",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_act:code_of_criminal_procedure_to_claim:state_of_maharashtra_\u2014_defense",
+      "source": "act:code_of_criminal_procedure",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "cited by",
+      "type": "supports",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_act:indian_evidence_act_to_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "act:indian_evidence_act",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "cited by",
+      "type": "supports",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_act:indian_evidence_act_to_claim:state_of_maharashtra_\u2014_defense",
+      "source": "act:indian_evidence_act",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "cited by",
+      "type": "supports",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_act:indian_penal_code_to_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "act:indian_penal_code",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "cited by",
+      "type": "supports",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_act:indian_penal_code_to_claim:state_of_maharashtra_\u2014_defense",
+      "source": "act:indian_penal_code",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "cited by",
+      "type": "supports",
+      "strength": 0.4
+     },
+     {
+      "id": "edge_evidence:fact_0_supports_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "evidence:fact_0",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.65
+     },
+     {
+      "id": "edge_evidence:fact_0_supports_claim:state_of_maharashtra_\u2014_defense",
+      "source": "evidence:fact_0",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "context for",
+      "type": "supports",
+      "strength": 0.3
+     },
+     {
+      "id": "edge_evidence:fact_1_supports_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "evidence:fact_1",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.65
+     },
+     {
+      "id": "edge_evidence:fact_1_supports_claim:state_of_maharashtra_\u2014_defense",
+      "source": "evidence:fact_1",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "context for",
+      "type": "supports",
+      "strength": 0.3
+     },
+     {
+      "id": "edge_evidence:fact_2_supports_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "evidence:fact_2",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.65
+     },
+     {
+      "id": "edge_evidence:fact_2_supports_claim:state_of_maharashtra_\u2014_defense",
+      "source": "evidence:fact_2",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "context for",
+      "type": "supports",
+      "strength": 0.3
+     },
+     {
+      "id": "edge_evidence:fact_3_supports_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "evidence:fact_3",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.65
+     },
+     {
+      "id": "edge_evidence:fact_3_supports_claim:state_of_maharashtra_\u2014_defense",
+      "source": "evidence:fact_3",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "context for",
+      "type": "supports",
+      "strength": 0.3
+     },
+     {
+      "id": "edge_evidence:fact_4_supports_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "evidence:fact_4",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.65
+     },
+     {
+      "id": "edge_evidence:fact_4_supports_claim:state_of_maharashtra_\u2014_defense",
+      "source": "evidence:fact_4",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "context for",
+      "type": "supports",
+      "strength": 0.3
+     },
+     {
+      "id": "edge_evidence:fact_5_supports_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "evidence:fact_5",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.65
+     },
+     {
+      "id": "edge_evidence:fact_5_supports_claim:state_of_maharashtra_\u2014_defense",
+      "source": "evidence:fact_5",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "context for",
+      "type": "supports",
+      "strength": 0.3
+     },
+     {
+      "id": "edge_evidence:fact_6_supports_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "evidence:fact_6",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.65
+     },
+     {
+      "id": "edge_evidence:fact_6_supports_claim:state_of_maharashtra_\u2014_defense",
+      "source": "evidence:fact_6",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "context for",
+      "type": "supports",
+      "strength": 0.3
+     },
+     {
+      "id": "edge_evidence:fact_7_supports_claim:ramesh_kumar_\u2014_criminal_claim",
+      "source": "evidence:fact_7",
+      "target": "claim:ramesh_kumar_\u2014_criminal_claim",
+      "label": "supports",
+      "type": "supports",
+      "strength": 0.65
+     },
+     {
+      "id": "edge_evidence:fact_7_supports_claim:state_of_maharashtra_\u2014_defense",
+      "source": "evidence:fact_7",
+      "target": "claim:state_of_maharashtra_\u2014_defense",
+      "label": "context for",
+      "type": "supports",
+      "strength": 0.3
+     },
+     {
+      "id": "edge_precedent:54915645_cites_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "precedent:54915645",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "cites",
+      "type": "cites",
+      "strength": 0.5
+     },
+     {
+      "id": "edge_precedent:54915645_cites_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "precedent:54915645",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "cites",
+      "type": "cites",
+      "strength": 0.5
+     },
+     {
+      "id": "edge_precedent:54915645_cites_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "precedent:54915645",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "cites",
+      "type": "cites",
+      "strength": 0.5
+     },
+     {
+      "id": "edge_precedent:169827402_cites_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "precedent:169827402",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "cites",
+      "type": "cites",
+      "strength": 0.5
+     },
+     {
+      "id": "edge_precedent:169827402_cites_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "precedent:169827402",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "cites",
+      "type": "cites",
+      "strength": 0.5
+     },
+     {
+      "id": "edge_precedent:169827402_cites_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "precedent:169827402",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "cites",
+      "type": "cites",
+      "strength": 0.5
+     },
+     {
+      "id": "edge_precedent:239513_cites_issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "source": "precedent:239513",
+      "target": "issue:whether_the_conviction_under_section_302_ipc_can_be_sustaine",
+      "label": "cites",
+      "type": "cites",
+      "strength": 0.5
+     },
+     {
+      "id": "edge_precedent:239513_cites_issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "source": "precedent:239513",
+      "target": "issue:whether_the_delay_of_eleven_hours_in_lodging_the_fir_is_fata",
+      "label": "cites",
+      "type": "cites",
+      "strength": 0.5
+     },
+     {
+      "id": "edge_precedent:239513_cites_issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "source": "precedent:239513",
+      "target": "issue:whether_the_facts_as_proved_make_out_an_offence_under_sectio",
+      "label": "cites",
+      "type": "cites",
+      "strength": 0.5
+     }
+    ],
+    "weak_nodes": [],
+    "node_count": 25,
+    "edge_count": 67
+   },
+   "summary": {
+    "issues": 3,
+    "claims": 2,
+    "evidence": 8,
+    "statutes": 9,
+    "precedents": 3,
+    "weak_claims": 0,
+    "edge_types": [
+     "cites",
+     "raises",
+     "supports"
+    ]
+   },
+   "notes": [
+    "Structure derived by rules from the case profile; links show how elements relate, not legal reasoning."
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "seq": 12,
+  "t": 1069,
+  "event": "artifact_update",
+  "kind": "graph",
+  "key": "72f277ca2c87f781",
+  "card_id": "card_d0696fa62b",
+  "implicit": false
+ },
+ {
+  "v": 1,
+  "seq": 13,
+  "t": 1069,
+  "event": "step",
+  "step_id": "s_3753eac75c",
+  "phase": "start",
+  "tool": "assess_outcome",
+  "label": "Scoring the appeal",
+  "origin": "dependency",
+  "depends_on": [],
+  "args_preview": {},
+  "produces_card": true,
+  "message": null,
+  "pct": null,
+  "status": null,
+  "duration_ms": null,
+  "summary": null
+ },
+ {
+  "v": 1,
+  "seq": 14,
+  "t": 1071,
+  "event": "step",
+  "step_id": "s_3753eac75c",
+  "phase": "end",
+  "tool": "assess_outcome",
+  "label": "Scoring the appeal",
+  "origin": "dependency",
+  "depends_on": [],
+  "args_preview": {},
+  "produces_card": false,
+  "message": null,
+  "pct": null,
+  "status": "ok",
+  "duration_ms": 1,
+  "summary": "75% (indicative)"
+ },
+ {
+  "v": 1,
+  "seq": 15,
+  "t": 1071,
+  "event": "card",
+  "card_id": "card_e40100d248",
+  "part_id": "p3",
+  "step_id": "s_3753eac75c",
+  "schema_ver": 1,
+  "supersedes": null,
+  "payload": {
+   "card_id": "card_e40100d248",
+   "schema_ver": 1,
+   "title": "Indicative outcome estimate",
+   "subtitle": "Appeal by the accused (appealing a conviction)",
+   "artifact_key": null,
+   "provenance": {
+    "engine": "logreg-binary",
+    "engine_version": "1",
+    "index_version": null,
+    "computed_ms": 1,
+    "inputs": {
+     "appellant_type": "accused_appeal"
+    },
+    "cached": false
+   },
+   "disclaimer": {
+    "level": "caution",
+    "text": "Indicative research estimate \u2014 a typical case in the training data sits near 50%. Trained on 187 appellate judgments; cross-validated accuracy 72% against a 60% base rate. Not legal advice."
+   },
+   "type": "outcome",
+   "estimate": {
+    "p_succeeds": 0.7466,
+    "p_rounded": 75,
+    "tier": "favorable",
+    "tier_label": "Leans toward relief",
+    "definition": "Chance of any appellate relief, including partial relief"
+   },
+   "inputs": {
+    "appellant_type": "accused_appeal",
+    "filing_date": "2021-04-12",
+    "appellant_source": "user_input"
+   },
+   "model": {
+    "name": "Logistic regression (binary: dismissed vs succeeds)",
+    "version": "outcome_classifier_binary.joblib",
+    "loaded": true,
+    "n_train": 187,
+    "cv_accuracy": 0.7159,
+    "baseline_accuracy": 0.6043,
+    "scope": "Criminal appeals"
+   },
+   "contributions": [
+    {
+     "feature": "appellant_type",
+     "display_name": "Appeal type",
+     "value": 1.0,
+     "contribution": 1.11,
+     "explanation": "This is the accused's own appeal against conviction, which pushed toward 'succeeds'."
+    },
+    {
+     "feature": "case_complexity",
+     "display_name": "Case Complexity",
+     "value": 0.65,
+     "contribution": 0.012,
+     "explanation": "Moderate case complexity (0.65) pushed toward 'succeeds'."
+    },
+    {
+     "feature": "court_level",
+     "display_name": "Court Level",
+     "value": 0.6,
+     "contribution": -0.01,
+     "explanation": "Moderate court level (0.60) pushed toward 'dismissed'."
+    },
+    {
+     "feature": "precedent_alignment",
+     "display_name": "Precedent Alignment",
+     "value": 0.557,
+     "contribution": 0.009,
+     "explanation": "Moderate precedent alignment (0.56) pushed toward 'dismissed'."
+    },
+    {
+     "feature": "statutory_strength",
+     "display_name": "Statutory Strength",
+     "value": 0.9,
+     "contribution": 0.003,
+     "explanation": "High statutory strength (0.90) pushed toward 'succeeds'."
+    },
+    {
+     "feature": "argument_completeness",
+     "display_name": "Argument Completeness",
+     "value": 1.0,
+     "contribution": 0.0,
+     "explanation": "High argument completeness (1.00) pushed toward 'succeeds'."
+    }
+   ],
+   "drivers_summary": "This estimate mostly reflects who is appealing (the accused); the facts extracted from the case move it by only a few points.",
+   "strengths": [
+    "This is the accused's own appeal against conviction, which pushed toward 'succeeds'.",
+    "Moderate case complexity (0.65) pushed toward 'succeeds'.",
+    "High statutory strength (0.90) pushed toward 'succeeds'."
+   ],
+   "weaknesses": [
+    "Moderate court level (0.60) pushed toward 'dismissed'.",
+    "Moderate precedent alignment (0.56) pushed toward 'dismissed'."
+   ],
+   "legacy": {
+    "p": 0.7449,
+    "note": "Uncalibrated rule score; it predicted 'succeeds' for every training case"
+   },
+   "caveats": [
+    "Appeal type is the dominant input; the other inputs are counts and averages from the case profile, not legal merit.",
+    "Trained on judgments whose outcome labels were derived from text, so label noise is part of the accuracy figure."
+   ],
+   "profile_method": "rules"
+  }
+ },
+ {
+  "v": 1,
+  "seq": 16,
+  "t": 1071,
+  "event": "artifact_update",
+  "kind": "outcome",
+  "key": "08778f3adbd6d748",
+  "card_id": "card_e40100d248",
+  "implicit": false
+ },
+ {
+  "v": 1,
+  "seq": 17,
+  "t": 1071,
+  "event": "text_delta",
+  "message_id": "m_0eb948a97f",
+  "part_id": "p4",
+  "delta": "Closest matches in the library: [P1] Dalpatsinh vs State (HC, 2008); [P2] Sk. Aziz vs The State (HC, 2010); [P3] Dukhmochan Pandey & Ors., Shamsul Mian & ... vs Stat (SC, 1997). These are the nearest judgments by meaning among 505 indexed \u2014 they are not a finding that any of them supports the appeal.\n\nThe map has 25 elements and 67 links. Every claim has at least one evidence link, so the map doesn't flag a weak point \u2014 that says nothing about how strong the evidence is.\n\n**Leans toward relief** \u2014 about 75%, as an indicative research estimate. This estimate mostly reflects who is appealing (the accused); the facts extracted from the case move it by only a few points. This is a base-rate indicator learned from 187 past appeals, not advice on this case."
+ },
+ {
+  "v": 1,
+  "seq": 18,
+  "t": 1071,
+  "event": "meta",
+  "conversation_title": null,
+  "suggestions": [
+   {
+    "label": "Explore scenarios",
+    "prompt": "Compare the appeal types",
+    "forced_tool": {
+     "name": "run_scenario",
+     "args": {}
+    }
+   },
+   {
+    "label": "Ask about the document",
+    "prompt": "What does the judgment say about the key issue?",
+    "forced_tool": null
+   }
+  ],
+  "case_inputs": {
+   "appellant_type": "accused_appeal",
+   "filing_date": "2021-04-12"
+  }
+ },
+ {
+  "v": 1,
+  "seq": 19,
+  "t": 1071,
+  "event": "done",
+  "status": "complete",
+  "message_id": "m_0eb948a97f",
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "llm_calls": 0
+  },
+  "timings": {
+   "ttft_ms": 1071,
+   "first_card_ms": 1068,
+   "total_ms": 1071
+  },
+  "warnings": []
+ }
+]
