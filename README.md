@@ -100,34 +100,6 @@ data outside the Space before relying on it.
 
 ---
 
-## Deploy on Render (Free Tier)
-
-For private Oracle A1 VM staging, see [deploy/oracle/README.md](deploy/oracle/README.md).
-
-1. **Connect your repo** — On Render, create a new **Web Service** and connect the Git repository containing this `lit-backend/` directory.
-
-2. **Configure the service:**
-   - **Environment:** `Python 3`
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `uvicorn main:app --host 0.0.0.0 --port $PORT`
-   - **Health Check Path:** `/api/v1/health/ready`
-
-3. **Set environment variables** (Dashboard → Environment):
-
-   | Key | Value |
-   |---|---|
-   | `HUGGINGFACE_API_KEY` | `hf_your_real_key` |
-   | `KANOON_BASE_URL` | `https://indiankanoon.org` |
-   | `ALLOWED_ORIGINS` | `https://your-frontend.vercel.app` |
-   | `USE_FIXTURES` | `false` |
-   | `ENV` | `production` |
-
-4. **Deploy** — Click Deploy. Render will use `render.yaml` for automatic configuration.
-
-   > The `Procfile` and `runtime.txt` are provided as fallbacks if `render.yaml` is not detected.
-
----
-
 ## API Endpoints
 
 ### Health
@@ -135,7 +107,7 @@ For private Oracle A1 VM staging, see [deploy/oracle/README.md](deploy/oracle/RE
 | Method | Path | Description |
 |---|---|---|
 | GET | `/health` | Basic health check — returns app name, version, status |
-| GET | `/api/v1/health/ready` | Readiness probe for Render — returns `ready`, `index_loaded`, `hf_key_set` |
+| GET | `/api/v1/health/ready` | Readiness probe — returns `ready`, `index_loaded`, `hf_key_set` |
 
 ### Precedent Search
 
@@ -188,13 +160,10 @@ For private Oracle A1 VM staging, see [deploy/oracle/README.md](deploy/oracle/RE
 
 ---
 
-## Cold Start Warning (Render Free Tier)
+## Sleep and Wake (Hugging Face Space)
 
-Render's free tier spins down instances after **15 minutes of inactivity**. On the first request after a cold start:
-
-- The local SentenceTransformer embedding model (used as fallback when no valid HF API key is set) must be downloaded and loaded from the Hugging Face Hub.
-- This initial load may take **30–60 seconds**.
-- Subsequent requests are fast — the model stays cached in memory until the instance is spun down again.
-- If you provide a valid `HUGGINGFACE_API_KEY`, embeddings are computed via the HF Inference API and there is no local model load, but the HF API itself may return a 503 while the model is warming up on their side (handled automatically with retry logic).
-
-For production use, consider upgrading to a paid Render tier or pre-warming the instance.
+Spaces on free hardware are suspended after a period of inactivity (Hugging
+Face's docs give two days as an example) and start again on the next visit, so
+the first request after a wake waits for the container to boot. The monorepo's
+`keep-alive.yml` workflow calls `/health` every six hours to keep the Space
+awake; see the deployment section above for its caveats.
