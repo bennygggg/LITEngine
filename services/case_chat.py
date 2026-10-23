@@ -134,7 +134,7 @@ class CaseChatService:
     async def _generate(self, sources: List[Dict[str, Any]], question: str, history: List[Dict[str, str]]) -> str:
         excerpts = "\n\n".join(f"[S{s['index']}] {s['text']}" for s in sources)
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        messages.extend(history)
+        messages.extend(m for m in history if m.get("role") in ("user", "assistant"))
         messages.append({
             "role": "user",
             "content": f"Case excerpts:\n\n{excerpts}\n\nQuestion: {question}",

@@ -218,7 +218,7 @@ CRIMINAL_KEYWORDS = re.compile(
     r"bail|anticipatory\s+bail|cognizable|non[- ]bailable|"
     r"sessions\s+case|murder|rape|theft|cheating|"
     r"Section\s+302|Section\s+420|Section\s+307|"
-    r"Section\s+376|Section\s+498A|Section\s+138)",
+    r"Section\s+376|Section\s+498A|Section\s+138)\b",  # trailing \b: bare 'FIR' used to match 'First', 'firm', 'fire'
     re.IGNORECASE,
 )
 
@@ -226,7 +226,7 @@ CIVIL_KEYWORDS = re.compile(
     r"\b(civil\s+(?:appeal|suit|petition|writ|revision)|"
     r"decree|injunction|specific\s+performance|"
     r"damages|partition|eviction|tenant|landlord|"
-    r"property\s+dispute|title\s+suit)",
+    r"property\s+dispute|title\s+suit)\b",
     re.IGNORECASE,
 )
 

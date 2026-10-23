@@ -1,12 +1,12 @@
 {
   "components": {
     "schemas": {
-      "AgentChatRequest": {
+      "AgentChatRequest-Input": {
         "properties": {
           "case": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/CaseRef"
+                "$ref": "#/components/schemas/CaseRef-Input"
               },
               {
                 "type": "null"
@@ -48,7 +48,66 @@
             "type": "string"
           },
           "user_message": {
-            "$ref": "#/components/schemas/UserMessage"
+            "$ref": "#/components/schemas/UserMessage-Input"
+          }
+        },
+        "required": [
+          "client",
+          "conversation_id",
+          "run_id",
+          "user_message"
+        ],
+        "title": "AgentChatRequest",
+        "type": "object"
+      },
+      "AgentChatRequest-Output": {
+        "properties": {
+          "case": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaseRef-Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "client": {
+            "$ref": "#/components/schemas/ClientInfo"
+          },
+          "conversation_id": {
+            "title": "Conversation Id",
+            "type": "string"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ChatTurn"
+            },
+            "maxItems": 12,
+            "title": "Messages",
+            "type": "array"
+          },
+          "options": {
+            "$ref": "#/components/schemas/AgentOptions"
+          },
+          "retry_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retry Of"
+          },
+          "run_id": {
+            "description": "Client-generated id; re-POSTing the same run_id with Last-Event-ID resumes",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "user_message": {
+            "$ref": "#/components/schemas/UserMessage-Output"
           }
         },
         "required": [
@@ -188,7 +247,7 @@
             "title": "Event"
           },
           "request": {
-            "$ref": "#/components/schemas/AgentChatRequest"
+            "$ref": "#/components/schemas/AgentChatRequest-Output"
           },
           "schema_version": {
             "default": 1,
@@ -683,7 +742,82 @@
         "title": "CaseProfileCard",
         "type": "object"
       },
-      "CaseRef": {
+      "CasePutRequest": {
+        "properties": {
+          "filename": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "text": {
+            "maxLength": 2000000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "CasePutRequest",
+        "type": "object"
+      },
+      "CaseRef-Input": {
+        "properties": {
+          "inputs": {
+            "$ref": "#/components/schemas/CaseInputs"
+          },
+          "profile_override": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StructuredCaseProfile"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set only if the user edited the profile"
+          },
+          "ref": {
+            "description": "sha256 of the case text (already PUT to /cases/{sha256})",
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Ref",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "maxLength": 300,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "title": "CaseRef",
+        "type": "object"
+      },
+      "CaseRef-Output": {
         "properties": {
           "inputs": {
             "$ref": "#/components/schemas/CaseInputs"
@@ -745,11 +879,16 @@
       "ChatMessage": {
         "properties": {
           "content": {
+            "maxLength": 8000,
             "title": "Content",
             "type": "string"
           },
           "role": {
-            "description": "'user' or 'assistant'",
+            "description": "'user' or 'assistant' — a client cannot inject 'system' turns",
+            "enum": [
+              "user",
+              "assistant"
+            ],
             "title": "Role",
             "type": "string"
           }
@@ -765,6 +904,7 @@
         "properties": {
           "case_text": {
             "description": "Full text of the case being discussed",
+            "maxLength": 2000000,
             "title": "Case Text",
             "type": "string"
           },
@@ -773,10 +913,12 @@
             "items": {
               "$ref": "#/components/schemas/ChatMessage"
             },
+            "maxItems": 20,
             "title": "History",
             "type": "array"
           },
           "question": {
+            "maxLength": 2000,
             "title": "Question",
             "type": "string"
           }
@@ -2355,6 +2497,17 @@
       },
       "MetaEvent": {
         "properties": {
+          "case_inputs": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaseInputs"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Effective appellant_type/filing_date after this run (from the form or an explicit user statement); the client persists them on the case"
+          },
           "conversation_title": {
             "anyOf": [
               {
@@ -3593,6 +3746,84 @@
         "title": "ScenarioCard",
         "type": "object"
       },
+      "ScenarioChanges": {
+        "description": "Levers a user can pull. Each maps onto a real input of the outcome model (see services/scenario.py).",
+        "properties": {
+          "add_sections": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 6,
+            "title": "Add Sections",
+            "type": "array"
+          },
+          "appellant_type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "accused_appeal",
+                  "state_appeal",
+                  "unclear"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Appellant Type"
+          },
+          "court_level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "Supreme Court",
+                  "High Court",
+                  "District Court"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Court Level"
+          },
+          "exclude_precedent_refs": {
+            "description": "P1..Pn: drop these precedents from the support set",
+            "items": {
+              "type": "string"
+            },
+            "title": "Exclude Precedent Refs",
+            "type": "array"
+          },
+          "extra_supporting_facts": {
+            "default": 0,
+            "maximum": 5.0,
+            "minimum": 0.0,
+            "title": "Extra Supporting Facts",
+            "type": "integer"
+          },
+          "remove_sections": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Remove Sections",
+            "type": "array"
+          },
+          "resolved_weak_claim_ids": {
+            "description": "Node ids to treat as now supported; only meaningful if the map has weak claims",
+            "items": {
+              "type": "string"
+            },
+            "title": "Resolved Weak Claim Ids",
+            "type": "array"
+          }
+        },
+        "title": "ScenarioChanges",
+        "type": "object"
+      },
       "ScenarioOutcome": {
         "properties": {
           "applied": {
@@ -3661,6 +3892,117 @@
           "effect_class"
         ],
         "title": "ScenarioOutcome",
+        "type": "object"
+      },
+      "ScenarioRequest": {
+        "properties": {
+          "appellant_type": {
+            "default": "unclear",
+            "enum": [
+              "accused_appeal",
+              "state_appeal",
+              "unclear"
+            ],
+            "title": "Appellant Type",
+            "type": "string"
+          },
+          "case_profile": {
+            "$ref": "#/components/schemas/StructuredCaseProfile"
+          },
+          "graph_stats": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graph Stats"
+          },
+          "include_sensitivity": {
+            "default": true,
+            "title": "Include Sensitivity",
+            "type": "boolean"
+          },
+          "precedents": {
+            "description": "SearchResult-shaped; P1..Pn refer to this order",
+            "items": {
+              "type": "object"
+            },
+            "maxItems": 10,
+            "title": "Precedents",
+            "type": "array"
+          },
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioSpec"
+            },
+            "maxItems": 5,
+            "minItems": 1,
+            "title": "Scenarios",
+            "type": "array"
+          }
+        },
+        "required": [
+          "case_profile",
+          "scenarios"
+        ],
+        "title": "ScenarioRequest",
+        "type": "object"
+      },
+      "ScenarioResponse": {
+        "properties": {
+          "base": {
+            "$ref": "#/components/schemas/ScenarioBase"
+          },
+          "model": {
+            "$ref": "#/components/schemas/ModelFacts"
+          },
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioOutcome"
+            },
+            "title": "Scenarios",
+            "type": "array"
+          },
+          "sensitivity": {
+            "items": {
+              "$ref": "#/components/schemas/SensitivityRow"
+            },
+            "title": "Sensitivity",
+            "type": "array"
+          }
+        },
+        "required": [
+          "model",
+          "base",
+          "scenarios"
+        ],
+        "title": "ScenarioResponse",
+        "type": "object"
+      },
+      "ScenarioSpec": {
+        "properties": {
+          "changes": {
+            "$ref": "#/components/schemas/ScenarioChanges"
+          },
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 120,
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "changes"
+        ],
+        "title": "ScenarioSpec",
         "type": "object"
       },
       "ScoreComponent": {
@@ -4194,6 +4536,12 @@
             "title": "Phase",
             "type": "string"
           },
+          "produces_card": {
+            "default": false,
+            "description": "On `start`: a card event for this step will follow — lets the UI show a skeleton in the card's final shape",
+            "title": "Produces Card",
+            "type": "boolean"
+          },
           "seq": {
             "description": "Strictly increasing within a run; used for Last-Event-ID resume",
             "title": "Seq",
@@ -4526,7 +4874,40 @@
         "title": "Usage",
         "type": "object"
       },
-      "UserMessage": {
+      "UserMessage-Input": {
+        "properties": {
+          "forced_tool": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ForcedTool"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when the user picked a tool from the + menu or a slash command"
+          },
+          "input_response": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InputResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "text": {
+            "default": "",
+            "maxLength": 4000,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "title": "UserMessage",
+        "type": "object"
+      },
+      "UserMessage-Output": {
         "properties": {
           "forced_tool": {
             "anyOf": [
@@ -4597,10 +4978,107 @@
   "info": {
     "description": "AI-powered legal intelligence system for Indian law",
     "title": "Legal Intelligence Terminal",
-    "version": "0.1.0"
+    "version": "1.0.0"
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/agent/chat": {
+      "post": {
+        "operationId": "chat_api_v1_agent_chat_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "last-event-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Last-Event-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentChatRequest-Input"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Chat",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/api/v1/agent/runs/{run_id}": {
+      "delete": {
+        "operationId": "stop_run_api_v1_agent_runs__run_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Stop Run",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
     "/api/v1/agent/schema": {
       "get": {
         "description": "Never served: registering this response model puts every card and event variant into the OpenAPI\ncomponents, which `openapi-typescript` turns into the frontend's types.",
@@ -4620,6 +5098,116 @@
         "summary": "Schema Carrier",
         "tags": [
           "Agent"
+        ]
+      }
+    },
+    "/api/v1/agent/status": {
+      "get": {
+        "operationId": "status_api_v1_agent_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Status",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/api/v1/cases/{sha}": {
+      "head": {
+        "operationId": "head_case_api_v1_cases__sha__head",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sha",
+            "required": true,
+            "schema": {
+              "title": "Sha",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Head Case",
+        "tags": [
+          "Cases"
+        ]
+      },
+      "put": {
+        "description": "Register a case's text in the server's short-lived cache; returns what was detected. Nothing is written to disk.",
+        "operationId": "put_case_api_v1_cases__sha__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sha",
+            "required": true,
+            "schema": {
+              "title": "Sha",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CasePutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CasePreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Case",
+        "tags": [
+          "Cases"
         ]
       }
     },
@@ -4960,7 +5548,7 @@
     },
     "/api/v1/health/ready": {
       "get": {
-        "description": "Readiness probe — returns readiness of all subsystems.",
+        "description": "Readiness probe — real state of each subsystem (the old version always said ready).",
         "operationId": "health_ready_api_v1_health_ready_get",
         "responses": {
           "200": {
@@ -5205,6 +5793,48 @@
           }
         },
         "summary": "Predict",
+        "tags": [
+          "Simulation"
+        ]
+      }
+    },
+    "/api/v1/simulation/scenario": {
+      "post": {
+        "description": "Re-score a case under hypothetical changes with the trained model.\n\nEach scenario perturbs a real model input (appeal type, supporting facts, statutes, precedent support, court level)\nand is scored by the same code path as the base estimate. Most levers move the estimate by only a point or two —\nthe response says so via `effect_class` and `warnings`.",
+        "operationId": "scenario_api_v1_simulation_scenario_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Scenario",
         "tags": [
           "Simulation"
         ]

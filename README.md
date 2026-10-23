@@ -10,7 +10,13 @@ pinned: false
 
 # Legal Intelligence Terminal (LIT) — Backend
 
-AI-powered legal intelligence system for Indian courts. This FastAPI backend provides semantic precedent search, automated fact extraction from case text, argument graph construction, and judicial outcome simulation. It integrates with Indian Kanoon for live judgment scraping, computes embeddings locally with MiniLM, and uses Hugging Face's Inference Providers for case-chat generation.
+AI-powered legal research for Indian courts. This FastAPI backend serves the v1.0.0 chat workspace: a streaming agent
+(`POST /api/v1/agent/chat`) that reads a case, searches a 505-judgment precedent library, builds an argument map, gives
+an indicative outcome estimate for criminal appeals, and compares scenarios — each as a typed card. The per-feature
+endpoints (facts, precedents, graph, simulation) remain. Embeddings are computed locally with MiniLM; the agent's
+planning and narration use Hugging Face's router (or run fully deterministic with `LLM_PROVIDER=none`).
+
+Start with `../docs/ARCHITECTURE.md`, `../docs/PROTOCOL.md` and `../docs/RUNBOOK.md`.
 
 ---
 
@@ -33,8 +39,10 @@ pip install -r requirements.txt
 cp .env.example .env
 # Edit .env — set HUGGINGFACE_API_KEY and other values as needed
 
-# 5. (Optional) Use fixtures for offline development
-export USE_FIXTURES=true
+# 5. (Optional) Use the real precedent library locally instead of the 3-case fixture index
+export PRECEDENT_ARTIFACT_DIR=data/precedent_artifacts/v1      # build with scripts/build_precedent_artifacts.py
+# macOS only: faiss and torch in one process need these
+export OMP_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false KMP_DUPLICATE_LIB_OK=TRUE
 
 # 6. Start the server
 uvicorn main:app --reload
@@ -68,19 +76,13 @@ and the committed model artifact together when deploying.
    relevant excerpt instead of a generated answer. The GitHub deployment token
    `HF_TOKEN` is separate and must never be put in Space variables or committed
    to Git.
-3. Commit backend changes to the monorepo's `main` branch. The monorepo's
-   `.github/workflows/deploy-hf.yml` deploys only the `lit-backend/` subtree to
-   the Space. Set the GitHub repository **secret** `HF_TOKEN` to a fine-grained
-   token with write access to this Space.
-4. Set the GitHub repository **variable** `HF_SPACE_URL` to the public direct
-   URL, `https://thebenmerlin-lit-backend.hf.space`. The
-   monorepo's `.github/workflows/keep-alive.yml` calls `/health` every six hours
-   and supports a manual run from the Actions tab. It fails
-   visibly if the request or JSON health check fails. Scheduled GitHub Actions
-   may be delayed and can be disabled after 60 days without activity in a
-   public repository, so this is best effort rather than an uptime guarantee.
+3. Allow the key to **read the private precedent dataset repo** (`PRECEDENT_ARTIFACT_REPO`,
+   pinned with `PRECEDENT_ARTIFACT_REVISION`); the Space downloads and verifies the library at start. See
+   `../docs/RUNBOOK.md` for the full variable list, staging, smoke test and rollback.
+4. Deploy by pushing the `lit-backend/` subtree to the Space (below). The repository's
+   `.github/workflows/deploy-hf.yml` and `keep-alive.yml` only apply while a GitHub remote is available.
 
-**Deploying without GitHub Actions.** The Space is a git repository, so the same
+**Deploying by hand (the current method).** The Space is a git repository, so the
 subtree can be pushed to it directly from a checkout. Log in once with a token
 that has write access to the Space (`hf auth login --add-to-git-credential`, run
 in a real terminal), then from the monorepo root:
@@ -102,11 +104,11 @@ curl --fail-with-body --show-error --max-time 30 \
 # Expect JSON containing "status":"healthy".
 curl --fail-with-body --show-error --max-time 30 \
   "${HF_SPACE_URL}/api/v1/health/ready"
-# Check outcome_model_loaded and index_loaded before testing model endpoints.
+# Check outcome_model_loaded and index.source == "artifact" (505 judgments) before testing model endpoints.
+python scripts/smoke.py "${HF_SPACE_URL}"   # health, readiness, library, and a streamed precedents run (no LLM needed)
 ```
 
-Then manually run both GitHub workflows and check their logs. If the frontend
-is deployed separately, point its backend URL to the same direct Space URL and
+If the frontend is deployed separately, point its backend URL to the same direct Space URL and
 check CORS from that exact frontend origin. `logs/`, `fixtures/`, and `data/`
 are writable but Space-local runtime changes are ephemeral; persist any new
 data outside the Space before relying on it.
@@ -120,7 +122,17 @@ data outside the Space before relying on it.
 | Method | Path | Description |
 |---|---|---|
 | GET | `/health` | Basic health check — returns app name, version, status |
-| GET | `/api/v1/health/ready` | Readiness probe — returns `ready`, `index_loaded`, `hf_key_set` |
+| GET | `/api/v1/health/ready` | Readiness — `ready`, library (`index.source`, judgments, version), embedder, outcome model, LLM configured (boolean) |
+
+### Chat agent
+
+| Method | Path | Description |
+|---|---|---|
+| POST | `/api/v1/agent/chat` | Run one assistant turn; streams Server-Sent Events (cards, steps, narration). See `../docs/PROTOCOL.md` |
+| DELETE | `/api/v1/agent/runs/{run_id}` | Stop a run |
+| GET | `/api/v1/agent/status` | LLM, library and model state |
+| PUT | `/api/v1/cases/{sha256}` | Register a matter's text in the RAM-only case cache |
+| POST | `/api/v1/simulation/scenario` | Compare scenarios by re-scoring the real outcome model |
 
 ### Precedent Search
 
@@ -162,7 +174,7 @@ data outside the Space before relying on it.
 
 | Variable | Default | Description |
 |---|---|---|
-| `HUGGINGFACE_API_KEY` | *(empty)* | HF Inference Providers token for case-chat generation (and embeddings when `EMBEDDING_BACKEND=hf_api`) |
+| `HUGGINGFACE_API_KEY` | *(empty)* | HF token: agent LLM calls, case-chat generation, downloading the precedent library (embeddings too when `EMBEDDING_BACKEND=hf_api`) |
 | `EMBEDDING_BACKEND` | `local` | `local` runs MiniLM in-process; `hf_api` calls the HF Inference API and needs a funded key. Same 384-dim vectors either way |
 | `KANOON_BASE_URL` | `https://api.kanoon.example.com/v1` | Base URL for Indian Kanoon scraper |
 | `ALLOWED_ORIGINS` | `*` | Comma-separated list of allowed CORS origins |
@@ -171,6 +183,30 @@ data outside the Space before relying on it.
 | `USE_FIXTURES` | `false` | Use local fixture data instead of live scraping |
 | `LOG_LEVEL` | `INFO` | Log level (DEBUG, INFO, WARNING, ERROR) |
 | `CACHE_TTL` | `3600` | In-memory cache TTL in seconds |
+| `PRECEDENT_ARTIFACT_DIR` | *(empty)* | Local directory holding the precedent library (`vectors.npy`, `meta.jsonl`, `manifest.json`) |
+| `PRECEDENT_ARTIFACT_REPO` / `_REVISION` / `_SUBDIR` | *(empty)* / `main` / `v1` | Private HF dataset repo the library is downloaded from at start (the key needs Read on it); pin the revision |
+| `LLM_PROVIDER` | `hf_router` | `hf_router`, `fake` (tests) or `none` (deterministic routing and templated narration; nothing leaves the server) |
+| `PLANNER_MODEL` / `NARRATION_MODEL` | `openai/gpt-oss-120b:cerebras` | Router models; `model:provider` pins the provider |
+| `FALLBACK_MODEL` | `Qwen/Qwen2.5-72B-Instruct` | Used when the primary model errors, times out or refuses |
+| `LLM_DAILY_TOKEN_CAP` | `0` | `0` = unlimited; above this the agent degrades to deterministic mode |
+| `AGENT_ENABLED` | `true` | Kill switch for the chat endpoint |
+| `AGENT_MAX_CONCURRENT` | `4` | Concurrent runs the 2-vCPU Space will accept (429 beyond) |
+| `AGENT_PING_S` / `AGENT_ORPHAN_CANCEL_S` / `AGENT_RUN_TIMEOUT_S` | `10` / `15` / `90` | Keep-alive cadence, cancel-after-disconnect grace, run wall-clock cap |
+
+---
+
+## Tests
+
+```bash
+export OMP_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false KMP_DUPLICATE_LIB_OK=TRUE   # macOS only
+.venv311/bin/python -m pytest -q -m "not slow and not live_server"      # 119 tests, no network, no LLM
+.venv311/bin/python scripts/export_openapi.py --check                    # contract drift
+.venv311/bin/python scripts/eval_agent.py                                # manual: 20 prompts against the live model
+```
+
+`.venv311` is Python 3.11 with the production pins (`uv venv --python 3.11 .venv311 && uv pip install --python
+.venv311/bin/python -r requirements-dev.txt`), so tests run on what the Space runs. `../scripts/verify.sh` runs the
+backend and frontend checks together.
 
 ---
 

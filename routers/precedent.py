@@ -50,8 +50,9 @@ async def search_precedents(request: PrecedentSearchRequest):
       3. If results < top_k and use_kanoon is True, supplement with
          keyword results from the Kanoon scraper
     """
+    # The query is derived from the user's case text, so log its size, never its content.
     logger.info(
-        f"Semantic precedent search: query='{request.query}', "
+        f"Semantic precedent search: query_chars={len(request.query)}, "
         f"top_k={request.top_k}, use_kanoon={request.use_kanoon}"
     )
 

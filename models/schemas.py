@@ -356,14 +356,14 @@ class EmbeddingResponse(BaseModel):
 # --- Case Chat ---
 
 class ChatMessage(BaseModel):
-    role: str = Field(..., description="'user' or 'assistant'")
-    content: str
+    role: Literal["user", "assistant"] = Field(..., description="'user' or 'assistant' — a client cannot inject 'system' turns")
+    content: str = Field(..., max_length=8000)
 
 
 class ChatRequest(BaseModel):
-    case_text: str = Field(..., description="Full text of the case being discussed")
-    question: str
-    history: List[ChatMessage] = Field(default_factory=list, description="Prior turns, oldest first")
+    case_text: str = Field(..., max_length=2_000_000, description="Full text of the case being discussed")
+    question: str = Field(..., max_length=2000)
+    history: List[ChatMessage] = Field(default_factory=list, max_length=20, description="Prior turns, oldest first")
 
 
 class ChatSource(BaseModel):

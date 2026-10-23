@@ -1,5 +1,7 @@
 """Case chat router — retrieval-augmented Q&A grounded in one case's text."""
 
+import asyncio
+
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from models.schemas import CaseUploadResponse, ChatRequest, ChatResponse
@@ -15,8 +17,9 @@ router = APIRouter(prefix="/chat", tags=["Chat"])
 @router.post("/upload", response_model=CaseUploadResponse)
 async def upload_case(file: UploadFile = File(...)):
     content = await file.read()
-    text = extract_text(file.filename, content)
-    logger.info(f"Uploaded case document: {file.filename} ({len(text.split())} words)")
+    # Parsing a 20 MB PDF is CPU-bound; keep it off the event loop so streams and pings keep flowing.
+    text = await asyncio.to_thread(extract_text, file.filename, content)
+    logger.info(f"Uploaded case document: {len(content) // 1024} KB, {len(text.split())} words")  # never the filename or content
     return {"text": text, "filename": file.filename, "word_count": len(text.split())}
 
 
