@@ -19,4 +19,3 @@ python-multipart==0.0.9
 # not imported by the live app.
 scikit-learn==1.8.0
 joblib==1.5.3
-gradio>=4.0.0
