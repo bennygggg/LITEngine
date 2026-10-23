@@ -455,6 +455,7 @@ class MessageStartEvent(EventBase):
     schema_version: int = SCHEMA_VERSION
     server_version: str
     case_known: bool = True
+    answer_first: bool = Field(False, description="The user asked for a short answer: the client shows the text before any cards")
 
 
 class TextDeltaEvent(EventBase):

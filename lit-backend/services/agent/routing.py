@@ -85,6 +85,28 @@ _GREETING = re.compile(r"\b(?:hi|hello|hey|namaste|help|what\s+can\s+you\s+do|wh
 _QUESTION = re.compile(r"\?\s*$|^\s*(?:what|why|how|when|where|who|which|did|does|do|is|was|were|can|could|has|have|according)\b", re.I)
 
 
+_BREVITY = re.compile(
+    r"\bone[\s-]?(?:liner|line|sentence|lined)\b|\b(?:in|as)\s+(?:a|one|1|single)\s+(?:line|sentence)\b|\bsingle\s+(?:line|sentence)\b|\b1[\s-]?(?:line|sentence)\b"
+    r"|\btl;?\s?dr\b|\b(?:short|quick|brief)\s+answer\b|\bbriefly\b|\bin\s+brief\b|\bin\s+short\b|\bkeep\s+it\s+(?:short|brief)\b|\bbe\s+(?:brief|short|concise)\b"
+    r"|\bin\s+(?:a\s+)?(?:few|couple\s+of)\s+words\b|\bjust\s+(?:tell|give)\s+me\b", re.I)
+
+
+def parse_brevity(text: str) -> bool:
+    """True when the user asked for a short answer ("one liner please", "briefly", "tl;dr"). Read from this message only."""
+    return bool(_BREVITY.search(text or ""))
+
+
+_FILLER = re.compile(_BREVITY.pattern + r"|\bplease\b|\bexactly\b|\bkindly\b", re.I)
+def retrieval_query(question: str) -> str:
+    """The text used to search the document for a question. Request-style filler ("one liner please") says how to answer, not
+    what to look for, and skews the ranking of passages. The model still sees the user's own words."""
+    cleaned = re.sub(r"\s+", " ", _FILLER.sub(" ", question))
+    cleaned = re.sub(r"\s+([?.!,;:])", r"\1", cleaned).strip(" ,;:-\u2014.")
+    if not re.search(r"[A-Za-z]{3}", cleaned):
+        cleaned = question.strip()
+    return cleaned
+
+
 def parse_scenario_levers(text: str) -> Dict[str, Any]:
     """Pull explicit levers out of a 'what if…' request. Only things the user actually said."""
     t = text.lower()

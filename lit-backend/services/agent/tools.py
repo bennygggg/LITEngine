@@ -29,7 +29,7 @@ from services.agent.llm.base import UsageTotals
 from services.embedder import embedder_service
 from services.agent.extraction import assess_quality, extract_profile, profile_key
 from services.agent.library import LibrarySearch, search_library
-from services.agent.routing import parse_explicit_appellant
+from services.agent.routing import retrieval_query, parse_explicit_appellant
 from services.agent.workspace import CaseWorkspace, artifact_key
 from services.graph_builder import build_argument_graph
 from services.outcome_model import is_model_loaded
@@ -85,6 +85,7 @@ class RunContext:
     text_part: Optional[str] = None      # the open streaming text part, if any
     warnings: List[str] = field(default_factory=list)
     narration_failed: bool = False
+    brief: bool = False                  # the user asked for a one-liner: one sentence, answer first
 
     def next_part(self) -> str:
         self.part_counter += 1
@@ -380,7 +381,7 @@ class Tools:
         async def compute() -> Tuple[Any, bool]:
             from services.agent import doc_index
             index = await ws.ensure_doc_index()
-            return await doc_index.retrieve(index, question, top_k=5), False
+            return await doc_index.retrieve(index, retrieval_query(question), top_k=5), False
 
         excerpts, step_id = await self._step("ask_case", origin, compute, args_preview={"question": question[:120]},
                                              summarize=lambda e: f"{len(e)} passages", card=True)

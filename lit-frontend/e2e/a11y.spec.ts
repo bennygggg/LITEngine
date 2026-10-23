@@ -24,7 +24,7 @@ test.describe('accessibility (WCAG 2.1 AA, no serious or critical violations)', 
         await expect(page.getByText('Indicative outcome estimate')).toBeVisible()
         await audit(page, 'conversation with cards')
         await page.getByRole('button', { name: 'Open map' }).click()
-        await expect(page.getByRole('complementary', { name: 'Details panel' }).locator('canvas').first()).toBeVisible()
+        await expect(page.getByLabel('Details panel').locator('canvas').first()).toBeVisible()
         await audit(page, 'map panel')
         await page.getByRole('button', { name: 'Close panel' }).click()
         await page.getByRole('button', { name: 'Matters' }).click()

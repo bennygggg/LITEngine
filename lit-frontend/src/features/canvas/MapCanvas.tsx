@@ -1,5 +1,5 @@
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
-import { Download, Focus, Maximize, Search, TriangleAlert } from 'lucide-react'
+import { Crosshair, Download, Scan, Search, TriangleAlert } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as Tabs from '@radix-ui/react-tabs'
 import { Button } from '@/design/ui/Button'
@@ -104,8 +104,8 @@ export default function MapCanvas({ card, focus }: { card: ArgumentMapCard; focu
           {['map', 'list'].map((t) => <Tabs.Trigger key={t} value={t} className="relative py-2.5 text-sm capitalize text-ink-muted outline-none data-[state=active]:text-ink data-[state=active]:after:absolute data-[state=active]:after:inset-x-0 data-[state=active]:after:-bottom-px data-[state=active]:after:h-0.5 data-[state=active]:after:bg-ink">{t === 'map' ? 'Map' : 'List'}</Tabs.Trigger>)}
         </Tabs.List>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon-sm" aria-label="Focus on the selected element" aria-pressed={focusMode} onClick={() => setFocusMode(!focusMode)} className={cn(focusMode && 'bg-border/70')}><Focus /></Button>
-          <Button variant="ghost" size="icon-sm" aria-label="Fit to panel" onClick={() => cy.current?.fit(undefined, 16)}><Maximize /></Button>
+          <Button variant="ghost" size="icon-sm" aria-label="Focus on the selected element" aria-pressed={focusMode} onClick={() => setFocusMode(!focusMode)} className={cn(focusMode && 'bg-border/70')}><Crosshair /></Button>
+          <Button variant="ghost" size="icon-sm" aria-label="Fit map to view" onClick={() => cy.current?.fit(undefined, 16)}><Scan /></Button>
           <Button variant="ghost" size="icon-sm" aria-label="Download as PNG" onClick={exportPng}><Download /></Button>
         </div>
       </div>

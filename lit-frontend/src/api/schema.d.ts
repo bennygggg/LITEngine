@@ -1604,6 +1604,12 @@ export interface components {
         /** MessageStartEvent */
         MessageStartEvent: {
             /**
+             * Answer First
+             * @description The user asked for a short answer: the client shows the text before any cards
+             * @default false
+             */
+            answer_first: boolean;
+            /**
              * Case Known
              * @default true
              */

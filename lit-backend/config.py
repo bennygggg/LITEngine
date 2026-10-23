@@ -34,7 +34,7 @@ class Settings(BaseSettings):
 
     # App Metadata
     APP_NAME: str = "Legal Intelligence Terminal"
-    APP_VERSION: str = "1.0.0"
+    APP_VERSION: str = "1.0.1"
     DEBUG: bool = False
 
     # Environment

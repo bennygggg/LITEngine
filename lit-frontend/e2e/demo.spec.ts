@@ -12,7 +12,7 @@ test.describe('recorded sample session', () => {
     await page.getByRole('button', { name: /Start the session/ }).click()
     await expect(page.getByText('Indicative outcome estimate')).toBeVisible({ timeout: 60_000 })
     await expect(page.getByText('Scenario comparison')).toBeVisible()
-    await expect(page.getByText('Sources in the document')).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Sources · \d+ passages? from the document/ })).toBeVisible()
     await expect(page.getByText('That’s the walkthrough')).toBeVisible({ timeout: 60_000 })
     expect(apiCalls).toEqual([])
   })

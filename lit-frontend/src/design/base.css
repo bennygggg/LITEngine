@@ -7,6 +7,10 @@
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
   }
+  /* The app is a fixed-height shell whose inner panes scroll. The document itself must never scroll, or the whole
+     interface (sidebar included) slides away when a pane reaches its end. */
+  html, body, #root { height: 100%; }
+  html, body { overflow: hidden; overscroll-behavior: none; }
   body {
     @apply bg-bg font-sans text-base text-ink antialiased;
     font-feature-settings: 'cv11', 'ss01';
@@ -40,6 +44,10 @@
     --tw-prose-td-borders: rgb(var(--c-border));
   }
   .prose-lit :where(p, ul, ol):not(:where([class~='not-prose'] *)) { margin-top: 0.75em; margin-bottom: 0.75em; }
+  /* A reply's first and last paragraph carry no outer margin, so the first line aligns with the assistant avatar and the
+     spacing between blocks is the message's own (space-y), not the prose style's. */
+  .prose-lit > :first-child { margin-top: 0 !important; }
+  .prose-lit > :last-child { margin-bottom: 0 !important; }
   .prose-lit :where(h1, h2, h3, h4) { @apply font-display font-medium tracking-tight; }
   .prose-lit :where(a) { @apply underline decoration-accent/40 underline-offset-2 hover:decoration-accent; }
 }

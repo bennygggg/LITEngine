@@ -33,6 +33,8 @@ export interface CanvasTarget {
 interface UiState extends Persisted {
   mobileSidebarOpen: boolean
   canvas: CanvasTarget | null
+  /** null = the card type's default (the argument map opens full screen); true/false once the user chooses */
+  canvasExpanded: boolean | null
   matterDialog: 'upload' | 'paste' | 'matters' | null
   settingsOpen: boolean
   setSidebarCollapsed: (v: boolean) => void
@@ -41,6 +43,7 @@ interface UiState extends Persisted {
   setAiNarration: (v: boolean) => void
   openCanvas: (t: CanvasTarget) => void
   closeCanvas: () => void
+  setCanvasExpanded: (v: boolean) => void
   openMatterDialog: (tab: 'upload' | 'paste' | 'matters') => void
   closeMatterDialog: () => void
   setSettingsOpen: (v: boolean) => void
@@ -55,14 +58,16 @@ export const useUi = create<UiState>((set, get) => {
     ...read(),
     mobileSidebarOpen: false,
     canvas: null,
+    canvasExpanded: null,
     matterDialog: null,
     settingsOpen: false,
     setSidebarCollapsed: (v) => { set({ sidebarCollapsed: v }); persist() },
     setMobileSidebarOpen: (v) => set({ mobileSidebarOpen: v }),
     setCanvasWidth: (w) => { set({ canvasWidth: Math.min(720, Math.max(420, w)) }); persist() },
     setAiNarration: (v) => { set({ aiNarration: v }); persist() },
-    openCanvas: (t) => set({ canvas: t }),
-    closeCanvas: () => set({ canvas: null }),
+    openCanvas: (t) => set((s) => ({ canvas: t, canvasExpanded: s.canvas?.cardId === t.cardId ? s.canvasExpanded : null })),
+    closeCanvas: () => set({ canvas: null, canvasExpanded: null }),
+    setCanvasExpanded: (v) => set({ canvasExpanded: v }),
     openMatterDialog: (tab) => set({ matterDialog: tab }),
     closeMatterDialog: () => set({ matterDialog: null }),
     setSettingsOpen: (v) => set({ settingsOpen: v }),

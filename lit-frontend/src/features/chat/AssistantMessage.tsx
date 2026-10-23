@@ -1,5 +1,5 @@
-import { Copy, RotateCw, TriangleAlert } from 'lucide-react'
-import { useMemo, type ReactNode } from 'react'
+import { ChevronDown, Copy, RotateCw, TriangleAlert } from 'lucide-react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { Button } from '@/design/ui/Button'
 import { Tooltip } from '@/design/ui/Tooltip'
 import { cn } from '@/lib/cn'
@@ -8,14 +8,14 @@ import { StreamingMarkdown } from '@/lib/markdown/StreamingMarkdown'
 import { CardRenderer } from '@/features/cards/CardRenderer'
 import { NeedsInputCard } from '@/features/cards/NeedsInputCard'
 import { useChatActions } from './actions'
-import type { Message, Part, StepPart } from './model'
+import type { CardPart, Message, Part, StepPart } from './model'
 import { messageText } from './reducer'
 import { StepTimeline } from './StepTimeline'
 
 export function Avatar() {
   return (
-    <span aria-hidden className="mt-0.5 flex size-6 shrink-0 select-none items-center justify-center rounded-full bg-ink font-display text-[13px] font-semibold leading-none text-bg">
-      L
+    <span aria-hidden className="flex size-6 shrink-0 select-none items-center justify-center rounded-full bg-ink font-display text-[13px] font-semibold leading-none text-bg [&>span]:translate-y-px">
+      <span>L</span>
     </span>
   )
 }
@@ -54,11 +54,40 @@ export function useCitations(msg: Message, open: (cardId: string, focus?: string
   }, [msg.parts, open])
 }
 
+/** A reply that answers a question about the document puts the answer first and tucks the passages it rests on below, collapsed. */
+function SourcesDisclosure({ part, startOpen }: { part: CardPart; startOpen: boolean }) {
+  const [open, setOpen] = useState(startOpen)
+  const n = part.payload?.type === 'sources' ? part.payload.excerpts.length : 0
+  if (!part.payload) return <CardRenderer part={part} />
+  return (
+    <div>
+      <button type="button" aria-expanded={open} onClick={() => setOpen(!open)}
+        className="flex h-8 items-center gap-1.5 rounded-md text-sm text-ink-muted transition-colors hover:text-ink">
+        <span>Sources{n ? ` · ${n} passage${n === 1 ? '' : 's'} from the document` : ''}</span>
+        <ChevronDown className={cn('size-3.5 transition-transform', open && 'rotate-180')} />
+      </button>
+      {open && <div className="mt-1 animate-fade-in"><CardRenderer part={part} /></div>}
+    </div>
+  )
+}
+
 export function AssistantMessage({ msg, isLast, children }: { msg: Message; isLast: boolean; children?: ReactNode }) {
   const actions = useChatActions()
   const live = msg.status === 'streaming'
   const citations = useCitations(msg, actions.openCanvas)
-  const grouped = groupParts(msg.parts)
+  // Answer first: when the user asked for a short answer, or the only cards are the document passages behind a reply, the text
+  // leads and the cards follow. Everything else keeps cards first: the commentary interprets what is above it.
+  const cardParts = msg.parts.filter((p): p is CardPart => p.kind === 'card')
+  const isSources = (p: CardPart) => p.payload?.type === 'sources' || (p.payload === null && p.type === 'sources')
+  const sourcesOnly = cardParts.length > 0 && cardParts.every(isSources)
+  const answerFirst = Boolean(msg.answerFirst) || sourcesOnly
+  const hasText = msg.parts.some((p) => p.kind === 'text' && p.text.trim() !== '')
+  const grouped = useMemo(() => {
+    const g = groupParts(msg.parts)
+    if (!answerFirst) return g
+    const rank = (x: (typeof g)[number]) => ('steps' in x ? 0 : x.kind === 'text' ? 1 : 2)
+    return [...g].sort((a, b) => rank(a) - rank(b))   // stable: order within each group is preserved
+  }, [msg.parts, answerFirst])
   const lastTextId = [...msg.parts].reverse().find((p) => p.kind === 'text')?.id
   const hasContent = msg.parts.length > 0
   const text = messageText(msg)
@@ -74,7 +103,7 @@ export function AssistantMessage({ msg, isLast, children }: { msg: Message; isLa
           {grouped.map((g) => {
             if ('steps' in g) return <StepTimeline key={g.id} steps={g.steps} live={live} />
             if (g.kind === 'text') return <StreamingMarkdown key={g.id} text={g.text} streaming={live && g.id === lastTextId && !msg.parts.some((p) => p.kind === 'card' && p.payload === null)} />
-            if (g.kind === 'card') return <CardRenderer key={g.id} part={g} />
+            if (g.kind === 'card') return sourcesOnly && answerFirst ? <SourcesDisclosure key={g.id} part={g} startOpen={!hasText && !live} /> : <CardRenderer key={g.id} part={g} />
             if (g.kind === 'input') return <NeedsInputCard key={g.id} card={g.payload} answered={g.answered} />
             return null
           })}

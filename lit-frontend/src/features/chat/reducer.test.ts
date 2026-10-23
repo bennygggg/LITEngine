@@ -115,3 +115,11 @@ describe('reducer invariants', () => {
     expect(settled.parts.some((p) => p.kind === 'step' && p.status === 'running')).toBe(false)
   })
 })
+
+describe('answer_first', () => {
+  it('is carried from message_start so the view can lead with the text', () => {
+    const start = { v: 1, seq: 1, t: 0, event: 'message_start', run_id: 'r', message_id: 'm', conversation_id: 'c', mode: 'llm', server_version: '1.0.1', schema_version: 1, case_known: true, answer_first: true } as never
+    expect(reduceEvent(newAssistantMessage('m'), start).answerFirst).toBe(true)
+    expect(reduceEvent(newAssistantMessage('m'), { ...(start as object), answer_first: undefined } as never).answerFirst).toBe(false)
+  })
+})

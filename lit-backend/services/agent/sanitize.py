@@ -60,3 +60,39 @@ class StreamSanitizer:
     def flush(self) -> str:
         rest, self._buf = self._buf, ""
         return rest
+
+
+# --- one-line answers -------------------------------------------------------------------------------------------------
+# Words that end in a full stop without ending the sentence ("State v. Rajasthan", "Sec. 302", "Dr. Sharma").
+_ABBREV = {"v", "vs", "no", "nos", "sec", "secs", "s", "ss", "art", "cl", "ch", "dr", "mr", "mrs", "ms", "shri", "smt", "ltd", "pvt", "co",
+           "ors", "anr", "etc", "viz", "cf", "i.e", "e.g", "hon", "hc", "sc", "ipc", "crpc", "pw", "dw", "w", "u"}
+_TRAILING_HANDLES = re.compile(r"(?:\s*\[[PS]\s*\d{1,2}\])+")
+
+
+def one_sentence(text: str, max_words: int = 40) -> str:
+    """The first sentence of `text` (with any citation handles that follow it), capped at `max_words`.
+
+    The model is asked for one sentence when a user asks for a one-liner; this makes it true even if the model rambles."""
+    t = re.sub(r"\s+", " ", text).strip()
+    t = re.sub(r"^(?:[#>*\-\u2022]+\s*)+", "", t)
+    end = len(t)
+    for m in re.finditer(r"[.!?]", t):
+        i = m.start()
+        before = re.search(r"([A-Za-z.]+)$", t[:i])
+        if before and before.group(1).lower().rstrip(".") in _ABBREV:
+            continue
+        rest = t[i + 1:]
+        h = _TRAILING_HANDLES.match(rest)
+        after = rest[h.end():] if h else rest
+        if after == "" or (after[:1] == " " and re.match(r"\s*[A-Z0-9\u201c\"'(\[]", after)):
+            end = i + 1 + (h.end() if h else 0)
+            break
+    out = t[:end].strip()
+    words = out.split(" ")
+    if len(words) > max_words:
+        return " ".join(words[:max_words]).rstrip(",;:\u2014- ") + "\u2026"
+    # tidy: a space before citation handles, handles before the full stop, and a full stop at the end ("delay[S3]" -> "delay [S3].")
+    handles = "".join(re.sub(r"\s+", "", h) for h in re.findall(r"\[[PS]\s*\d{1,2}\]", out))
+    body = re.sub(r"\s*\[[PS]\s*\d{1,2}\]", "", out).strip()
+    stop = body[-1] if body and body[-1] in ".!?" else "."
+    return body.rstrip(".!? ") + (f" {handles}" if handles else "") + stop

@@ -20,12 +20,12 @@ export function StepTimeline({ steps, live }: { steps: StepPart[]; live: boolean
   const total = steps.reduce((s, x) => s + (x.durationMs ?? 0), 0)
   const running = steps.some((s) => s.status === 'running')
   return (
-    <div className="my-3 text-sm">
+    <div className="text-sm">
       <button
         type="button"
         onClick={() => setUserOpen(!open)}
         aria-expanded={open}
-        className="flex items-center gap-1.5 rounded-md py-0.5 text-ink-muted transition-colors hover:text-ink"
+        className="flex h-6 items-center gap-1.5 rounded-md text-ink-muted transition-colors hover:text-ink"
       >
         {running ? <Spinner className="size-3" /> : <Check className="size-3.5" />}
         <span>{running ? 'Working' : `${steps.length} step${steps.length === 1 ? '' : 's'}${total ? ` · ${fmt(total)}` : ''}`}</span>

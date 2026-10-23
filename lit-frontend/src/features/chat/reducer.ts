@@ -44,7 +44,7 @@ export function reduceEvent(msg: Message, ev: AgentEvent): Message {
 
   switch (ev.event) {
     case 'message_start':
-      return { ...next, runId: ev.run_id, mode: ev.mode, model: ev.model ?? null }
+      return { ...next, runId: ev.run_id, mode: ev.mode, model: ev.model ?? null, answerFirst: ev.answer_first ?? false }
 
     case 'text_delta': {
       const idx = next.parts.findIndex((p) => p.kind === 'text' && p.id === ev.part_id)

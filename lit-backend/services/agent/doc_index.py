@@ -63,7 +63,20 @@ def chunk_with_offsets(text: str, words: int = CHUNK_WORDS, overlap: int = CHUNK
         chunks.append(DocChunk(index=len(chunks), text=text[start:end], char_start=start, char_end=end))
         if j >= n:
             break
-        i = max(j - overlap, i + 1)
+        nxt = max(j - overlap, i + 1)
+        # The next passage must start where a sentence starts. Starting mid-sentence drops the subject ("he was falsely
+        # implicated" - who?), and the reader and the model both lose who is speaking. Prefer reaching back for context.
+        start_at = nxt
+        for k in range(nxt, max(i, nxt - 2 * overlap), -1):
+            if k > i and _ends_sentence(text[spans[k - 1][0] : spans[k - 1][1]]):
+                start_at = k
+                break
+        else:
+            for k in range(nxt, min(j, nxt + overlap)):
+                if _ends_sentence(text[spans[k - 1][0] : spans[k - 1][1]]):
+                    start_at = k
+                    break
+        i = start_at if start_at > i else nxt
     return chunks
 
 

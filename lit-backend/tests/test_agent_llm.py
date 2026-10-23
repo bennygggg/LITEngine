@@ -225,3 +225,42 @@ def test_usage_totals_reach_the_done_event(client):
     ev = run(client, {"text": "Find precedents on delay in lodging an FIR."}, {"filing_date": "2021-04-12"})
     assert ev[-1]["usage"]["llm_calls"] == 1 and ev[-1]["usage"]["output_tokens"] > 0
     assert ev[-1]["timings"]["ttft_ms"] is not None
+
+
+# ---- one-liners: the answer comes first and is one sentence ------------------------------------------------------------------
+RAMBLE = ("The appellant is alleged to have attacked the deceased with an axe during a land dispute [S1]. "
+          "A key caveat is that the weapon recovery is contested. Next, examine the trial record.")
+
+
+def test_a_one_liner_request_gets_exactly_one_sentence_and_no_intro(client):
+    # the planner picks the tool (with a chatty preamble that must not reach the user), then the narration rambles
+    fake_llm.script([{"text": "Sure, let me look that up for you.", "tool_calls": [{"name": "ask_case", "arguments": {"question": "what happened"}}]}, {"text": RAMBLE}])
+    ev = run(client, {"text": "What happened exactly? One liner please"}, INPUTS)
+    start = ev[0]
+    assert start["event"] == "message_start" and start["answer_first"] is True
+    assert "sources" in kinds(ev)
+    text = text_of(ev)
+    assert text.startswith("The appellant is alleged") and text.count(". ") == 0 and "caveat" not in text and "Next," not in text
+    assert "[S1]" in text                                   # the citation that belongs to the sentence survives
+    first_text_at = next(i for i, e in enumerate(ev) if e["event"] == "text_delta")
+    assert not any(e["event"] == "text_delta" for e in ev[:first_text_at])   # nothing precedes the answer
+
+
+def test_a_planner_that_answers_directly_is_also_cut_to_one_line(client):
+    fake_llm.script([{"text": RAMBLE}])
+    ev = run(client, {"text": "What happened exactly? One liner please"}, INPUTS)
+    text = text_of(ev)
+    assert kinds(ev) == [] and text.startswith("The appellant is alleged") and "caveat" not in text and "Next," not in text
+
+
+def test_a_normal_question_is_unchanged(client):
+    fake_llm.script([{"tool_calls": [{"name": "ask_case", "arguments": {"question": "what happened"}}]}, {"text": RAMBLE}])
+    ev = run(client, {"text": "What happened exactly?"}, INPUTS)
+    assert ev[0]["answer_first"] is False
+    assert "Next, examine" in text_of(ev)
+
+
+def test_one_liner_works_without_an_llm(client):
+    ev = run(client, {"text": "What happened exactly? One liner please"}, INPUTS, options={"mode": "deterministic", "narrate": "template"})
+    text = text_of(ev)
+    assert ev[0]["answer_first"] is True and text and "\n" not in text and len(text.split()) <= 60

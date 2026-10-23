@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.1 — polish
+
+### Fixed
+- **The whole page no longer scrolls.** Screen-reader-only text deep inside a long conversation stretched the document, so scrolling a conversation to its end slid the entire interface (sidebar included) up the window. The shell is now the containing block for everything inside it and the document itself cannot scroll.
+- **The argument map opens full screen**, with a clear way back to the side panel (button and Esc). The toolbar icon that looked like "full screen" was really "fit to view"; it now has its own icon and label. While the map covers the window, the page behind it is inert.
+- **Assistant avatar alignment.** The avatar now sits on the same centre line as the first row of the reply (the step row had a 12 px top margin; the first paragraph had its own).
+- **One-liners are one line.** "One liner please", "in one sentence", "tl;dr", "briefly" give exactly one sentence, answer first, with no caveat or next step, enforced on the server even if the model rambles. When the question is about the document, the sources are tucked under the answer behind a "Sources" row instead of leading it.
+- **Wrong-party attribution.** Document passages were cut mid-sentence, losing their subject, so the model could credit a defence claim (the alibi, false implication) to the prosecution. Passages now start at sentence starts and the grounding rules say to attribute each claim to the party that made it. Measured on the live model: 15 of 15 runs correct, from 0 of 6 before.
+- Request filler ("one liner please") is no longer part of the document search, and the no-AI one-liner is an honest "Closest passage" instead of a sentence fragment.
+
+### Changed
+- Prompt version 2026-10-24.1. The evaluation script gains three one-liner cases and an attribution check (23 prompts).
+
 ## 1.0.0 — chat workspace
 
 The eight-tab interface is replaced by one full-screen chat. An orchestrator picks the analyses; results render as

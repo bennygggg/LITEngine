@@ -7,7 +7,7 @@ from models.agent_schemas import CardEvent, ErrorEvent
 from services.agent import narration, prompts
 from services.agent.llm.base import Finish, LLMUnavailable, Message, TextDelta, ToolCall
 from services.agent.llm_runtime import stream_with_fallback
-from services.agent.sanitize import StreamSanitizer
+from services.agent.sanitize import StreamSanitizer, one_sentence
 from services.agent.routing import PlannedTool
 from services.agent.tools import RunContext, Tools
 from utils.logger import get_logger
@@ -65,12 +65,15 @@ async def plan(ctx: RunContext, tools: Tools) -> tuple:
                 Message("user", f"{user_intent(ctx)}\n\n{prompts.case_state(ctx)}")]
     planned: List[PlannedTool] = []
     streamed = False
+    held: List[str] = []   # one-liner mode: hold text back; a preamble is dropped, a direct answer is cut to one sentence
     clean = StreamSanitizer(prompts.issued_refs(ctx))
     try:
         async for ev in stream_with_fallback(ctx.llm, models_for("plan"), messages, usage, tools=prompts.TOOLS, max_tokens=800, temperature=0.1):
             if isinstance(ev, TextDelta):
                 out = clean.feed(ev.text)
-                if out:
+                if out and ctx.brief:
+                    held.append(out)
+                elif out:
                     tools.stream_text(out)
                     streamed = True
             elif isinstance(ev, ToolCall) and ev.name in prompts.TOOL_NAMES and len(planned) < MAX_TOOLS:
@@ -82,9 +85,16 @@ async def plan(ctx: RunContext, tools: Tools) -> tuple:
         logger.warning(f"planner unavailable: {exc}")
         return None, False
     tail = clean.flush()
-    if tail:
+    if tail and ctx.brief:
+        held.append(tail)
+    elif tail:
         tools.stream_text(tail)
         streamed = True
+    if ctx.brief and held and not planned:
+        line = one_sentence("".join(held))
+        if line:
+            tools.stream_text(line)
+            streamed = True
     tools.end_text()
     return planned, (streamed and not planned)
 
@@ -94,17 +104,20 @@ async def narrate(ctx: RunContext, tools: Tools) -> bool:
     summary = prompts.summarize_run(ctx)
     messages = [
         Message("system", prompts.SYSTEM_PROMPT), *history_messages(ctx),
-        Message("user", f"{user_intent(ctx)}\n\n{prompts.case_state(ctx)}\n\n<tool_results>\n{summary}\n</tool_results>\n\n{prompts.NARRATION_INSTRUCTION}"
-                                  + (f"\nPer-result guidance:\n{prompts.narration_hints(ctx)}" if ctx.emitted_cards else "")),
+        Message("user", f"{user_intent(ctx)}\n\n{prompts.case_state(ctx)}\n\n<tool_results>\n{summary}\n</tool_results>\n\n"
+                        + (prompts.ONE_LINE_INSTRUCTION if ctx.brief else
+                           prompts.NARRATION_INSTRUCTION + (f"\nPer-result guidance:\n{prompts.narration_hints(ctx)}" if ctx.emitted_cards else ""))),
     ]
     text_parts: List[str] = []
     clean = StreamSanitizer(prompts.issued_refs(ctx))
     try:
-        async for ev in stream_with_fallback(ctx.llm, models_for("narrate"), messages, ctx.usage, max_tokens=get_settings().AGENT_MAX_TOKENS, temperature=0.3):
+        max_tokens = min(get_settings().AGENT_MAX_TOKENS, 600) if ctx.brief else get_settings().AGENT_MAX_TOKENS
+        async for ev in stream_with_fallback(ctx.llm, models_for("narrate"), messages, ctx.usage, max_tokens=max_tokens, temperature=0.3):
             if isinstance(ev, TextDelta):
                 out = clean.feed(ev.text)
                 if out:
-                    tools.stream_text(out)
+                    if not ctx.brief:        # a one-liner is held back so it can be cut to one sentence before the user sees it
+                        tools.stream_text(out)
                     text_parts.append(out)
     except LLMUnavailable as exc:
         tools.end_text()
@@ -115,8 +128,14 @@ async def narrate(ctx: RunContext, tools: Tools) -> bool:
         return False
     tail = clean.flush()
     if tail:
-        tools.stream_text(tail)
+        if not ctx.brief:
+            tools.stream_text(tail)
         text_parts.append(tail)
+    if ctx.brief:
+        line = one_sentence("".join(text_parts))
+        text_parts = [line] if line else []
+        if line:
+            tools.stream_text(line)
     tools.end_text()
     full = "".join(text_parts)
     if clean.dropped:  # already removed from the stream; recorded so a regression in the prompt shows up in evals

@@ -15,7 +15,7 @@ from models.agent_schemas import (
 from services.agent import cards, llm_flow, narration, prompts
 from services.agent.llm.factory import get_llm
 from services.agent.events import RunLog
-from services.agent.routing import PlannedTool, Route, parse_scenario_levers, route, scenario_specs
+from services.agent.routing import PlannedTool, Route, parse_brevity, parse_scenario_levers, route, scenario_specs
 from services.agent.tools import AwaitingInput, RunContext, ToolError, Tools
 from services.agent.workspace import CaseWorkspace
 from utils.logger import get_logger
@@ -91,12 +91,13 @@ class Orchestrator:
         req, log = ctx.request, ctx.log
         um = req.user_message
         tools = Tools(ctx)
+        ctx.brief = parse_brevity(um.text) and um.input_response is None
         steered = bool(um.forced_tool or um.input_response)
         mode = "forced" if steered else ("llm" if ctx.llm is not None else "deterministic")
         log.emit(MessageStartEvent, run_id=req.run_id, message_id=ctx.message_id, conversation_id=req.conversation_id,
                  mode=mode, model=(self.settings.NARRATION_MODEL if ctx.llm is not None else None),
                  prompt_version=(prompts.PROMPT_VERSION if ctx.llm is not None else None), server_version=self.settings.APP_VERSION,
-                 case_known=ctx.ws is not None or req.case is None)
+                 case_known=ctx.ws is not None or req.case is None, answer_first=ctx.brief)
 
         planned: List[PlannedTool]
         if um.input_response:
@@ -138,7 +139,7 @@ class Orchestrator:
             return
 
         text = narration.intro(planned)
-        if text and um.input_response is None:
+        if text and um.input_response is None and not ctx.brief:
             tools.emit_text(text)
 
         for t in planned:

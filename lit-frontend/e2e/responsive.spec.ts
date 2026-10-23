@@ -20,7 +20,7 @@ test('on a phone a review runs and the map opens as a full-screen sheet', async 
   await page.locator('input[type=date]').fill('2024-06-14')
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Open map' }).click()
-  const panel = page.getByRole('complementary', { name: 'Details panel' })
+  const panel = page.getByLabel('Details panel')
   await expect(panel).toBeVisible()
   const box = await panel.boundingBox()
   expect(box!.width).toBeGreaterThanOrEqual(385)

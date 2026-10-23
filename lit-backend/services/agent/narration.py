@@ -10,6 +10,7 @@ import re
 from typing import Any, List, Optional
 
 from models.agent_schemas import AgentChatRequest, CaseInputs
+from services.agent.sanitize import one_sentence
 from services.agent.tools import RunContext
 
 HELP = (
@@ -38,6 +39,15 @@ def intro(tools: List[Any]) -> Optional[str]:
 
 def _pct(p: float) -> str:
     return f"{round(p * 20) * 5}%"
+
+
+def _from_first_full_sentence(passage: str) -> str:
+    t = re.sub(r"\s+", " ", passage).strip()
+    if t[:1].islower():                      # starts mid-sentence: drop the fragment up to the first sentence boundary
+        m = re.search(r"[.!?]\s+(?=[A-Z0-9\u201c\"(])", t)
+        if m:
+            t = t[m.end():]
+    return t
 
 
 def outro(ctx: RunContext) -> str:
@@ -80,6 +90,15 @@ def outro(ctx: RunContext) -> str:
                 parts.append(f"{n} more passage{'s are' if n > 1 else ' is'} listed under the sources.")
         else:
             parts.append(OFF_TOPIC)
+    if ctx.brief and parts:
+        if "sources" in kinds:
+            card = next(c for c in cards if c.type == "sources")
+            if card.excerpts and card.excerpts[0].cosine >= 0.25:
+                # Without the AI there is no real answer to give, so say what this is: the closest passage, from its first complete sentence
+                # (passages are cut at word boundaries, so they often begin mid-sentence)
+                quote = one_sentence(_from_first_full_sentence(card.excerpts[0].text), 36).rstrip(".\u2026")
+                return f"Closest passage: \u201c{quote}.\u201d [S1]"
+        return one_sentence(re.sub(r"\*\*", "", parts[0]))
     return "\n\n".join(parts)
 
 

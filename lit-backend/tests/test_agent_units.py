@@ -236,3 +236,72 @@ def test_fixture_index_returns_a_real_cosine():
     rng = np.random.default_rng(0)
     for hit in embedder_service.search(rng.normal(size=384).tolist(), 3):
         assert -1.0 <= hit["cosine"] <= 1.0
+
+
+# ---- one-liners -------------------------------------------------------------------------------------------------------
+@pytest.mark.parametrize("text,expected", [
+    ("What happened exactly? One liner please", True),
+    ("give me a one-line summary", True), ("in one sentence, who won?", True), ("tl;dr", True), ("TLDR of the facts", True),
+    ("briefly, what are the issues", True), ("short answer: was the FIR delayed?", True), ("keep it short", True),
+    ("Who are the parties?", False), ("Summarise this matter and tell me what is at stake.", False),
+    ("What does the appellant's brief argue about the FIR?", False), ("Is the line of cases consistent?", False),
+])
+def test_brevity_is_read_from_the_users_own_words(text, expected):
+    from services.agent.routing import parse_brevity
+    assert parse_brevity(text) is expected
+
+
+@pytest.mark.parametrize("raw,expected", [
+    ("The appellant is alleged to have killed the deceased with a kulhari. A key caveat is that the chain is contested.",
+     "The appellant is alleged to have killed the deceased with a kulhari."),
+    ("The weapon was recovered under Section 27 [S4]. Next, read the record.", "The weapon was recovered under Section 27 [S4]."),
+    ("The weapon was recovered. [S4][S5] Next, read the record.", "The weapon was recovered [S4][S5]."),
+    ("In State v. Rajasthan the court noted the delay. It then moved on.", "In State v. Rajasthan the court noted the delay."),
+    ("Sec. 302 IPC is invoked against Dr. Sharma.", "Sec. 302 IPC is invoked against Dr. Sharma."),
+    ("No terminal punctuation here", "No terminal punctuation here."),
+    ("The FIR was lodged eleven hours after the occurrence[S2]", "The FIR was lodged eleven hours after the occurrence [S2]."),
+    ("He was convicted [S1][S3] on that basis.", "He was convicted on that basis [S1][S3]."),
+    ("- It was a hit and run.\n\nSecond sentence.", "It was a hit and run."),
+])
+def test_one_sentence_cuts_to_the_first_sentence_and_keeps_its_citations(raw, expected):
+    from services.agent.sanitize import one_sentence
+    assert one_sentence(raw) == expected
+
+
+def test_one_sentence_caps_runaway_length():
+    from services.agent.sanitize import one_sentence
+    out = one_sentence(" ".join(["word"] * 120) + ".")
+    assert len(out.split()) <= 40 and out.endswith("…")
+
+
+def test_a_passage_that_starts_mid_sentence_is_not_quoted_as_a_fragment():
+    from services.agent.narration import _from_first_full_sentence
+    assert _from_first_full_sentence("after heavy rain. The learned trial court accepted this in part. The appellant contends") == "The learned trial court accepted this in part. The appellant contends"
+    assert _from_first_full_sentence("The appellant was convicted. Later") == "The appellant was convicted. Later"
+    assert _from_first_full_sentence("no boundary at all") == "no boundary at all"
+
+
+@pytest.mark.parametrize("asked,searched", [
+    ("What happened exactly? One liner please", "What happened?"),
+    ("In one sentence, was there any delay in lodging the FIR?", "was there any delay in lodging the FIR?"),
+    ("tl;dr of what the prosecution says happened", "of what the prosecution says happened"),
+    ("Does the judgment say anything about recovery of the weapon?", "Does the judgment say anything about recovery of the weapon?"),
+    ("one liner please", "one liner please"),     # nothing left once the filler is gone: keep what the user wrote
+])
+def test_request_style_filler_is_kept_out_of_the_document_search(asked, searched):
+    from services.agent.routing import retrieval_query
+    assert retrieval_query(asked) == searched
+
+
+def test_every_passage_starts_at_the_start_of_a_sentence():
+    """Passages cut mid-sentence lost their subject ("he was falsely implicated"), so the model could credit a claim to the wrong party."""
+    from services.agent.doc_index import chunk_with_offsets
+    text = open("tests/fixtures/demo_matter.txt", encoding="utf-8").read().strip()
+    chunks = chunk_with_offsets(text)
+    assert len(chunks) > 3
+    for c in chunks:
+        assert c.text == text[c.char_start:c.char_end]
+        assert c.text[:1].isupper() or c.text[:1].isdigit(), f"passage {c.index} starts mid-sentence: {c.text[:50]!r}"
+    # coverage: nothing is lost between passages
+    assert chunks[0].char_start == 0 and chunks[-1].char_end == len(text)
+    assert all(b.char_start < a.char_end for a, b in zip(chunks, chunks[1:]))   # they overlap rather than leave gaps

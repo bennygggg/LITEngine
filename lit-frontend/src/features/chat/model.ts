@@ -79,6 +79,8 @@ export interface Message {
   runId?: string
   mode?: 'llm' | 'forced' | 'deterministic'
   model?: string | null
+  /** The user asked for a short answer: the text comes before any cards. */
+  answerFirst?: boolean
   usage?: DoneEvent['usage']
   timings?: DoneEvent['timings']
   warnings?: string[]
