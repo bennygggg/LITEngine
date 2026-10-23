@@ -3,10 +3,8 @@ title: LITEngine Backend
 emoji: ⚖️
 colorFrom: blue
 colorTo: indigo
-sdk: gradio
-python_version: 3.12.12
-sdk_version: 4.44.0
-app_file: app.py
+sdk: docker
+app_port: 7860
 pinned: false
 ---
 
@@ -46,29 +44,30 @@ uvicorn main:app --reload
 
 ---
 
-## Deploy to Hugging Face Spaces (Gradio on ZeroGPU)
+## Deploy to Hugging Face Spaces (Docker)
 
 The Space repository is the contents of this `lit-backend/` directory. This
-README and `app.py` must appear at its root. The Gradio entrypoint mounts the
-existing FastAPI app, including `/health`, `/docs`, and `/api/v1/...`, on port
-7860. ZeroGPU currently supports Python 3.10.13 and 3.12.12; this Space pins
-3.12.12 because its trained outcome model needs scikit-learn 1.8.0, which
-requires Python 3.11 or newer. Keep that dependency and the committed model
-artifact together when deploying.
+README (its frontmatter sets `sdk: docker` and `app_port: 7860`) and the
+`Dockerfile` must appear at its root. The image runs the FastAPI app, including
+`/health`, `/docs`, and `/api/v1/...`, with uvicorn on port 7860. The backend is
+CPU-only. The image uses Python 3.11 because the trained outcome model needs
+scikit-learn 1.8.0, which requires Python 3.11 or newer. Keep that dependency
+and the committed model artifact together when deploying.
 
-1. Use the existing **Gradio** Space `thebenmerlin/lit-backend` on **ZeroGPU**.
-   Free personal accounts in good standing may host up to two ZeroGPU Spaces.
+1. Use the existing **Docker** Space `thebenmerlin/lit-backend` on **CPU Basic**
+   hardware (**Settings → Hardware**). Docker Spaces cannot use ZeroGPU.
 2. In the Space's **Settings → Variables and secrets**, set:
 
    | Name | Type | Value |
    |---|---|---|
    | `ENV` | Variable | `production` |
    | `ALLOWED_ORIGINS` | Variable | Exact frontend origin(s), comma-separated, for example `https://litengine.example.com` |
-   | `HUGGINGFACE_API_KEY` | Secret | An Inference API token, if using the hosted embedding path |
+   | `HUGGINGFACE_API_KEY` | Secret | An Inference Providers token, used for case-chat generation |
 
-   `HUGGINGFACE_API_KEY` is optional if using the local MiniLM fallback. The
-   GitHub deployment token `HF_TOKEN` is separate and must never be put in
-   Space variables or committed to Git.
+   `HUGGINGFACE_API_KEY` is optional: without it, case chat returns the most
+   relevant excerpt instead of a generated answer. The GitHub deployment token
+   `HF_TOKEN` is separate and must never be put in Space variables or committed
+   to Git.
 3. Commit backend changes to the monorepo's `main` branch. The monorepo's
    `.github/workflows/deploy-hf.yml` deploys only the `lit-backend/` subtree to
    the Space. Set the GitHub repository **secret** `HF_TOKEN` to a fine-grained
