@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from config import get_settings
 from utils.logger import setup_logger, get_logger
@@ -104,6 +105,12 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    # Landing route — the Space's App tab and anyone opening the bare URL get
+    # the interactive API docs instead of a 404.
+    @app.get("/", include_in_schema=False)
+    async def root():
+        return RedirectResponse(url="/docs")
+
     # Health endpoint (root level)
     @app.get("/health")
     async def health():
@@ -114,7 +121,7 @@ def create_app() -> FastAPI:
             "status": "healthy",
         }
 
-    # Readiness endpoint (for Render health checks)
+    # Readiness endpoint
     @app.get("/api/v1/health/ready")
     async def health_ready():
         """Readiness probe — returns readiness of all subsystems."""
