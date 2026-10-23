@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
 
 from config import get_settings
 from utils.logger import setup_logger, get_logger
@@ -14,38 +13,11 @@ from services.outcome_model import is_model_loaded
 from services.case_chat import case_chat_service
 
 # Routers
-from routers import precedent, facts, graph, simulation, chat
+from routers import precedent, facts, graph, simulation, chat, landing
 
 logger = get_logger(__name__)
 
 _index_loaded = False
-
-# Landing page for the bare URL (the Space's App tab). Colours come from the
-# browser's own light/dark scheme, so there is no theme CSS to maintain.
-_LANDING_HTML = """<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<title>__APP_NAME__</title>
-<style>
-  body { font: 16px/1.5 system-ui, sans-serif; display: grid; place-items: center; min-height: 100vh; margin: 0; padding: 0 16px; }
-  main { text-align: center; }
-  h1 { font-size: 1.4rem; margin: 0 0 .25rem; }
-  .status { opacity: .7; margin: 0 0 1rem; }
-  a { margin: 0 .6rem; }
-</style>
-</head>
-<body>
-<main>
-  <h1>__APP_NAME__</h1>
-  <p class="status">Backend API v__VERSION__ is running.</p>
-  <a href="/docs">API docs</a><a href="/health">Health</a>
-</main>
-</body>
-</html>
-"""
 
 
 @asynccontextmanager
@@ -132,14 +104,6 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Landing route — anyone opening the bare URL gets a small status page
-    # instead of a 404.
-    @app.get("/", include_in_schema=False, response_class=HTMLResponse)
-    async def root():
-        return _LANDING_HTML.replace("__APP_NAME__", settings.APP_NAME).replace(
-            "__VERSION__", settings.APP_VERSION
-        )
-
     # Health endpoint (root level)
     @app.get("/health")
     async def health():
@@ -161,6 +125,9 @@ def create_app() -> FastAPI:
             "outcome_model_loaded": is_model_loaded(),
             "dated_precedent_index_configured": bool(settings.PRECEDENT_INDEX_PATH),
         }
+
+    # Landing page at the bare URL (no prefix)
+    app.include_router(landing.router)
 
     # Register routers with /api/v1 prefix
     app.include_router(precedent.router, prefix="/api/v1")
