@@ -28,5 +28,8 @@ async def ask(request: ChatRequest):
         raise HTTPException(status_code=400, detail="question is empty")
 
     history = [{"role": m.role, "content": m.content} for m in request.history]
-    result = await case_chat_service.ask(request.case_text, request.question, history)
-    return result
+    try:
+        return await case_chat_service.ask(request.case_text, request.question, history)
+    except Exception as exc:  # noqa: BLE001 — retrieval/embedding failure; surface a reason, not a bare 500
+        logger.error(f"Case chat failed: {exc}")
+        raise HTTPException(status_code=503, detail=f"Could not search this case right now: {exc}")

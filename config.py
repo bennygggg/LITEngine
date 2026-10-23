@@ -9,6 +9,14 @@ class Settings(BaseSettings):
     # Hugging Face Configuration
     HUGGINGFACE_API_KEY: str = ""
 
+    # Where embeddings come from: "local" runs all-MiniLM-L6-v2 inside this
+    # process (pre-cached in the Docker image), "hf_api" calls the HF
+    # Inference Providers router and needs a funded HUGGINGFACE_API_KEY. Both
+    # give the same 384-dim vectors, so the FAISS index works with either.
+    # Local is the default so a missing, unfunded or rate-limited key can't
+    # take precedent search and case chat down with it.
+    EMBEDDING_BACKEND: str = "local"
+
     # Kanoon API Configuration
     KANOON_BASE_URL: str = "https://api.kanoon.example.com/v1"
 

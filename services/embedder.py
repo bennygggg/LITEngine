@@ -1,8 +1,8 @@
 """
-Embedder service — Hugging Face Inference API + FAISS semantic search.
+Embedder service — sentence embeddings + FAISS semantic search.
 
 Provides:
-  • Embedding generation via the HF Inference API
+  • Embedding generation, local by default or via the HF Inference API
     (model: sentence-transformers/all-MiniLM-L6-v2, dim=384)
   • FAISS IndexFlatL2 for fast L2 nearest-neighbour search
   • Automatic text chunking of long judgments
@@ -136,10 +136,12 @@ def _chunk_text(text: str, chunk_size: int = CHUNK_WORD_SIZE,
 
 
 class EmbedderService:
-    """Hugging Face Inference API embedder with FAISS index management.
+    """Embedder with FAISS index management.
 
-    Primary embedding source: HF Inference API (async, via httpx).
-    Fallback: local SentenceTransformer model when no valid API key is set.
+    Default embedding source: local SentenceTransformer model
+    (EMBEDDING_BACKEND=local).
+    Optional: HF Inference API (async, via httpx) with EMBEDDING_BACKEND=hf_api
+    and a valid HUGGINGFACE_API_KEY.
     """
 
     def __init__(self) -> None:
@@ -149,15 +151,17 @@ class EmbedderService:
         self.dimension = EMBEDDING_DIM
 
         # Decide mode: "hf_api" or "local"
-        self._use_hf_api = bool(
-            self.api_key and not self.api_key.startswith("hf_your_")
-        )
+        wants_hf_api = self.settings.EMBEDDING_BACKEND.strip().lower() == "hf_api"
+        key_valid = bool(self.api_key and not self.api_key.startswith("hf_your_"))
+        self._use_hf_api = wants_hf_api and key_valid
         self._local_model = None
-        if not self._use_hf_api:
+        if wants_hf_api and not key_valid:
             logger.warning(
-                "No valid HUGGINGFACE_API_KEY — falling back to "
-                "local SentenceTransformer model for embeddings"
+                "EMBEDDING_BACKEND=hf_api but no valid HUGGINGFACE_API_KEY — "
+                "falling back to local SentenceTransformer model for embeddings"
             )
+        elif not wants_hf_api:
+            logger.info("Embeddings: local SentenceTransformer model (EMBEDDING_BACKEND=local)")
 
         # FAISS state
         self._index: Optional[faiss.IndexFlatL2] = None
@@ -180,6 +184,12 @@ class EmbedderService:
                 logger.error(f"Failed to load local embedding model: {e}")
                 raise
         return self._local_model
+
+    async def warm_up(self) -> None:
+        """Load the local model now so the first request doesn't pay for it."""
+        if self._use_hf_api:
+            return
+        await asyncio.to_thread(self._get_local_model)
 
     async def _get_embedding_local(self, text: str) -> List[float]:
         """Generate embedding using local SentenceTransformer model."""
@@ -212,8 +222,8 @@ class EmbedderService:
     async def _get_embedding(self, text: str) -> List[float]:
         """Embed a single string.
 
-        Primary: HF Inference API with retry + backoff.
-        Fallback: local SentenceTransformer model when no valid API key.
+        Local SentenceTransformer model by default; HF Inference API with
+        retry + backoff when EMBEDDING_BACKEND=hf_api and the key is valid.
         """
         if not self._use_hf_api:
             return await self._get_embedding_local(text)
