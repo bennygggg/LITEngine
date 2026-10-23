@@ -1,0 +1,7 @@
+# Only lit-frontend is built on Vercel (project root directory = lit-frontend)
+lit-backend
+docs
+scripts
+.githooks
+.github
+.claude

@@ -33,3 +33,4 @@
 /lit-backend/.cache/
 /lit-frontend/test-results/
 /lit-frontend/playwright-report/
+.vercel
