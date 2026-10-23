@@ -76,7 +76,7 @@ export default function DemoPage() {
             {messages.length === 0 && (
               <div className="py-16 text-center">
                 <Play className="mx-auto mb-3 size-6 text-ink-muted" />
-                <h2 className="font-display text-3xl font-medium tracking-tight">See LIT work a real appeal</h2>
+                <h2 className="font-display text-3xl font-normal tracking-tight">See LIT work a real appeal</h2>
                 <p className="mx-auto mt-3 max-w-md text-ink-muted">A criminal appeal on a fictional matter: read the case, map the argument, estimate the outcome, find precedents, test scenarios, and ask the document — {player.total - 1} steps, about two minutes.</p>
               </div>
             )}

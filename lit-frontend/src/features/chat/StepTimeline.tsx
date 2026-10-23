@@ -39,7 +39,7 @@ export function StepTimeline({ steps, live }: { steps: StepPart[]; live: boolean
               <span className="min-w-0 flex-1">
                 <span className={cn(s.status === 'running' && 'text-ink')}>{s.label}</span>
                 {s.summary && s.status !== 'running' ? <span className="text-ink-subtle"> — {s.summary}</span> : null}
-                {s.origin === 'dependency' ? <span className="ml-1.5 text-2xs uppercase tracking-wider text-ink-subtle">needed first</span> : null}
+                {s.origin === 'dependency' ? <span className="ml-1.5 text-2xs text-ink-subtle">needed first</span> : null}
               </span>
               {s.status === 'cached' ? <span className="text-2xs text-ink-subtle">reused</span> : s.durationMs != null ? <span className="tnum text-2xs text-ink-subtle">{fmt(s.durationMs)}</span> : null}
             </li>

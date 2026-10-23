@@ -40,7 +40,7 @@ export function OutcomeCardView({ card }: { card: Card }) {
       actions={<Badge tone="outline">Indicative</Badge>}>
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <div>
-          <p className="font-display text-3xl font-medium leading-tight tracking-tight">{card.estimate.tier_label}</p>
+          <p className="font-display text-3xl font-normal leading-tight tracking-tight">{card.estimate.tier_label}</p>
           <p className="mt-1 text-sm text-ink-muted">about <span className="tnum font-medium text-ink">{card.estimate.p_rounded}%</span> chance of any appellate relief, including partial relief</p>
         </div>
         <Badge tone={tier.tone}><tier.Icon className="size-3" />{tier.word}</Badge>
@@ -49,7 +49,7 @@ export function OutcomeCardView({ card }: { card: Card }) {
 
       {contribs.length > 0 && (
         <div className="mt-6">
-          <h4 className="mb-2 text-2xs font-medium uppercase tracking-[0.08em] text-ink-subtle">What moves the estimate <span className="normal-case tracking-normal">(compared with a typical case)</span></h4>
+          <h4 className="mb-2 text-xs font-medium text-ink-subtle">What moves the estimate <span className="normal-case tracking-normal">(compared with a typical case)</span></h4>
           <ul className="space-y-2" aria-label="Drivers">
             {contribs.map((c) => {
               const w = Math.max(2, (Math.abs(c.contribution) / scale) * 50)

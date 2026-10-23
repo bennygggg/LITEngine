@@ -59,7 +59,7 @@ export function CanvasHost() {
         onPointerUp={() => { drag.current = null }}
         onKeyDown={(e) => { if (e.key === 'ArrowLeft') setCanvasWidth(canvasWidth + 24); if (e.key === 'ArrowRight') setCanvasWidth(canvasWidth - 24) }} />
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
-        <div className="min-w-0"><p className="text-2xs font-medium uppercase tracking-[0.08em] text-ink-subtle">{card ? NAMES[card.type] : 'Details'}</p><h2 className="truncate font-display text-base font-medium leading-tight">{(card && 'subtitle' in card && card.subtitle) || card?.title || 'Not available'}</h2></div>
+        <div className="min-w-0"><p className="text-xs font-medium text-ink-subtle">{card ? NAMES[card.type] : 'Details'}</p><h2 className="truncate font-display text-base font-normal leading-tight">{(card && 'subtitle' in card && card.subtitle) || card?.title || 'Not available'}</h2></div>
         <Button variant="ghost" size="icon-sm" aria-label="Close panel" onClick={closeCanvas}><X /></Button>
       </header>
       <div className="min-h-0 flex-1">

@@ -17,12 +17,12 @@ export function EmptyState({ composer, onReviewSample, onUpload, onFindPrecedent
   ]
   return (
     <div className="mx-auto flex min-h-0 w-full max-w-column flex-1 flex-col justify-center px-4 pb-16 pt-8">
-      <h1 className="mb-8 text-center font-display text-4xl font-medium leading-tight tracking-tight text-ink sm:text-[2.75rem]">What are you working on?</h1>
+      <h1 className="mb-8 text-center font-display text-4xl font-normal leading-[1.1] tracking-[-0.02em] text-ink sm:text-[3rem]">What are you working on?</h1>
       {composer}
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         {starters.map((s) => (
           <button key={s.title} type="button" onClick={s.onClick}
-            className="group flex flex-col items-start gap-2 rounded-xl border border-border bg-surface/60 p-4 text-left transition-colors hover:border-border-strong hover:bg-surface">
+            className="group flex flex-col items-start gap-2 rounded-md border border-border bg-surface p-4 text-left transition-colors hover:border-border-strong hover:bg-surface">
             <s.icon className="size-4.5 text-ink-muted" />
             <span className="text-sm font-medium">{s.title}</span>
             <span className="text-xs leading-relaxed text-ink-muted">{s.body}</span>

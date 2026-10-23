@@ -123,14 +123,14 @@ export default function MapCanvas({ card, focus }: { card: ArgumentMapCard; focu
         <div className="max-h-[42%] shrink-0 overflow-y-auto border-t border-border px-4 py-3 text-sm">
           {sel ? (
             <div>
-              <p className="text-2xs font-medium uppercase tracking-[0.08em]" style={{ color: token(TYPE_TOKEN[sel.type as NodeType]) }}>{TYPE_LABEL[sel.type as NodeType]}{weakIds.has(sel.id) && ' · no evidence link'}</p>
-              <h3 className="mt-0.5 font-display text-base font-medium leading-snug">{sel.label}</h3>
+              <p className="text-xs font-medium" style={{ color: token(TYPE_TOKEN[sel.type as NodeType]) }}>{TYPE_LABEL[sel.type as NodeType]}{weakIds.has(sel.id) && ' · no evidence link'}</p>
+              <h3 className="mt-0.5 font-display text-base font-normal leading-snug">{sel.label}</h3>
               {sel.description && <p className="mt-1 text-ink-muted">{sel.description}</p>}
               {connections.length > 0 && (
                 <ul className="mt-2 space-y-1">
                   {connections.map(({ edge, other, outgoing }) => (
                     <li key={edge.id}><button type="button" onClick={() => other && setSelected(other.id)} className="flex w-full items-baseline gap-2 rounded px-1 py-0.5 text-left hover:bg-sunken">
-                      <span className="w-14 shrink-0 text-2xs uppercase tracking-wide text-ink-subtle">{outgoing ? edge.label || edge.type : `← ${edge.label || edge.type}`}</span>
+                      <span className="w-14 shrink-0 text-2xs text-ink-subtle">{outgoing ? edge.label || edge.type : `← ${edge.label || edge.type}`}</span>
                       <span className="min-w-0 flex-1 truncate">{other?.label}</span>
                     </button></li>
                   ))}
@@ -146,7 +146,7 @@ export default function MapCanvas({ card, focus }: { card: ArgumentMapCard; focu
       <Tabs.Content value="list" className="min-h-0 flex-1 overflow-y-auto px-4 py-3 outline-none">
         {present.map((t) => (
           <section key={t} className="mb-5">
-            <h3 className="mb-1.5 text-2xs font-medium uppercase tracking-[0.08em] text-ink-subtle">{TYPE_LABEL[t]}</h3>
+            <h3 className="mb-1.5 text-xs font-medium text-ink-subtle">{TYPE_LABEL[t]}</h3>
             <ul className="divide-y divide-border rounded-lg border border-border">
               {card.graph.nodes.filter((n) => n.type === t).map((n) => {
                 const links = card.graph.edges.filter((e) => e.source === n.id || e.target === n.id)

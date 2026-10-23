@@ -43,7 +43,7 @@ export const MenuItem = forwardRef<ElementRef<typeof RadixMenu.Item>, ComponentP
 )
 
 export function MenuLabel({ className, ...props }: ComponentPropsWithoutRef<typeof RadixMenu.Label>) {
-  return <RadixMenu.Label className={cn('px-2.5 pb-1 pt-2 text-2xs font-medium uppercase tracking-[0.08em] text-ink-subtle', className)} {...props} />
+  return <RadixMenu.Label className={cn('px-2.5 pb-1 pt-2 text-xs font-medium text-ink-subtle', className)} {...props} />
 }
 
 export function MenuSeparator({ className, ...props }: ComponentPropsWithoutRef<typeof RadixMenu.Separator>) {

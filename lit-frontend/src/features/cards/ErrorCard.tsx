@@ -9,7 +9,7 @@ export function ErrorCardView({ card }: { card: ErrorCard }) {
     <section role="alert" className="flex items-start gap-3 rounded-lg border border-border bg-surface px-5 py-4 shadow-raised">
       <CircleAlert className="mt-0.5 size-4 shrink-0 text-ink-muted" />
       <div className="min-w-0 flex-1">
-        <h3 className="font-display text-base font-medium">{card.title}</h3>
+        <h3 className="font-display text-base font-normal">{card.title}</h3>
         <p className="mt-1 text-sm text-ink-muted">{card.message}</p>
         {card.technical && <details className="mt-2 text-xs text-ink-subtle"><summary className="cursor-pointer">Technical detail</summary><p className="mt-1 break-words">{card.technical}</p></details>}
       </div>

@@ -38,7 +38,7 @@ function Swatch({ token }: { token: string }) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="space-y-4">
-      <h2 className="border-b border-border pb-2 text-2xs font-medium uppercase tracking-[0.1em] text-ink-subtle">{title}</h2>
+      <h2 className="border-b border-border pb-2 text-xs font-medium text-ink-subtle">{title}</h2>
       {children}
     </section>
   )
@@ -55,8 +55,8 @@ export default function KitPage() {
     <main className="mx-auto max-w-4xl space-y-12 px-6 py-12">
       <header className="flex items-end justify-between gap-6">
         <div>
-          <p className="mb-2 text-2xs font-medium uppercase tracking-[0.1em] text-ink-subtle">LIT · Design kit · Phase 0</p>
-          <h1 className="font-display text-4xl font-medium tracking-tight">Foundations</h1>
+          <p className="mb-2 text-xs font-medium text-ink-subtle">LIT · Design kit · Phase 0</p>
+          <h1 className="font-display text-4xl font-normal tracking-tight">Foundations</h1>
           <p className="mt-2 max-w-xl text-ink-muted">
             Tokens, type and the base primitives every card builds on. Re-tuning the look (the Harvey pass) edits
             <code className="mx-1 rounded bg-sunken px-1 text-sm">tokens.css</code>
@@ -104,15 +104,15 @@ export default function KitPage() {
 
       <Section title="Type">
         <div className="space-y-3">
-          <p className="font-display text-4xl font-medium tracking-tight">What are you working on?</p>
-          <p className="font-display text-2xl font-medium tracking-tight">Mohan Lal v. State of Rajasthan</p>
-          <p className="font-display text-lg font-medium">Case profile</p>
+          <p className="font-display text-4xl font-normal tracking-tight">What are you working on?</p>
+          <p className="font-display text-2xl font-normal tracking-tight">Mohan Lal v. State of Rajasthan</p>
+          <p className="font-display text-lg font-normal">Case profile</p>
           <p className="max-w-prose text-base text-ink">
             Body text sets at 15&nbsp;px with a 1.65 line height so long assistant answers read like a memo, not a chat bubble.
             Figures use tabular numerals: <span className="tnum">1,240 words · 505 judgments · cosine 0.572</span>.
           </p>
           <p className="text-sm text-ink-muted">UI chrome sets at 13&nbsp;px. Secondary information is muted, never faint.</p>
-          <p className="text-2xs font-medium uppercase tracking-[0.1em] text-ink-subtle">Eyebrow label</p>
+          <p className="text-xs font-medium text-ink-subtle">Eyebrow label</p>
         </div>
       </Section>
 

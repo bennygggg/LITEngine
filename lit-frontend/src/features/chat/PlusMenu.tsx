@@ -20,7 +20,7 @@ export function PlusMenu({ hasCase, disabled, onAddCase, onChooseCase, onPickToo
     <Menu open={open} onOpenChange={onOpenChange}>
       <Tooltip label="Add a matter or pick a tool">
         <MenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Add a matter or pick a tool" disabled={disabled} className="rounded-full border border-border-strong"><Plus /></Button>
+          <Button variant="ghost" size="icon" aria-label="Add a matter or pick a tool" disabled={disabled} className="rounded-sm border border-border-strong"><Plus /></Button>
         </MenuTrigger>
       </Tooltip>
       <MenuContent align="start" side="top" className="w-80">

@@ -17,8 +17,8 @@ export function NeedsInputCard({ card, answered }: { card: Card; answered?: Reco
   return (
     <section className={cn('rounded-lg border bg-surface shadow-raised', done ? 'border-border' : 'border-accent/40')} aria-label={card.title}>
       <div className="px-5 pb-1 pt-4">
-        <p className="mb-1 text-2xs font-medium uppercase tracking-[0.08em] text-ink-subtle">{done ? 'Provided' : 'Needed to continue'}</p>
-        <h3 className="font-display text-lg font-medium tracking-tight">{done ? 'Details provided' : card.title}</h3>
+        <p className="mb-1 text-xs font-medium text-ink-subtle">{done ? 'Provided' : 'Needed to continue'}</p>
+        <h3 className="font-display text-lg font-normal tracking-tight">{done ? 'Details provided' : card.title}</h3>
         {!done && <p className="mt-1 text-sm text-ink-muted">{card.reason}</p>}
       </div>
       <form

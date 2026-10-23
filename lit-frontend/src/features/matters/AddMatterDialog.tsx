@@ -65,14 +65,14 @@ function Library({ onChoose }: { onChoose: (r: CaseRecord) => void }) {
       </label>
       {mine.length > 0 && (
         <section className="mb-5">
-          <h3 className="mb-1.5 text-2xs font-medium uppercase tracking-[0.08em] text-ink-subtle">My matters</h3>
+          <h3 className="mb-1.5 text-xs font-medium text-ink-subtle">My matters</h3>
           <ul className="divide-y divide-border rounded-lg border border-border">
             {mine.map((c) => <MatterRow key={c.id} title={c.title} meta={[`${c.wordCount.toLocaleString()} words`, c.source === 'upload' ? 'Uploaded' : 'Pasted']} onChoose={() => onChoose(c)} />)}
           </ul>
         </section>
       )}
       <section>
-        <h3 className="mb-1.5 flex items-center gap-2 text-2xs font-medium uppercase tracking-[0.08em] text-ink-subtle">Sample matters <Badge tone="outline">Fictional</Badge></h3>
+        <h3 className="mb-1.5 flex items-center gap-2 text-xs font-medium text-ink-subtle">Sample matters <Badge tone="outline">Fictional</Badge></h3>
         <ul className="divide-y divide-border rounded-lg border border-border">
           {samples.map((s: SampleMatter) => (
             <MatterRow key={s.id} title={s.title} meta={[s.court, String(s.year), s.kind]} chips={s.sections} onChoose={async () => onChoose(await addSample(s))} />

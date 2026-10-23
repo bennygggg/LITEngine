@@ -1,7 +1,8 @@
 /*
   Design tokens — the single place colour, type and shadow decisions live.
   Colours are space-separated RGB triplets so Tailwind can apply alpha (`bg-accent/10`).
-  The Harvey-fidelity pass (after v1.0.0) re-tunes THIS FILE and a few component variants; nothing else.
+  Restyle history: v1.0.0 warm "oxide" palette -> style pass (this file): near-monochrome warm neutrals, a dark sidebar
+  on a light canvas, one restrained sage accent. Component code uses semantic tokens only.
 */
 
 @import '@fontsource-variable/inter';
@@ -10,19 +11,27 @@
 :root {
   color-scheme: light;
 
-  --c-bg: 247 245 240;
+  --c-bg: 250 250 249;
   --c-surface: 255 255 255;
-  --c-sunken: 240 237 230;
-  --c-border: 228 224 214;
-  --c-border-strong: 208 203 191;
-  --c-ink: 31 29 26;
+  --c-sunken: 243 242 240;
+  --c-border: 231 229 226;
+  --c-border-strong: 211 208 203;
+  --c-ink: 15 14 13;
   /* Secondary text must clear WCAG AA (4.5:1) on every surface it sits on, including the tinted sidebar and chips. */
-  --c-ink-muted: 90 86 78;
-  --c-ink-subtle: 106 101 91;
-  --c-accent: 165 67 47;
+  --c-ink-muted: 92 89 83;
+  --c-ink-subtle: 104 101 94;
+  --c-accent: 47 79 74;
   --c-accent-ink: 255 255 255;
-  --c-accent-soft: 243 228 223;
-  --c-shadow: 31 29 26;
+  --c-accent-soft: 232 239 237;
+  --c-shadow: 15 14 13;
+
+  /* The sidebar is dark in both themes: it frames the work, it is not part of the page */
+  --c-side: 20 19 18;
+  --c-side-ink: 250 250 249;
+  --c-side-muted: 168 164 156;
+  --c-side-subtle: 140 136 129;
+  --c-side-hover: 255 255 255;
+  --c-side-border: 255 255 255;
 
   /* Outcome tiers — always paired with an icon and words in the UI, never colour alone */
   --c-fav: 52 110 80;
@@ -40,18 +49,20 @@
 .dark {
   color-scheme: dark;
 
-  --c-bg: 20 19 16;
-  --c-surface: 28 26 23;
-  --c-sunken: 16 15 13;
-  --c-border: 46 43 38;
-  --c-border-strong: 66 62 55;
-  --c-ink: 237 233 224;
-  --c-ink-muted: 179 173 159;
-  --c-ink-subtle: 154 148 135;
-  --c-accent: 214 136 112;
-  --c-accent-ink: 28 18 14;
-  --c-accent-soft: 56 38 32;
+  --c-bg: 15 14 13;
+  --c-surface: 24 23 21;
+  --c-sunken: 10 9 8;
+  --c-border: 43 41 38;
+  --c-border-strong: 66 63 58;
+  --c-ink: 250 250 249;
+  --c-ink-muted: 168 164 157;
+  --c-ink-subtle: 150 146 139;
+  --c-accent: 143 184 175;
+  --c-accent-ink: 15 24 22;
+  --c-accent-soft: 32 46 43;
   --c-shadow: 0 0 0;
+
+  --c-side: 10 9 8;
 
   --c-fav: 120 180 148;
   --c-unc: 214 168 90;

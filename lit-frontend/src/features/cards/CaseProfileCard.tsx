@@ -9,7 +9,7 @@ import type { CaseProfileCard as Card } from '@/types/agent'
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <h4 className="mb-1.5 text-2xs font-medium uppercase tracking-[0.08em] text-ink-subtle">{label}</h4>
+      <h4 className="mb-1.5 text-xs font-medium text-ink-subtle">{label}</h4>
       {children}
     </div>
   )

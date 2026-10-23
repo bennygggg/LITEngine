@@ -25,7 +25,7 @@ export default function CardsGallery() {
       <div className="mx-auto max-w-column space-y-12 px-4 py-10">
         {msgs.map(([name, m]) => (
           <section key={name}>
-            <h2 className="mb-4 border-b border-border pb-2 text-2xs font-medium uppercase tracking-[0.1em] text-ink-subtle">{name}</h2>
+            <h2 className="mb-4 border-b border-border pb-2 text-xs font-medium text-ink-subtle">{name}</h2>
             <AssistantMessage msg={m} isLast />
           </section>
         ))}

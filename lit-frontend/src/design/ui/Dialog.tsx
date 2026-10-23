@@ -26,7 +26,7 @@ export function DialogContent({
       >
         <header className="flex items-start justify-between gap-4 border-b border-border px-6 py-4">
           <div>
-            <RadixDialog.Title className="font-display text-xl font-medium tracking-tight">{title}</RadixDialog.Title>
+            <RadixDialog.Title className="font-display text-xl font-normal tracking-tight">{title}</RadixDialog.Title>
             {description ? <RadixDialog.Description className="mt-0.5 text-sm text-ink-muted">{description}</RadixDialog.Description> : <RadixDialog.Description className="sr-only">{title}</RadixDialog.Description>}
           </div>
           <RadixDialog.Close asChild>

@@ -63,7 +63,7 @@ export function Composer({ matter, busy, large, autoFocus, onSubmit, onStop, onA
   const placeholder = spec?.hint ?? (matter ? 'Ask about this matter, or press + to pick a tool' : 'Ask a legal research question, or press + to add a matter')
 
   return (
-    <div className={cn('rounded-composer border border-border-strong bg-surface shadow-raised transition-colors focus-within:border-ink/50', large && 'shadow-float')}>
+    <div className={cn('rounded-composer border border-border-strong bg-surface transition-colors focus-within:border-ink/60', large && 'shadow-float')}>
       {(matter || spec) && (
         <div className="flex flex-wrap items-center gap-1.5 px-3.5 pt-3">
           {matter && (
@@ -102,9 +102,9 @@ export function Composer({ matter, busy, large, autoFocus, onSubmit, onStop, onA
         <div className="flex items-center gap-2">
           {!busy && <span className="hidden items-center gap-1 text-xs text-ink-subtle sm:inline-flex"><Kbd>↵</Kbd> to send</span>}
           {busy ? (
-            <Button size="icon" onClick={onStop} aria-label="Stop generating" className="rounded-full"><Square className="size-3.5 fill-current" /></Button>
+            <Button size="icon" onClick={onStop} aria-label="Stop generating" className="rounded-sm"><Square className="size-3.5 fill-current" /></Button>
           ) : (
-            <Button size="icon" onClick={submit} disabled={!canSend} aria-label="Send message" className="rounded-full"><ArrowUp /></Button>
+            <Button size="icon" onClick={submit} disabled={!canSend} aria-label="Send message" className="rounded-sm"><ArrowUp /></Button>
           )}
         </div>
       </div>
