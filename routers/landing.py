@@ -18,15 +18,14 @@ router = APIRouter(include_in_schema=False)
 _STARTED_AT = time.time()
 
 # Colours come from the browser's own light/dark scheme (color-scheme + system
-# colours), so there is no theme CSS to maintain. The page re-checks itself
-# every minute.
+# colours), so there is no theme CSS to maintain. The page reloads itself every
+# minute, except while a Health/Readiness result is on screen.
 _PAGE = Template("""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<meta http-equiv="refresh" content="60">
 <title>$name</title>
 <style>
   :root { --line: rgba(128, 128, 128, .35); --muted: rgba(128, 128, 128, 1); --ok: #16a34a; --warn: #d97706; }
@@ -49,7 +48,9 @@ _PAGE = Template("""<!doctype html>
   .buttons { display: flex; flex-wrap: wrap; gap: .5rem; }
   .btn { border: 1px solid var(--line); border-radius: 6px; padding: .45rem .9rem; text-decoration: none; color: inherit; font-weight: 600; }
   .btn:hover { border-color: currentColor; }
+  button.btn { font: inherit; font-weight: 600; background: transparent; cursor: pointer; }
   .btn.primary { background: CanvasText; color: Canvas; border-color: CanvasText; }
+  .out { border: 1px solid var(--line); border-radius: 8px; padding: .75rem 1rem; margin: .75rem 0 0; font: .8rem/1.5 ui-monospace, monospace; white-space: pre-wrap; overflow-x: auto; }
   .foot { color: var(--muted); font-size: .8rem; margin-top: 1rem; }
 </style>
 </head>
@@ -65,8 +66,23 @@ _PAGE = Template("""<!doctype html>
     <div><dt>Up for</dt><dd>$uptime</dd></div>
   </dl>
   <div class="buttons">$buttons</div>
+  <pre id="out" class="out" hidden></pre>
   <p class="foot">Checked $checked UTC &middot; refreshes every minute</p>
 </main>
+<script>
+  var out = document.getElementById("out");
+  document.querySelectorAll("[data-check]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      out.hidden = false;
+      out.textContent = "Checking...";
+      fetch(button.dataset.check, { cache: "no-store" })
+        .then(function (r) { return r.json().then(function (body) { return [r.status, body]; }); })
+        .then(function (res) { out.textContent = button.textContent + " - HTTP " + res[0] + "\\n" + JSON.stringify(res[1], null, 2); })
+        .catch(function (e) { out.textContent = button.textContent + " - failed: " + e.message; });
+    });
+  });
+  setInterval(function () { if (out.hidden) location.reload(); }, 60000);
+</script>
 </body>
 </html>
 """)
@@ -110,6 +126,11 @@ def _checks(settings) -> list[tuple[str, bool, str]]:
     ]
 
 
+def _check_button(url: str, text: str) -> str:
+    """A button that fetches `url` and shows the JSON on the page."""
+    return f'<button class="btn" data-check="{escape(url)}">{escape(text)}</button>'
+
+
 def _button(href: str, text: str, primary: bool = False, external: bool = False) -> str:
     classes = "btn primary" if primary else "btn"
     target = ' target="_blank" rel="noopener"' if external else ""
@@ -130,8 +151,8 @@ async def landing():
 
     buttons = [
         _button("/docs", "API docs", primary=True),
-        _button("/health", "Health"),
-        _button("/api/v1/health/ready", "Readiness"),
+        _check_button("/health", "Health"),
+        _check_button("/api/v1/health/ready", "Readiness"),
     ]
     frontend = next((o for o in settings.allowed_origins_list if o.startswith("https://")), "")
     if frontend:
