@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     # Use fixtures (offline dev mode)
     USE_FIXTURES: bool = False
 
+    # Throwaway streaming test endpoint (/api/v1/spike/stream) used to prove SSE survives the HF proxy.
+    # Off everywhere except the staging Space.
+    SPIKE_ENABLED: bool = False
+
     # Outcome model — which prediction populates the top-level
     # SimulationResponse.result: "new_model" (trained binary classifier)
     # or "old_heuristic" (hand-picked weights). Automatically forced to

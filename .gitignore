@@ -28,3 +28,5 @@
 
 # Git
 *.orig
+/lit-backend/.venv311/
+/lit-backend/.cache/

@@ -1,0 +1,64 @@
+/*
+  Design tokens — the single place colour, type and shadow decisions live.
+  Colours are space-separated RGB triplets so Tailwind can apply alpha (`bg-accent/10`).
+  The Harvey-fidelity pass (after v1.0.0) re-tunes THIS FILE and a few component variants; nothing else.
+*/
+
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/newsreader';
+
+:root {
+  color-scheme: light;
+
+  --c-bg: 247 245 240;
+  --c-surface: 255 255 255;
+  --c-sunken: 240 237 230;
+  --c-border: 228 224 214;
+  --c-border-strong: 208 203 191;
+  --c-ink: 31 29 26;
+  --c-ink-muted: 107 102 92;
+  --c-ink-subtle: 140 135 125;
+  --c-accent: 165 67 47;
+  --c-accent-ink: 255 255 255;
+  --c-accent-soft: 243 228 223;
+  --c-shadow: 31 29 26;
+
+  /* Outcome tiers — always paired with an icon and words in the UI, never colour alone */
+  --c-fav: 52 110 80;
+  --c-unc: 150 104 24;
+  --c-unfav: 158 58 50;
+
+  /* Argument-map node types (also distinguished by shape) */
+  --c-node-issue: 62 106 154;
+  --c-node-claim: 181 83 47;
+  --c-node-evidence: 75 127 102;
+  --c-node-statute: 154 122 46;
+  --c-node-precedent: 123 94 148;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --c-bg: 20 19 16;
+  --c-surface: 28 26 23;
+  --c-sunken: 16 15 13;
+  --c-border: 46 43 38;
+  --c-border-strong: 66 62 55;
+  --c-ink: 237 233 224;
+  --c-ink-muted: 163 157 144;
+  --c-ink-subtle: 120 115 104;
+  --c-accent: 214 136 112;
+  --c-accent-ink: 28 18 14;
+  --c-accent-soft: 56 38 32;
+  --c-shadow: 0 0 0;
+
+  --c-fav: 120 180 148;
+  --c-unc: 214 168 90;
+  --c-unfav: 220 120 110;
+
+  --c-node-issue: 124 168 214;
+  --c-node-claim: 224 138 100;
+  --c-node-evidence: 128 186 156;
+  --c-node-statute: 206 176 96;
+  --c-node-precedent: 176 148 204;
+}

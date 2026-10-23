@@ -1,0 +1,5231 @@
+{
+  "components": {
+    "schemas": {
+      "AgentChatRequest": {
+        "properties": {
+          "case": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "client": {
+            "$ref": "#/components/schemas/ClientInfo"
+          },
+          "conversation_id": {
+            "title": "Conversation Id",
+            "type": "string"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ChatTurn"
+            },
+            "maxItems": 12,
+            "title": "Messages",
+            "type": "array"
+          },
+          "options": {
+            "$ref": "#/components/schemas/AgentOptions"
+          },
+          "retry_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retry Of"
+          },
+          "run_id": {
+            "description": "Client-generated id; re-POSTing the same run_id with Last-Event-ID resumes",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "user_message": {
+            "$ref": "#/components/schemas/UserMessage"
+          }
+        },
+        "required": [
+          "client",
+          "conversation_id",
+          "run_id",
+          "user_message"
+        ],
+        "title": "AgentChatRequest",
+        "type": "object"
+      },
+      "AgentOptions": {
+        "properties": {
+          "mode": {
+            "default": "auto",
+            "enum": [
+              "auto",
+              "deterministic"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "narrate": {
+            "default": "llm",
+            "enum": [
+              "llm",
+              "template",
+              "none"
+            ],
+            "title": "Narrate",
+            "type": "string"
+          }
+        },
+        "title": "AgentOptions",
+        "type": "object"
+      },
+      "AgentSchemaBundle": {
+        "description": "Carrier model: registering this on a route puts every card and event variant into the OpenAPI\ncomponents so openapi-typescript can generate the client types. Not used at runtime.",
+        "properties": {
+          "card": {
+            "discriminator": {
+              "mapping": {
+                "argument_map": "#/components/schemas/ArgumentMapCard",
+                "case_profile": "#/components/schemas/CaseProfileCard",
+                "document": "#/components/schemas/DocumentCard",
+                "error": "#/components/schemas/ErrorCard",
+                "needs_input": "#/components/schemas/NeedsInputCard",
+                "outcome": "#/components/schemas/OutcomeCard",
+                "precedents": "#/components/schemas/PrecedentsCard",
+                "scenario": "#/components/schemas/ScenarioCard",
+                "sources": "#/components/schemas/SourcesCard"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CaseProfileCard"
+              },
+              {
+                "$ref": "#/components/schemas/PrecedentsCard"
+              },
+              {
+                "$ref": "#/components/schemas/ArgumentMapCard"
+              },
+              {
+                "$ref": "#/components/schemas/OutcomeCard"
+              },
+              {
+                "$ref": "#/components/schemas/ScenarioCard"
+              },
+              {
+                "$ref": "#/components/schemas/SourcesCard"
+              },
+              {
+                "$ref": "#/components/schemas/NeedsInputCard"
+              },
+              {
+                "$ref": "#/components/schemas/DocumentCard"
+              },
+              {
+                "$ref": "#/components/schemas/ErrorCard"
+              }
+            ],
+            "title": "Card"
+          },
+          "case_preview": {
+            "$ref": "#/components/schemas/CasePreview"
+          },
+          "event": {
+            "discriminator": {
+              "mapping": {
+                "artifact_update": "#/components/schemas/ArtifactUpdateEvent",
+                "card": "#/components/schemas/CardEvent",
+                "done": "#/components/schemas/DoneEvent",
+                "error": "#/components/schemas/ErrorEvent",
+                "message_start": "#/components/schemas/MessageStartEvent",
+                "meta": "#/components/schemas/MetaEvent",
+                "needs_input": "#/components/schemas/NeedsInputEvent",
+                "ping": "#/components/schemas/PingEvent",
+                "step": "#/components/schemas/StepEvent",
+                "text_delta": "#/components/schemas/TextDeltaEvent"
+              },
+              "propertyName": "event"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MessageStartEvent"
+              },
+              {
+                "$ref": "#/components/schemas/TextDeltaEvent"
+              },
+              {
+                "$ref": "#/components/schemas/StepEvent"
+              },
+              {
+                "$ref": "#/components/schemas/CardEvent"
+              },
+              {
+                "$ref": "#/components/schemas/NeedsInputEvent"
+              },
+              {
+                "$ref": "#/components/schemas/ArtifactUpdateEvent"
+              },
+              {
+                "$ref": "#/components/schemas/MetaEvent"
+              },
+              {
+                "$ref": "#/components/schemas/PingEvent"
+              },
+              {
+                "$ref": "#/components/schemas/ErrorEvent"
+              },
+              {
+                "$ref": "#/components/schemas/DoneEvent"
+              }
+            ],
+            "title": "Event"
+          },
+          "request": {
+            "$ref": "#/components/schemas/AgentChatRequest"
+          },
+          "schema_version": {
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "request",
+          "card",
+          "event",
+          "case_preview"
+        ],
+        "title": "AgentSchemaBundle",
+        "type": "object"
+      },
+      "AppliedLever": {
+        "properties": {
+          "lever": {
+            "title": "Lever",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "status": {
+            "enum": [
+              "applied",
+              "clamped",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "lever",
+          "status"
+        ],
+        "title": "AppliedLever",
+        "type": "object"
+      },
+      "ArgumentMapCard": {
+        "properties": {
+          "artifact_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Key"
+          },
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "disclaimer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Disclaimer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "graph": {
+            "$ref": "#/components/schemas/GraphBuildResponse"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_ver": {
+            "default": 1,
+            "title": "Schema Ver",
+            "type": "integer"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/GraphSummary"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "argument_map",
+            "default": "argument_map",
+            "enum": [
+              "argument_map"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_id",
+          "title",
+          "graph",
+          "summary"
+        ],
+        "title": "ArgumentMapCard",
+        "type": "object"
+      },
+      "ArtifactUpdateEvent": {
+        "properties": {
+          "card_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card Id"
+          },
+          "event": {
+            "const": "artifact_update",
+            "default": "artifact_update",
+            "enum": [
+              "artifact_update"
+            ],
+            "title": "Event",
+            "type": "string"
+          },
+          "implicit": {
+            "default": false,
+            "title": "Implicit",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "profile",
+              "precedents",
+              "graph",
+              "outcome",
+              "scenario",
+              "excerpts"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "seq": {
+            "description": "Strictly increasing within a run; used for Last-Event-ID resume",
+            "title": "Seq",
+            "type": "integer"
+          },
+          "t": {
+            "default": 0,
+            "description": "Milliseconds since the request was received",
+            "title": "T",
+            "type": "integer"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq",
+          "kind",
+          "key"
+        ],
+        "title": "ArtifactUpdateEvent",
+        "type": "object"
+      },
+      "Body_upload_case_api_v1_chat_upload_post": {
+        "properties": {
+          "file": {
+            "format": "binary",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_case_api_v1_chat_upload_post",
+        "type": "object"
+      },
+      "CardEvent": {
+        "properties": {
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "event": {
+            "const": "card",
+            "default": "card",
+            "enum": [
+              "card"
+            ],
+            "title": "Event",
+            "type": "string"
+          },
+          "part_id": {
+            "title": "Part Id",
+            "type": "string"
+          },
+          "payload": {
+            "discriminator": {
+              "mapping": {
+                "argument_map": "#/components/schemas/ArgumentMapCard",
+                "case_profile": "#/components/schemas/CaseProfileCard",
+                "document": "#/components/schemas/DocumentCard",
+                "error": "#/components/schemas/ErrorCard",
+                "needs_input": "#/components/schemas/NeedsInputCard",
+                "outcome": "#/components/schemas/OutcomeCard",
+                "precedents": "#/components/schemas/PrecedentsCard",
+                "scenario": "#/components/schemas/ScenarioCard",
+                "sources": "#/components/schemas/SourcesCard"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CaseProfileCard"
+              },
+              {
+                "$ref": "#/components/schemas/PrecedentsCard"
+              },
+              {
+                "$ref": "#/components/schemas/ArgumentMapCard"
+              },
+              {
+                "$ref": "#/components/schemas/OutcomeCard"
+              },
+              {
+                "$ref": "#/components/schemas/ScenarioCard"
+              },
+              {
+                "$ref": "#/components/schemas/SourcesCard"
+              },
+              {
+                "$ref": "#/components/schemas/NeedsInputCard"
+              },
+              {
+                "$ref": "#/components/schemas/DocumentCard"
+              },
+              {
+                "$ref": "#/components/schemas/ErrorCard"
+              }
+            ],
+            "title": "Payload"
+          },
+          "schema_ver": {
+            "default": 1,
+            "title": "Schema Ver",
+            "type": "integer"
+          },
+          "seq": {
+            "description": "Strictly increasing within a run; used for Last-Event-ID resume",
+            "title": "Seq",
+            "type": "integer"
+          },
+          "step_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step Id"
+          },
+          "supersedes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supersedes"
+          },
+          "t": {
+            "default": 0,
+            "description": "Milliseconds since the request was received",
+            "title": "T",
+            "type": "integer"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq",
+          "card_id",
+          "part_id",
+          "payload"
+        ],
+        "title": "CardEvent",
+        "type": "object"
+      },
+      "CaseInputs": {
+        "properties": {
+          "appellant_type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "accused_appeal",
+                  "state_appeal",
+                  "unclear"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Direct user input, never inferred from case text",
+            "title": "Appellant Type"
+          },
+          "filing_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Used as the precedent cutoff (decided strictly before)",
+            "title": "Filing Date"
+          }
+        },
+        "title": "CaseInputs",
+        "type": "object"
+      },
+      "CasePreview": {
+        "properties": {
+          "detected": {
+            "$ref": "#/components/schemas/DetectedCase"
+          },
+          "extraction": {
+            "$ref": "#/components/schemas/ExtractionQuality"
+          },
+          "known": {
+            "default": true,
+            "title": "Known",
+            "type": "boolean"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "word_count": {
+            "title": "Word Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ref",
+          "word_count",
+          "detected",
+          "extraction"
+        ],
+        "title": "CasePreview",
+        "type": "object"
+      },
+      "CaseProfileCard": {
+        "properties": {
+          "artifact_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Key"
+          },
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "disclaimer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Disclaimer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extraction": {
+            "$ref": "#/components/schemas/ExtractionQuality"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/CaseInputs"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/StructuredCaseProfile"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_ver": {
+            "default": 1,
+            "title": "Schema Ver",
+            "type": "integer"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "case_profile",
+            "default": "case_profile",
+            "enum": [
+              "case_profile"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_id",
+          "title",
+          "profile",
+          "extraction"
+        ],
+        "title": "CaseProfileCard",
+        "type": "object"
+      },
+      "CaseRef": {
+        "properties": {
+          "inputs": {
+            "$ref": "#/components/schemas/CaseInputs"
+          },
+          "profile_override": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StructuredCaseProfile"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set only if the user edited the profile"
+          },
+          "ref": {
+            "description": "sha256 of the case text (already PUT to /cases/{sha256})",
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Ref",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "maxLength": 300,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "title": "CaseRef",
+        "type": "object"
+      },
+      "CaseUploadResponse": {
+        "properties": {
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "word_count": {
+            "title": "Word Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "text",
+          "filename",
+          "word_count"
+        ],
+        "title": "CaseUploadResponse",
+        "type": "object"
+      },
+      "ChatMessage": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "role": {
+            "description": "'user' or 'assistant'",
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ],
+        "title": "ChatMessage",
+        "type": "object"
+      },
+      "ChatRequest": {
+        "properties": {
+          "case_text": {
+            "description": "Full text of the case being discussed",
+            "title": "Case Text",
+            "type": "string"
+          },
+          "history": {
+            "description": "Prior turns, oldest first",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "case_text",
+          "question"
+        ],
+        "title": "ChatRequest",
+        "type": "object"
+      },
+      "ChatResponse": {
+        "properties": {
+          "answer": {
+            "title": "Answer",
+            "type": "string"
+          },
+          "method": {
+            "description": "'generated' (model answered) or 'extractive' (fallback: raw top excerpt, no model available)",
+            "title": "Method",
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/ChatSource"
+            },
+            "title": "Sources",
+            "type": "array"
+          }
+        },
+        "required": [
+          "answer",
+          "sources",
+          "method"
+        ],
+        "title": "ChatResponse",
+        "type": "object"
+      },
+      "ChatSource": {
+        "properties": {
+          "index": {
+            "description": "1-based, matches the [S1]/[S2] labels used in the answer",
+            "title": "Index",
+            "type": "integer"
+          },
+          "similarity_score": {
+            "title": "Similarity Score",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "text",
+          "similarity_score"
+        ],
+        "title": "ChatSource",
+        "type": "object"
+      },
+      "ChatTurn": {
+        "description": "Prior turns are text only — cards are re-described to the model by the server, never replayed.",
+        "properties": {
+          "content": {
+            "maxLength": 8000,
+            "title": "Content",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ],
+        "title": "ChatTurn",
+        "type": "object"
+      },
+      "ClientInfo": {
+        "properties": {
+          "schema_version": {
+            "default": 1,
+            "description": "Wire schema the client understands",
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "version": {
+            "description": "Client app version, e.g. 1.0.0",
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "title": "ClientInfo",
+        "type": "object"
+      },
+      "DetectedCase": {
+        "properties": {
+          "court_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Court Level"
+          },
+          "petitioner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Petitioner"
+          },
+          "respondent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Respondent"
+          },
+          "sections": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sections",
+            "type": "array"
+          }
+        },
+        "title": "DetectedCase",
+        "type": "object"
+      },
+      "Disclaimer": {
+        "properties": {
+          "level": {
+            "default": "info",
+            "enum": [
+              "info",
+              "caution"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "Disclaimer",
+        "type": "object"
+      },
+      "DocumentCard": {
+        "properties": {
+          "artifact_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Key"
+          },
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "disclaimer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Disclaimer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extraction": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtractionQuality"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "pages": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages"
+          },
+          "preview": {
+            "default": "",
+            "title": "Preview",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_ver": {
+            "default": 1,
+            "title": "Schema Ver",
+            "type": "integer"
+          },
+          "source": {
+            "enum": [
+              "sample",
+              "upload",
+              "paste"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "document",
+            "default": "document",
+            "enum": [
+              "document"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "word_count": {
+            "title": "Word Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "card_id",
+          "title",
+          "case_id",
+          "word_count",
+          "source"
+        ],
+        "title": "DocumentCard",
+        "type": "object"
+      },
+      "DoneEvent": {
+        "properties": {
+          "event": {
+            "const": "done",
+            "default": "done",
+            "enum": [
+              "done"
+            ],
+            "title": "Event",
+            "type": "string"
+          },
+          "message_id": {
+            "title": "Message Id",
+            "type": "string"
+          },
+          "seq": {
+            "description": "Strictly increasing within a run; used for Last-Event-ID resume",
+            "title": "Seq",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "complete",
+              "awaiting_input",
+              "cancelled",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "t": {
+            "default": 0,
+            "description": "Milliseconds since the request was received",
+            "title": "T",
+            "type": "integer"
+          },
+          "timings": {
+            "$ref": "#/components/schemas/Timings"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/Usage"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          },
+          "warnings": {
+            "description": "e.g. citation refs the model used that no tool issued",
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "seq",
+          "status",
+          "message_id"
+        ],
+        "title": "DoneEvent",
+        "type": "object"
+      },
+      "ErrorCard": {
+        "properties": {
+          "artifact_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Key"
+          },
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "disclaimer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Disclaimer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "retry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ForcedTool"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "retryable": {
+            "default": false,
+            "title": "Retryable",
+            "type": "boolean"
+          },
+          "schema_ver": {
+            "default": 1,
+            "title": "Schema Ver",
+            "type": "integer"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "technical": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Collapsible detail; never contains case content",
+            "title": "Technical"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "error",
+            "default": "error",
+            "enum": [
+              "error"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_id",
+          "title",
+          "code",
+          "message"
+        ],
+        "title": "ErrorCard",
+        "type": "object"
+      },
+      "ErrorEvent": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "event": {
+            "const": "error",
+            "default": "error",
+            "enum": [
+              "error"
+            ],
+            "title": "Event",
+            "type": "string"
+          },
+          "http_status": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Http Status"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "default": false,
+            "title": "Retryable",
+            "type": "boolean"
+          },
+          "scope": {
+            "default": "run",
+            "enum": [
+              "run",
+              "step",
+              "llm"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "seq": {
+            "description": "Strictly increasing within a run; used for Last-Event-ID resume",
+            "title": "Seq",
+            "type": "integer"
+          },
+          "step_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step Id"
+          },
+          "t": {
+            "default": 0,
+            "description": "Milliseconds since the request was received",
+            "title": "T",
+            "type": "integer"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq",
+          "code",
+          "message"
+        ],
+        "title": "ErrorEvent",
+        "type": "object"
+      },
+      "Excerpt": {
+        "properties": {
+          "char_end": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Char End"
+          },
+          "char_start": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Offsets into the case text, for the source viewer",
+            "title": "Char Start"
+          },
+          "chunk_index": {
+            "title": "Chunk Index",
+            "type": "integer"
+          },
+          "cosine": {
+            "title": "Cosine",
+            "type": "number"
+          },
+          "ref": {
+            "description": "S1, S2, ...",
+            "title": "Ref",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref",
+          "text",
+          "cosine",
+          "chunk_index"
+        ],
+        "title": "Excerpt",
+        "type": "object"
+      },
+      "ExtractionMetadata": {
+        "description": "Metadata about how the case profile was extracted.",
+        "properties": {
+          "confidence": {
+            "description": "Overall extraction confidence (0–1)",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "extraction_method": {
+            "description": "Method used: 'model', 'hybrid', or 'rules'",
+            "title": "Extraction Method",
+            "type": "string"
+          },
+          "processing_time_ms": {
+            "description": "Total processing time in milliseconds",
+            "minimum": 0.0,
+            "title": "Processing Time Ms",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "extraction_method",
+          "confidence",
+          "processing_time_ms"
+        ],
+        "title": "ExtractionMetadata",
+        "type": "object"
+      },
+      "ExtractionQuality": {
+        "properties": {
+          "completeness": {
+            "description": "Computed from which fields were found — replaces the constant metadata.confidence",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Completeness",
+            "type": "number"
+          },
+          "method": {
+            "enum": [
+              "rules",
+              "hybrid",
+              "model",
+              "llm_assisted"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "missing": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing",
+            "type": "array"
+          },
+          "quality": {
+            "enum": [
+              "good",
+              "partial",
+              "poor"
+            ],
+            "title": "Quality",
+            "type": "string"
+          }
+        },
+        "required": [
+          "method",
+          "quality",
+          "completeness"
+        ],
+        "title": "ExtractionQuality",
+        "type": "object"
+      },
+      "FactBatchExtractRequest": {
+        "properties": {
+          "cases": {
+            "description": "List of case texts to process (max 5)",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 5,
+            "minItems": 1,
+            "title": "Cases",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cases"
+        ],
+        "title": "FactBatchExtractRequest",
+        "type": "object"
+      },
+      "FactExtractRequest": {
+        "properties": {
+          "case_text": {
+            "description": "Raw case description / judgment text to extract structured facts from",
+            "title": "Case Text",
+            "type": "string"
+          },
+          "use_model": {
+            "default": true,
+            "description": "Use InLegalBERT model (falls back to rules if unavailable)",
+            "title": "Use Model",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "case_text"
+        ],
+        "title": "FactExtractRequest",
+        "type": "object"
+      },
+      "FeatureDelta": {
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "feature": {
+            "title": "Feature",
+            "type": "string"
+          },
+          "from_value": {
+            "title": "From Value"
+          },
+          "logit_delta": {
+            "title": "Logit Delta",
+            "type": "number"
+          },
+          "share_of_change": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Share Of Change",
+            "type": "number"
+          },
+          "to_value": {
+            "title": "To Value"
+          }
+        },
+        "required": [
+          "feature",
+          "display_name",
+          "logit_delta",
+          "share_of_change"
+        ],
+        "title": "FeatureDelta",
+        "type": "object"
+      },
+      "ForcedTool": {
+        "properties": {
+          "args": {
+            "title": "Args",
+            "type": "object"
+          },
+          "name": {
+            "enum": [
+              "extract_case_facts",
+              "search_precedents",
+              "build_argument_map",
+              "assess_outcome",
+              "run_scenario",
+              "ask_case",
+              "inspect_artifact",
+              "full_review"
+            ],
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ForcedTool",
+        "type": "object"
+      },
+      "GraphBuildRequest": {
+        "properties": {
+          "case_profile": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StructuredCaseProfile"
+              }
+            ],
+            "description": "Structured case profile from fact extraction"
+          },
+          "precedents": {
+            "description": "Optional precedent search results to add as PRECEDENT nodes (max 3)",
+            "items": {
+              "$ref": "#/components/schemas/SearchResult"
+            },
+            "maxItems": 3,
+            "title": "Precedents",
+            "type": "array"
+          }
+        },
+        "required": [
+          "case_profile"
+        ],
+        "title": "GraphBuildRequest",
+        "type": "object"
+      },
+      "GraphBuildResponse": {
+        "properties": {
+          "edge_count": {
+            "title": "Edge Count",
+            "type": "integer"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "node_count": {
+            "title": "Node Count",
+            "type": "integer"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/GraphNode"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "weak_nodes": {
+            "description": "Node ids flagged as weak (no supporting evidence)",
+            "items": {
+              "type": "string"
+            },
+            "title": "Weak Nodes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "nodes",
+          "edges",
+          "node_count",
+          "edge_count"
+        ],
+        "title": "GraphBuildResponse",
+        "type": "object"
+      },
+      "GraphEdge": {
+        "description": "A directed edge between two graph nodes.",
+        "properties": {
+          "id": {
+            "description": "Unique edge identifier",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "description": "Edge label for rendering",
+            "title": "Label",
+            "type": "string"
+          },
+          "source": {
+            "description": "Source node id",
+            "title": "Source",
+            "type": "string"
+          },
+          "strength": {
+            "default": 0.5,
+            "description": "Connection strength (0–1)",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Strength",
+            "type": "number"
+          },
+          "target": {
+            "description": "Target node id",
+            "title": "Target",
+            "type": "string"
+          },
+          "type": {
+            "description": "One of: supports, contradicts, cites, raises",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "target",
+          "label",
+          "type"
+        ],
+        "title": "GraphEdge",
+        "type": "object"
+      },
+      "GraphNode": {
+        "description": "A single node in the argument graph.",
+        "properties": {
+          "color": {
+            "description": "Hex color for rendering",
+            "title": "Color",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "description": "Short description of the node",
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "description": "Unique node identifier",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "description": "Display text",
+            "title": "Label",
+            "type": "string"
+          },
+          "shape": {
+            "description": "Shape for rendering: rectangle, ellipse, diamond, hexagon, round-rectangle",
+            "title": "Shape",
+            "type": "string"
+          },
+          "type": {
+            "description": "One of: CLAIM, EVIDENCE, STATUTE, PRECEDENT, ISSUE",
+            "title": "Type",
+            "type": "string"
+          },
+          "weak": {
+            "default": false,
+            "description": "True if node has no supporting evidence edges",
+            "title": "Weak",
+            "type": "boolean"
+          },
+          "weight": {
+            "default": 0.5,
+            "description": "Importance score (0–1)",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "type",
+          "color",
+          "shape"
+        ],
+        "title": "GraphNode",
+        "type": "object"
+      },
+      "GraphQueryRequest": {
+        "properties": {
+          "limit": {
+            "default": 10,
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "query": {
+            "description": "Query to search the knowledge graph",
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "GraphQueryRequest",
+        "type": "object"
+      },
+      "GraphQueryResponse": {
+        "properties": {
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/GraphNode"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodes",
+          "edges",
+          "query"
+        ],
+        "title": "GraphQueryResponse",
+        "type": "object"
+      },
+      "GraphSummary": {
+        "properties": {
+          "claims": {
+            "default": 0,
+            "title": "Claims",
+            "type": "integer"
+          },
+          "edge_types": {
+            "description": "Only the edge types that actually occur",
+            "items": {
+              "type": "string"
+            },
+            "title": "Edge Types",
+            "type": "array"
+          },
+          "evidence": {
+            "default": 0,
+            "title": "Evidence",
+            "type": "integer"
+          },
+          "issues": {
+            "default": 0,
+            "title": "Issues",
+            "type": "integer"
+          },
+          "precedents": {
+            "default": 0,
+            "title": "Precedents",
+            "type": "integer"
+          },
+          "statutes": {
+            "default": 0,
+            "title": "Statutes",
+            "type": "integer"
+          },
+          "weak_claims": {
+            "default": 0,
+            "title": "Weak Claims",
+            "type": "integer"
+          }
+        },
+        "title": "GraphSummary",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "IndexInfo": {
+        "properties": {
+          "chunks": {
+            "title": "Chunks",
+            "type": "integer"
+          },
+          "docs": {
+            "title": "Docs",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "docs",
+          "chunks"
+        ],
+        "title": "IndexInfo",
+        "type": "object"
+      },
+      "IndexRequest": {
+        "properties": {
+          "doc_id": {
+            "description": "Document ID to fetch from Kanoon and embed into FAISS index",
+            "title": "Doc Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "doc_id"
+        ],
+        "title": "IndexRequest",
+        "type": "object"
+      },
+      "IndexResponse": {
+        "properties": {
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "doc_id": {
+            "title": "Doc Id",
+            "type": "string"
+          },
+          "indexed": {
+            "title": "Indexed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "indexed",
+          "doc_id",
+          "chunk_count"
+        ],
+        "title": "IndexResponse",
+        "type": "object"
+      },
+      "IndexStats": {
+        "properties": {
+          "index_size_bytes": {
+            "title": "Index Size Bytes",
+            "type": "integer"
+          },
+          "total_documents": {
+            "title": "Total Documents",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_documents",
+          "index_size_bytes"
+        ],
+        "title": "IndexStats",
+        "type": "object"
+      },
+      "InputField": {
+        "properties": {
+          "default": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default"
+          },
+          "kind": {
+            "enum": [
+              "select",
+              "date"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "name": {
+            "enum": [
+              "appellant_type",
+              "filing_date"
+            ],
+            "title": "Name",
+            "type": "string"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/InputOption"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "required": {
+            "default": true,
+            "title": "Required",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "label"
+        ],
+        "title": "InputField",
+        "type": "object"
+      },
+      "InputOption": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "title": "InputOption",
+        "type": "object"
+      },
+      "InputResponse": {
+        "description": "The user's answer to a NeedsInputCard; starts a new run on the forced path.",
+        "properties": {
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "pending": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ForcedTool"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "values": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "object"
+          }
+        },
+        "required": [
+          "card_id"
+        ],
+        "title": "InputResponse",
+        "type": "object"
+      },
+      "JudgmentDetail": {
+        "description": "Full judgment detail fetched from a single doc page.",
+        "properties": {
+          "acts": {
+            "description": "Acts / sections referenced",
+            "items": {
+              "type": "string"
+            },
+            "title": "Acts",
+            "type": "array"
+          },
+          "bench": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bench"
+          },
+          "citations": {
+            "description": "Citations referenced in the judgment",
+            "items": {
+              "type": "string"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "court": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Court"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "doc_id": {
+            "title": "Doc Id",
+            "type": "string"
+          },
+          "text": {
+            "description": "Full judgment text",
+            "title": "Text",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "doc_id",
+          "title",
+          "url",
+          "text"
+        ],
+        "title": "JudgmentDetail",
+        "type": "object"
+      },
+      "LegacyHeuristic": {
+        "properties": {
+          "note": {
+            "default": "Uncalibrated rule score; it predicted 'succeeds' for every training case",
+            "title": "Note",
+            "type": "string"
+          },
+          "p": {
+            "title": "P",
+            "type": "number"
+          }
+        },
+        "required": [
+          "p"
+        ],
+        "title": "LegacyHeuristic",
+        "type": "object"
+      },
+      "MLFeatureContribution": {
+        "description": "One feature's signed contribution to the trained model's\nprediction — unlike ScoreComponent's fixed a-priori weights, this is\nspecific to this one prediction (coefficient x this case's value).",
+        "properties": {
+          "contribution": {
+            "description": "Signed contribution to the 'succeeds' log-odds (coefficient x value)",
+            "title": "Contribution",
+            "type": "number"
+          },
+          "display_name": {
+            "description": "Human-readable feature name",
+            "title": "Display Name",
+            "type": "string"
+          },
+          "explanation": {
+            "description": "Plain-language explanation of this feature's effect",
+            "title": "Explanation",
+            "type": "string"
+          },
+          "feature": {
+            "description": "Feature identifier",
+            "title": "Feature",
+            "type": "string"
+          },
+          "value": {
+            "description": "Raw feature value fed to the model",
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "feature",
+          "display_name",
+          "value",
+          "contribution",
+          "explanation"
+        ],
+        "title": "MLFeatureContribution",
+        "type": "object"
+      },
+      "MLModelResult": {
+        "description": "Outcome prediction from the trained logistic regression model\n(outcome_classifier_binary.joblib), returned alongside the\nhand-picked heuristic for side-by-side comparison.",
+        "properties": {
+          "explanation_sentences": {
+            "description": "Top 2-3 plain-language explanations, most influential first",
+            "items": {
+              "type": "string"
+            },
+            "title": "Explanation Sentences",
+            "type": "array"
+          },
+          "feature_contributions": {
+            "description": "All feature contributions, ranked by |contribution| descending",
+            "items": {
+              "$ref": "#/components/schemas/MLFeatureContribution"
+            },
+            "title": "Feature Contributions",
+            "type": "array"
+          },
+          "key_strengths": {
+            "description": "Top positive-contribution factors",
+            "items": {
+              "type": "string"
+            },
+            "title": "Key Strengths",
+            "type": "array"
+          },
+          "key_weaknesses": {
+            "description": "Top negative-contribution factors",
+            "items": {
+              "type": "string"
+            },
+            "title": "Key Weaknesses",
+            "type": "array"
+          },
+          "model_loaded": {
+            "description": "False if the trained model failed to load and this is a fallback stub",
+            "title": "Model Loaded",
+            "type": "boolean"
+          },
+          "model_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Path/identifier of the loaded model artifact",
+            "title": "Model Version"
+          },
+          "predicted_class": {
+            "description": "'dismissed' or 'succeeds' (or 'unknown' if the model failed to load)",
+            "title": "Predicted Class",
+            "type": "string"
+          },
+          "probabilities": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Full class probability distribution",
+            "title": "Probabilities",
+            "type": "object"
+          },
+          "probability": {
+            "description": "Model's probability for predicted_class",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Probability",
+            "type": "number"
+          },
+          "recommendation": {
+            "default": "",
+            "description": "1-2 sentence plain-English recommendation",
+            "title": "Recommendation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "predicted_class",
+          "probability",
+          "probabilities",
+          "model_loaded"
+        ],
+        "title": "MLModelResult",
+        "type": "object"
+      },
+      "MessageStartEvent": {
+        "properties": {
+          "case_known": {
+            "default": true,
+            "title": "Case Known",
+            "type": "boolean"
+          },
+          "conversation_id": {
+            "title": "Conversation Id",
+            "type": "string"
+          },
+          "event": {
+            "const": "message_start",
+            "default": "message_start",
+            "enum": [
+              "message_start"
+            ],
+            "title": "Event",
+            "type": "string"
+          },
+          "message_id": {
+            "title": "Message Id",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "llm",
+              "forced",
+              "deterministic"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "seq": {
+            "description": "Strictly increasing within a run; used for Last-Event-ID resume",
+            "title": "Seq",
+            "type": "integer"
+          },
+          "server_version": {
+            "title": "Server Version",
+            "type": "string"
+          },
+          "t": {
+            "default": 0,
+            "description": "Milliseconds since the request was received",
+            "title": "T",
+            "type": "integer"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq",
+          "run_id",
+          "message_id",
+          "conversation_id",
+          "mode",
+          "server_version"
+        ],
+        "title": "MessageStartEvent",
+        "type": "object"
+      },
+      "MetaEvent": {
+        "properties": {
+          "conversation_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Title"
+          },
+          "event": {
+            "const": "meta",
+            "default": "meta",
+            "enum": [
+              "meta"
+            ],
+            "title": "Event",
+            "type": "string"
+          },
+          "seq": {
+            "description": "Strictly increasing within a run; used for Last-Event-ID resume",
+            "title": "Seq",
+            "type": "integer"
+          },
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/Suggestion"
+            },
+            "title": "Suggestions",
+            "type": "array"
+          },
+          "t": {
+            "default": 0,
+            "description": "Milliseconds since the request was received",
+            "title": "T",
+            "type": "integer"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq"
+        ],
+        "title": "MetaEvent",
+        "type": "object"
+      },
+      "ModelFacts": {
+        "properties": {
+          "baseline_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline Accuracy"
+          },
+          "cv_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cv Accuracy"
+          },
+          "loaded": {
+            "default": true,
+            "title": "Loaded",
+            "type": "boolean"
+          },
+          "n_train": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Train"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "scope": {
+            "default": "Criminal appeals",
+            "title": "Scope",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ModelFacts",
+        "type": "object"
+      },
+      "NeedsInputCard": {
+        "properties": {
+          "artifact_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Key"
+          },
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "disclaimer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Disclaimer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/InputField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint"
+          },
+          "pending": {
+            "$ref": "#/components/schemas/ForcedTool"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "schema_ver": {
+            "default": 1,
+            "title": "Schema Ver",
+            "type": "integer"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "needs_input",
+            "default": "needs_input",
+            "enum": [
+              "needs_input"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_id",
+          "title",
+          "reason",
+          "pending",
+          "fields"
+        ],
+        "title": "NeedsInputCard",
+        "type": "object"
+      },
+      "NeedsInputEvent": {
+        "properties": {
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "event": {
+            "const": "needs_input",
+            "default": "needs_input",
+            "enum": [
+              "needs_input"
+            ],
+            "title": "Event",
+            "type": "string"
+          },
+          "part_id": {
+            "title": "Part Id",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/NeedsInputCard"
+          },
+          "seq": {
+            "description": "Strictly increasing within a run; used for Last-Event-ID resume",
+            "title": "Seq",
+            "type": "integer"
+          },
+          "t": {
+            "default": 0,
+            "description": "Milliseconds since the request was received",
+            "title": "T",
+            "type": "integer"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq",
+          "card_id",
+          "part_id",
+          "payload"
+        ],
+        "title": "NeedsInputEvent",
+        "type": "object"
+      },
+      "OldVsNewComparison": {
+        "description": "Both prediction approaches side by side, for a live before/after\ncomparison. `primary` reflects which one populates the top-level\nSimulationResponse.result — controlled by the OUTCOME_MODEL_PRIMARY\nenv var, or forced to 'old_heuristic' if the new model failed to load.",
+        "properties": {
+          "new_model": {
+            "$ref": "#/components/schemas/MLModelResult"
+          },
+          "old_heuristic": {
+            "$ref": "#/components/schemas/SimulationResult"
+          },
+          "primary": {
+            "description": "Which of the two is currently populating SimulationResponse.result",
+            "enum": [
+              "old_heuristic",
+              "new_model"
+            ],
+            "title": "Primary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "primary",
+          "old_heuristic",
+          "new_model"
+        ],
+        "title": "OldVsNewComparison",
+        "type": "object"
+      },
+      "OutcomeCard": {
+        "properties": {
+          "artifact_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Key"
+          },
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "caveats": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Caveats",
+            "type": "array"
+          },
+          "contributions": {
+            "items": {
+              "$ref": "#/components/schemas/OutcomeContribution"
+            },
+            "title": "Contributions",
+            "type": "array"
+          },
+          "disclaimer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Disclaimer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "drivers_summary": {
+            "default": "",
+            "title": "Drivers Summary",
+            "type": "string"
+          },
+          "estimate": {
+            "$ref": "#/components/schemas/OutcomeEstimate"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/OutcomeInputs"
+          },
+          "legacy": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LegacyHeuristic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "$ref": "#/components/schemas/ModelFacts"
+          },
+          "profile_method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Extraction method behind the inputs (rule-extracted profiles match training)",
+            "title": "Profile Method"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_ver": {
+            "default": 1,
+            "title": "Schema Ver",
+            "type": "integer"
+          },
+          "strengths": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Strengths",
+            "type": "array"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "outcome",
+            "default": "outcome",
+            "enum": [
+              "outcome"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "weaknesses": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Weaknesses",
+            "type": "array"
+          }
+        },
+        "required": [
+          "card_id",
+          "title",
+          "estimate",
+          "inputs",
+          "model"
+        ],
+        "title": "OutcomeCard",
+        "type": "object"
+      },
+      "OutcomeContribution": {
+        "properties": {
+          "contribution": {
+            "description": "Signed log-odds contribution, centred on a typical training case",
+            "title": "Contribution",
+            "type": "number"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "feature": {
+            "title": "Feature",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "feature",
+          "display_name",
+          "value",
+          "contribution",
+          "explanation"
+        ],
+        "title": "OutcomeContribution",
+        "type": "object"
+      },
+      "OutcomeEstimate": {
+        "properties": {
+          "definition": {
+            "default": "Chance of any appellate relief, including partial relief",
+            "title": "Definition",
+            "type": "string"
+          },
+          "p_rounded": {
+            "description": "Rounded to the nearest 5; this is the figure shown and quoted",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "P Rounded",
+            "type": "integer"
+          },
+          "p_succeeds": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "P Succeeds",
+            "type": "number"
+          },
+          "tier": {
+            "enum": [
+              "favorable",
+              "uncertain",
+              "unfavorable"
+            ],
+            "title": "Tier",
+            "type": "string"
+          },
+          "tier_label": {
+            "description": "Plain wording shown first, e.g. 'Below even odds'",
+            "title": "Tier Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "p_succeeds",
+          "p_rounded",
+          "tier",
+          "tier_label"
+        ],
+        "title": "OutcomeEstimate",
+        "type": "object"
+      },
+      "OutcomeInputs": {
+        "properties": {
+          "appellant_source": {
+            "default": "user_input",
+            "enum": [
+              "user_input",
+              "form"
+            ],
+            "title": "Appellant Source",
+            "type": "string"
+          },
+          "appellant_type": {
+            "enum": [
+              "accused_appeal",
+              "state_appeal",
+              "unclear"
+            ],
+            "title": "Appellant Type",
+            "type": "string"
+          },
+          "filing_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filing Date"
+          }
+        },
+        "required": [
+          "appellant_type"
+        ],
+        "title": "OutcomeInputs",
+        "type": "object"
+      },
+      "Parties": {
+        "description": "Litigating parties extracted from a case.",
+        "properties": {
+          "petitioner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Name(s) of the petitioner/appellant",
+            "title": "Petitioner"
+          },
+          "respondent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Name(s) of the respondent/respondent",
+            "title": "Respondent"
+          }
+        },
+        "title": "Parties",
+        "type": "object"
+      },
+      "PingEvent": {
+        "properties": {
+          "event": {
+            "const": "ping",
+            "default": "ping",
+            "enum": [
+              "ping"
+            ],
+            "title": "Event",
+            "type": "string"
+          },
+          "seq": {
+            "description": "Strictly increasing within a run; used for Last-Event-ID resume",
+            "title": "Seq",
+            "type": "integer"
+          },
+          "t": {
+            "default": 0,
+            "description": "Milliseconds since the request was received",
+            "title": "T",
+            "type": "integer"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          },
+          "warm": {
+            "default": true,
+            "title": "Warm",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "seq"
+        ],
+        "title": "PingEvent",
+        "type": "object"
+      },
+      "PrecedentFilter": {
+        "properties": {
+          "before_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before Date"
+          },
+          "undated_excluded": {
+            "default": 0,
+            "title": "Undated Excluded",
+            "type": "integer"
+          }
+        },
+        "title": "PrecedentFilter",
+        "type": "object"
+      },
+      "PrecedentHit": {
+        "properties": {
+          "band": {
+            "default": "unranked",
+            "enum": [
+              "close",
+              "related",
+              "loose",
+              "unranked"
+            ],
+            "title": "Band",
+            "type": "string"
+          },
+          "cosine": {
+            "description": "True cosine similarity. NOT a probability of relevance and never shown as a percent",
+            "title": "Cosine",
+            "type": "number"
+          },
+          "court": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Court"
+          },
+          "court_tier": {
+            "default": "other",
+            "enum": [
+              "SC",
+              "HC",
+              "other"
+            ],
+            "title": "Court Tier",
+            "type": "string"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "doc_id": {
+            "title": "Doc Id",
+            "type": "string"
+          },
+          "matched_statutes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Matched Statutes",
+            "type": "array"
+          },
+          "ref": {
+            "description": "Citation handle the model and UI share: P1, P2, ...",
+            "title": "Ref",
+            "type": "string"
+          },
+          "snippet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "<= 300 chars; the full judgment stays at the source",
+            "title": "Snippet"
+          },
+          "source": {
+            "default": "faiss",
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref",
+          "doc_id",
+          "title",
+          "url",
+          "cosine"
+        ],
+        "title": "PrecedentHit",
+        "type": "object"
+      },
+      "PrecedentMatch": {
+        "description": "A precedent result enriched with a semantic similarity score.",
+        "properties": {
+          "court": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Name of the court",
+            "title": "Court"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Date of judgment (YYYY-MM-DD)",
+            "title": "Date"
+          },
+          "doc_id": {
+            "description": "Document ID",
+            "title": "Doc Id",
+            "type": "string"
+          },
+          "similarity_score": {
+            "description": "Semantic similarity score (0–1, higher is more similar)",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Similarity Score",
+            "type": "number"
+          },
+          "snippet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Excerpt / snippet",
+            "title": "Snippet"
+          },
+          "source": {
+            "description": "Origin of this result: 'faiss' or 'kanoon'",
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "description": "Case name / title",
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "description": "Full URL to the judgment",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "url",
+          "doc_id",
+          "similarity_score",
+          "source"
+        ],
+        "title": "PrecedentMatch",
+        "type": "object"
+      },
+      "PrecedentSearchRequest": {
+        "properties": {
+          "before_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Return only judgments decided strictly before this date",
+            "title": "Before Date"
+          },
+          "court": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter Kanoon fallback by court",
+            "title": "Court"
+          },
+          "limit": {
+            "default": 10,
+            "description": "Max Kanoon results to fetch for supplementation",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "query": {
+            "description": "Natural-language query or case description to search precedents with",
+            "title": "Query",
+            "type": "string"
+          },
+          "top_k": {
+            "default": 5,
+            "description": "Number of semantic results to return",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Top K",
+            "type": "integer"
+          },
+          "use_kanoon": {
+            "default": true,
+            "description": "Fall back to Kanoon scraper if FAISS results < top_k",
+            "title": "Use Kanoon",
+            "type": "boolean"
+          },
+          "year_from": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Start year filter for Kanoon fallback",
+            "title": "Year From"
+          },
+          "year_to": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "End year filter for Kanoon fallback",
+            "title": "Year To"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "PrecedentSearchRequest",
+        "type": "object"
+      },
+      "PrecedentSearchResponse": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/PrecedentMatch"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "results",
+          "total",
+          "query"
+        ],
+        "title": "PrecedentSearchResponse",
+        "type": "object"
+      },
+      "PrecedentsCard": {
+        "properties": {
+          "artifact_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Key"
+          },
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "disclaimer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Disclaimer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "filter": {
+            "$ref": "#/components/schemas/PrecedentFilter"
+          },
+          "index": {
+            "$ref": "#/components/schemas/IndexInfo"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "query_source": {
+            "default": "issues",
+            "enum": [
+              "user",
+              "issues",
+              "combined"
+            ],
+            "title": "Query Source",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/PrecedentHit"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "schema_ver": {
+            "default": 1,
+            "title": "Schema Ver",
+            "type": "integer"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "precedents",
+            "default": "precedents",
+            "enum": [
+              "precedents"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "used_for_graph": {
+            "description": "Refs of the precedents (max 3) placed on the map",
+            "items": {
+              "type": "string"
+            },
+            "title": "Used For Graph",
+            "type": "array"
+          }
+        },
+        "required": [
+          "card_id",
+          "title",
+          "query",
+          "index",
+          "results"
+        ],
+        "title": "PrecedentsCard",
+        "type": "object"
+      },
+      "Provenance": {
+        "properties": {
+          "cached": {
+            "default": false,
+            "title": "Cached",
+            "type": "boolean"
+          },
+          "computed_ms": {
+            "default": 0,
+            "title": "Computed Ms",
+            "type": "integer"
+          },
+          "engine": {
+            "description": "Which engine produced this (e.g. 'rules', 'faiss-minilm', 'logreg-binary')",
+            "title": "Engine",
+            "type": "string"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "index_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Index Version"
+          },
+          "inputs": {
+            "title": "Inputs",
+            "type": "object"
+          }
+        },
+        "required": [
+          "engine",
+          "engine_version"
+        ],
+        "title": "Provenance",
+        "type": "object"
+      },
+      "RiskAssessment": {
+        "properties": {
+          "color": {
+            "description": "Color for rendering: green, amber, red",
+            "title": "Color",
+            "type": "string"
+          },
+          "level": {
+            "description": "One of: Favorable, Uncertain, Unfavorable",
+            "title": "Level",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level",
+          "color"
+        ],
+        "title": "RiskAssessment",
+        "type": "object"
+      },
+      "ScenarioBase": {
+        "properties": {
+          "appellant_type": {
+            "enum": [
+              "accused_appeal",
+              "state_appeal",
+              "unclear"
+            ],
+            "title": "Appellant Type",
+            "type": "string"
+          },
+          "features": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Features",
+            "type": "object"
+          },
+          "p_succeeds": {
+            "title": "P Succeeds",
+            "type": "number"
+          }
+        },
+        "required": [
+          "p_succeeds",
+          "appellant_type"
+        ],
+        "title": "ScenarioBase",
+        "type": "object"
+      },
+      "ScenarioCard": {
+        "properties": {
+          "artifact_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Key"
+          },
+          "base": {
+            "$ref": "#/components/schemas/ScenarioBase"
+          },
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "disclaimer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Disclaimer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "$ref": "#/components/schemas/ModelFacts"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioOutcome"
+            },
+            "title": "Scenarios",
+            "type": "array"
+          },
+          "schema_ver": {
+            "default": 1,
+            "title": "Schema Ver",
+            "type": "integer"
+          },
+          "sensitivity": {
+            "items": {
+              "$ref": "#/components/schemas/SensitivityRow"
+            },
+            "title": "Sensitivity",
+            "type": "array"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "scenario",
+            "default": "scenario",
+            "enum": [
+              "scenario"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_id",
+          "title",
+          "model",
+          "base",
+          "scenarios"
+        ],
+        "title": "ScenarioCard",
+        "type": "object"
+      },
+      "ScenarioOutcome": {
+        "properties": {
+          "applied": {
+            "items": {
+              "$ref": "#/components/schemas/AppliedLever"
+            },
+            "title": "Applied",
+            "type": "array"
+          },
+          "delta_pp": {
+            "title": "Delta Pp",
+            "type": "number"
+          },
+          "dominant_feature": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dominant Feature"
+          },
+          "effect_class": {
+            "enum": [
+              "large",
+              "small",
+              "negligible"
+            ],
+            "title": "Effect Class",
+            "type": "string"
+          },
+          "feature_deltas": {
+            "items": {
+              "$ref": "#/components/schemas/FeatureDelta"
+            },
+            "title": "Feature Deltas",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "p_succeeds": {
+            "title": "P Succeeds",
+            "type": "number"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "p_succeeds",
+          "delta_pp",
+          "effect_class"
+        ],
+        "title": "ScenarioOutcome",
+        "type": "object"
+      },
+      "ScoreComponent": {
+        "description": "One component of the judicial outcome scoring breakdown.",
+        "properties": {
+          "component": {
+            "description": "Component name",
+            "title": "Component",
+            "type": "string"
+          },
+          "explanation": {
+            "description": "Human-readable reason for this score",
+            "title": "Explanation",
+            "type": "string"
+          },
+          "raw_score": {
+            "description": "Raw score for this component (0–1)",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Raw Score",
+            "type": "number"
+          },
+          "weight": {
+            "description": "Component weight (0–1)",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Weight",
+            "type": "number"
+          },
+          "weighted_score": {
+            "description": "weight × raw_score",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Weighted Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "component",
+          "weight",
+          "raw_score",
+          "weighted_score",
+          "explanation"
+        ],
+        "title": "ScoreComponent",
+        "type": "object"
+      },
+      "SearchResult": {
+        "description": "A single result from an Indian Kanoon search.",
+        "properties": {
+          "court": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Name of the court",
+            "title": "Court"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Date of judgment (YYYY-MM-DD)",
+            "title": "Date"
+          },
+          "doc_id": {
+            "description": "Document ID extracted from the URL",
+            "title": "Doc Id",
+            "type": "string"
+          },
+          "similarity_score": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Semantic similarity score (0–1)",
+            "title": "Similarity Score"
+          },
+          "snippet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Excerpt / snippet from the search result",
+            "title": "Snippet"
+          },
+          "title": {
+            "description": "Case name / title",
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "description": "Full URL to the judgment on indiankanoon.org",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "url",
+          "doc_id"
+        ],
+        "title": "SearchResult",
+        "type": "object"
+      },
+      "SensitivityRow": {
+        "properties": {
+          "confounded": {
+            "default": false,
+            "title": "Confounded",
+            "type": "boolean"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "feature": {
+            "title": "Feature",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "categorical",
+              "continuous"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "p_at_high": {
+            "title": "P At High",
+            "type": "number"
+          },
+          "p_at_low": {
+            "title": "P At Low",
+            "type": "number"
+          },
+          "swing_pp": {
+            "title": "Swing Pp",
+            "type": "number"
+          }
+        },
+        "required": [
+          "feature",
+          "display_name",
+          "p_at_low",
+          "p_at_high",
+          "swing_pp",
+          "kind"
+        ],
+        "title": "SensitivityRow",
+        "type": "object"
+      },
+      "SimulationRequest": {
+        "description": "Request for a judicial outcome prediction.",
+        "properties": {
+          "appellant_type": {
+            "default": "unclear",
+            "description": "Who is bringing this appeal — a direct user input (e.g. a toggle), never inferred from case text: 'accused_appeal' (the convicted person appealing their own conviction) or 'state_appeal' (the State or a complainant appealing an acquittal). Defaults to 'unclear' if not provided.",
+            "enum": [
+              "accused_appeal",
+              "state_appeal",
+              "unclear"
+            ],
+            "title": "Appellant Type",
+            "type": "string"
+          },
+          "case_profile": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StructuredCaseProfile"
+              }
+            ],
+            "description": "Structured case profile from fact extraction"
+          },
+          "filing_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Date the appeal was filed; used to bound precedent retrieval upstream",
+            "title": "Filing Date"
+          },
+          "graph_stats": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional: { 'node_count': int, 'weak_nodes': list[str] } from argument graph",
+            "title": "Graph Stats"
+          },
+          "precedents": {
+            "description": "Optional precedent search results (used for alignment scoring)",
+            "items": {
+              "$ref": "#/components/schemas/SearchResult"
+            },
+            "maxItems": 10,
+            "title": "Precedents",
+            "type": "array"
+          }
+        },
+        "required": [
+          "case_profile"
+        ],
+        "title": "SimulationRequest",
+        "type": "object"
+      },
+      "SimulationResponse": {
+        "properties": {
+          "old_vs_new": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OldVsNewComparison"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Both the old heuristic and new trained-model predictions side by side. Additive field — absent/None only if something unexpected prevented computing it, which does not happen in the current implementation but keeps the type honest for any older client that doesn't expect this field."
+          },
+          "processing_time_ms": {
+            "title": "Processing Time Ms",
+            "type": "number"
+          },
+          "result": {
+            "$ref": "#/components/schemas/SimulationResult"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result",
+          "processing_time_ms",
+          "timestamp"
+        ],
+        "title": "SimulationResponse",
+        "type": "object"
+      },
+      "SimulationResult": {
+        "description": "Full judicial outcome prediction with explainable scoring.",
+        "properties": {
+          "key_strengths": {
+            "description": "Top 3 factors helping the case",
+            "items": {
+              "type": "string"
+            },
+            "title": "Key Strengths",
+            "type": "array"
+          },
+          "key_weaknesses": {
+            "description": "Top 3 factors hurting the case",
+            "items": {
+              "type": "string"
+            },
+            "title": "Key Weaknesses",
+            "type": "array"
+          },
+          "recommendation": {
+            "description": "1-2 sentence plain-English recommendation",
+            "title": "Recommendation",
+            "type": "string"
+          },
+          "risk_assessment": {
+            "$ref": "#/components/schemas/RiskAssessment"
+          },
+          "score_breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreComponent"
+            },
+            "title": "Score Breakdown",
+            "type": "array"
+          },
+          "win_probability": {
+            "description": "Estimated chance of any appellate relief, including partial relief (0–1)",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Win Probability",
+            "type": "number"
+          }
+        },
+        "required": [
+          "win_probability",
+          "risk_assessment",
+          "score_breakdown",
+          "recommendation"
+        ],
+        "title": "SimulationResult",
+        "type": "object"
+      },
+      "SourcesCard": {
+        "properties": {
+          "artifact_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Key"
+          },
+          "card_id": {
+            "title": "Card Id",
+            "type": "string"
+          },
+          "coverage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage"
+          },
+          "disclaimer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Disclaimer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "excerpts": {
+            "items": {
+              "$ref": "#/components/schemas/Excerpt"
+            },
+            "title": "Excerpts",
+            "type": "array"
+          },
+          "method": {
+            "default": "generated",
+            "enum": [
+              "generated",
+              "extractive"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "schema_ver": {
+            "default": 1,
+            "title": "Schema Ver",
+            "type": "integer"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "sources",
+            "default": "sources",
+            "enum": [
+              "sources"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_id",
+          "title",
+          "question",
+          "excerpts"
+        ],
+        "title": "SourcesCard",
+        "type": "object"
+      },
+      "StatusResponse": {
+        "properties": {
+          "module": {
+            "title": "Module",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "module"
+        ],
+        "title": "StatusResponse",
+        "type": "object"
+      },
+      "StepEvent": {
+        "properties": {
+          "args_preview": {
+            "title": "Args Preview",
+            "type": "object"
+          },
+          "depends_on": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Depends On",
+            "type": "array"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "event": {
+            "const": "step",
+            "default": "step",
+            "enum": [
+              "step"
+            ],
+            "title": "Event",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "origin": {
+            "default": "forced",
+            "enum": [
+              "llm",
+              "forced",
+              "dependency"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "phase": {
+            "enum": [
+              "start",
+              "progress",
+              "end"
+            ],
+            "title": "Phase",
+            "type": "string"
+          },
+          "seq": {
+            "description": "Strictly increasing within a run; used for Last-Event-ID resume",
+            "title": "Seq",
+            "type": "integer"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ok",
+                  "cached",
+                  "skipped",
+                  "error"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "step_id": {
+            "title": "Step Id",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "t": {
+            "default": 0,
+            "description": "Milliseconds since the request was received",
+            "title": "T",
+            "type": "integer"
+          },
+          "tool": {
+            "enum": [
+              "extract_case_facts",
+              "search_precedents",
+              "build_argument_map",
+              "assess_outcome",
+              "run_scenario",
+              "ask_case",
+              "inspect_artifact",
+              "full_review"
+            ],
+            "title": "Tool",
+            "type": "string"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq",
+          "step_id",
+          "phase",
+          "tool",
+          "label"
+        ],
+        "title": "StepEvent",
+        "type": "object"
+      },
+      "StructuredCaseProfile": {
+        "description": "Fully structured case profile extracted from raw legal text.\n\nExample output:\n```json\n{\n  \"parties\": {\n    \"petitioner\": \"State of Maharashtra\",\n    \"respondent\": \"Ramesh Kumar @ Ramesh Arjun\"\n  },\n  \"legal_issues\": [\n    \"Whether the confession made to a police officer is admissible under Section 25 of the Evidence Act\",\n    \"Whether the investigation violated Section 167 CrPC timelines\"\n  ],\n  \"ipc_sections\": [\"Section 302\", \"Section 201\", \"Section 34\"],\n  \"acts_referenced\": [\n    \"Indian Penal Code, 1860\",\n    \"Code of Criminal Procedure, 1973\",\n    \"Indian Evidence Act, 1872\"\n  ],\n  \"court_level\": \"High Court\",\n  \"case_type\": \"criminal\",\n  \"key_facts\": [\n    \"The deceased was last seen alive at 9:30 PM near the market area\",\n    \"Post-mortem confirmed death due to strangulation\",\n    \"The accused and deceased were known to each other for over 5 years\"\n  ],\n  \"relief_sought\": \"Quashing of FIR No. 45/2023 and grant of anticipatory bail under Section 438 CrPC\",\n  \"metadata\": {\n    \"extraction_method\": \"hybrid\",\n    \"confidence\": 0.82,\n    \"processing_time_ms\": 3450\n  }\n}\n```",
+        "properties": {
+          "acts_referenced": {
+            "description": "Statutes and Acts referenced in the case",
+            "items": {
+              "type": "string"
+            },
+            "title": "Acts Referenced",
+            "type": "array"
+          },
+          "case_type": {
+            "default": "other",
+            "description": "Case classification: criminal / civil / constitutional / tax / labour / other",
+            "title": "Case Type",
+            "type": "string"
+          },
+          "court_level": {
+            "default": "Unknown",
+            "description": "Court level: Supreme Court / High Court / District Court / Tribunal",
+            "title": "Court Level",
+            "type": "string"
+          },
+          "ipc_sections": {
+            "description": "IPC/CrPC/CPC/Evidence Act sections mentioned",
+            "items": {
+              "type": "string"
+            },
+            "title": "Ipc Sections",
+            "type": "array"
+          },
+          "key_facts": {
+            "description": "Bullet-point key facts extracted from the case",
+            "items": {
+              "type": "string"
+            },
+            "title": "Key Facts",
+            "type": "array"
+          },
+          "legal_issues": {
+            "description": "Key legal questions/issues in the case",
+            "items": {
+              "type": "string"
+            },
+            "title": "Legal Issues",
+            "type": "array"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtractionMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Extraction metadata (method, confidence, timing)"
+          },
+          "parties": {
+            "$ref": "#/components/schemas/Parties"
+          },
+          "relief_sought": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Prayer / relief sought by the petitioner",
+            "title": "Relief Sought"
+          }
+        },
+        "required": [
+          "parties"
+        ],
+        "title": "StructuredCaseProfile",
+        "type": "object"
+      },
+      "Suggestion": {
+        "properties": {
+          "forced_tool": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ForcedTool"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "prompt"
+        ],
+        "title": "Suggestion",
+        "type": "object"
+      },
+      "TaskStatus": {
+        "description": "Status of an async extraction task (during model cold start).",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StructuredCaseProfile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "description": "One of: 'pending', 'processing', 'completed', 'failed'",
+            "title": "Status",
+            "type": "string"
+          },
+          "task_id": {
+            "title": "Task Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "status",
+          "created_at"
+        ],
+        "title": "TaskStatus",
+        "type": "object"
+      },
+      "TextDeltaEvent": {
+        "properties": {
+          "delta": {
+            "title": "Delta",
+            "type": "string"
+          },
+          "event": {
+            "const": "text_delta",
+            "default": "text_delta",
+            "enum": [
+              "text_delta"
+            ],
+            "title": "Event",
+            "type": "string"
+          },
+          "message_id": {
+            "title": "Message Id",
+            "type": "string"
+          },
+          "part_id": {
+            "description": "A new part_id starts a new text part; there is no explicit end",
+            "title": "Part Id",
+            "type": "string"
+          },
+          "seq": {
+            "description": "Strictly increasing within a run; used for Last-Event-ID resume",
+            "title": "Seq",
+            "type": "integer"
+          },
+          "t": {
+            "default": 0,
+            "description": "Milliseconds since the request was received",
+            "title": "T",
+            "type": "integer"
+          },
+          "v": {
+            "default": 1,
+            "title": "V",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq",
+          "message_id",
+          "part_id",
+          "delta"
+        ],
+        "title": "TextDeltaEvent",
+        "type": "object"
+      },
+      "Timings": {
+        "properties": {
+          "first_card_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Card Ms"
+          },
+          "total_ms": {
+            "default": 0,
+            "title": "Total Ms",
+            "type": "integer"
+          },
+          "ttft_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ttft Ms"
+          }
+        },
+        "title": "Timings",
+        "type": "object"
+      },
+      "Usage": {
+        "properties": {
+          "input_tokens": {
+            "default": 0,
+            "title": "Input Tokens",
+            "type": "integer"
+          },
+          "llm_calls": {
+            "default": 0,
+            "title": "Llm Calls",
+            "type": "integer"
+          },
+          "output_tokens": {
+            "default": 0,
+            "title": "Output Tokens",
+            "type": "integer"
+          }
+        },
+        "title": "Usage",
+        "type": "object"
+      },
+      "UserMessage": {
+        "properties": {
+          "forced_tool": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ForcedTool"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when the user picked a tool from the + menu or a slash command"
+          },
+          "input_response": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InputResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "text": {
+            "default": "",
+            "maxLength": 4000,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "title": "UserMessage",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "AI-powered legal intelligence system for Indian law",
+    "title": "Legal Intelligence Terminal",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/agent/schema": {
+      "get": {
+        "description": "Never served: registering this response model puts every card and event variant into the OpenAPI\ncomponents, which `openapi-typescript` turns into the frontend's types.",
+        "operationId": "schema_carrier_api_v1_agent_schema_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSchemaBundle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Schema Carrier",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/api/v1/chat/ask": {
+      "post": {
+        "operationId": "ask_api_v1_chat_ask_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ask",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
+    "/api/v1/chat/upload": {
+      "post": {
+        "operationId": "upload_case_api_v1_chat_upload_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_case_api_v1_chat_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseUploadResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Case",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
+    "/api/v1/facts/": {
+      "get": {
+        "description": "Check facts module status.",
+        "operationId": "facts_status_api_v1_facts__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Facts Status",
+        "tags": [
+          "Facts"
+        ]
+      }
+    },
+    "/api/v1/facts/extract": {
+      "post": {
+        "description": "Extract structured legal elements from raw case text.\n\nUses InLegalBERT via HF Inference API if available, with rule-based\nfallback. If the model is warming up (cold start), returns 202 Accepted\nwith a task_id for polling.\n\nExample response:\n```json\n{\n  \"parties\": {\n    \"petitioner\": \"State of Maharashtra\",\n    \"respondent\": \"Ramesh Kumar\"\n  },\n  \"legal_issues\": [\n    \"Whether confession to police officer is admissible under Section 25 Evidence Act\"\n  ],\n  \"ipc_sections\": [\"Section 302\", \"Section 201\"],\n  \"acts_referenced\": [\n    \"Indian Penal Code, 1860\",\n    \"Code of Criminal Procedure, 1973\",\n    \"Indian Evidence Act, 1872\"\n  ],\n  \"court_level\": \"High Court\",\n  \"case_type\": \"criminal\",\n  \"key_facts\": [\n    \"The deceased was last seen alive at 9:30 PM near the market area\",\n    \"Post-mortem confirmed death due to strangulation\"\n  ],\n  \"relief_sought\": \"Quashing of FIR No. 45/2023\",\n  \"metadata\": {\n    \"extraction_method\": \"hybrid\",\n    \"confidence\": 0.82,\n    \"processing_time_ms\": 3450\n  }\n}\n```",
+        "operationId": "extract_facts_api_v1_facts_extract_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FactExtractRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StructuredCaseProfile"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Extract Facts",
+        "tags": [
+          "Facts"
+        ]
+      }
+    },
+    "/api/v1/facts/extract/batch": {
+      "post": {
+        "description": "Extract structured profiles for multiple cases concurrently.\n\nProcesses up to 5 cases in parallel using asyncio.gather.\nIf the model is warming up, returns 202 with task_id for each case.\n\nReturns a list of StructuredCaseProfile (or task references for 202s).",
+        "operationId": "extract_facts_batch_api_v1_facts_extract_batch_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FactBatchExtractRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Extract Facts Batch",
+        "tags": [
+          "Facts"
+        ]
+      }
+    },
+    "/api/v1/facts/status/{task_id}": {
+      "get": {
+        "description": "Poll the status of an async extraction task.\n\nReturns the task status (pending / processing / completed / failed)\nand the result if available.",
+        "operationId": "get_task_status_api_v1_facts_status__task_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "title": "Task Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Task Status",
+        "tags": [
+          "Facts"
+        ]
+      }
+    },
+    "/api/v1/graph/": {
+      "get": {
+        "description": "Check graph module status.",
+        "operationId": "graph_status_api_v1_graph__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Graph Status",
+        "tags": [
+          "Graph"
+        ]
+      }
+    },
+    "/api/v1/graph/build": {
+      "post": {
+        "description": "Build an argument graph from a StructuredCaseProfile.\n\nCreates nodes for issues, claims, statutes, evidence, and precedents,\nwith edges representing supports/contradicts/cites/raises relationships.\nFlags weak claims (no supporting evidence).",
+        "operationId": "build_graph_api_v1_graph_build_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GraphBuildRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphBuildResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Build Graph",
+        "tags": [
+          "Graph"
+        ]
+      }
+    },
+    "/api/v1/graph/query": {
+      "post": {
+        "description": "Query the knowledge graph.\n\nSearches for nodes and edges matching the query text.",
+        "operationId": "query_graph_api_v1_graph_query_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GraphQueryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphQueryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Query Graph",
+        "tags": [
+          "Graph"
+        ]
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "description": "Readiness probe — returns readiness of all subsystems.",
+        "operationId": "health_ready_api_v1_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Ready"
+      }
+    },
+    "/api/v1/precedent/": {
+      "get": {
+        "description": "Check precedent module status.",
+        "operationId": "precedent_status_api_v1_precedent__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Precedent Status",
+        "tags": [
+          "Precedent"
+        ]
+      }
+    },
+    "/api/v1/precedent/index": {
+      "post": {
+        "description": "Fetch a judgment from Kanoon, chunk it, embed the chunks,\nand add them to the FAISS index.",
+        "operationId": "index_document_api_v1_precedent_index_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IndexRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Index Document",
+        "tags": [
+          "Precedent"
+        ]
+      }
+    },
+    "/api/v1/precedent/index/stats": {
+      "get": {
+        "description": "Return current FAISS index statistics.",
+        "operationId": "index_stats_api_v1_precedent_index_stats_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexStats"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Index Stats",
+        "tags": [
+          "Precedent"
+        ]
+      }
+    },
+    "/api/v1/precedent/search": {
+      "post": {
+        "description": "Search precedents using semantic similarity.\n\nFlow:\n  1. Embed the query via HF Inference API (sentence-transformers/all-MiniLM-L6-v2)\n  2. Search the FAISS index for top_k nearest neighbours\n  3. If results < top_k and use_kanoon is True, supplement with\n     keyword results from the Kanoon scraper",
+        "operationId": "search_precedents_api_v1_precedent_search_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrecedentSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrecedentSearchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Precedents",
+        "tags": [
+          "Precedent"
+        ]
+      }
+    },
+    "/api/v1/precedent/{doc_id}": {
+      "get": {
+        "description": "Fetch full judgment detail from Indian Kanoon.\n\nParses the judgment page to extract text, bench, citations,\nand referenced acts/sections.",
+        "operationId": "get_precedent_detail_api_v1_precedent__doc_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "doc_id",
+            "required": true,
+            "schema": {
+              "title": "Doc Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JudgmentDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Precedent Detail",
+        "tags": [
+          "Precedent"
+        ]
+      }
+    },
+    "/api/v1/simulation/": {
+      "get": {
+        "description": "Check simulation module status.",
+        "operationId": "simulation_status_api_v1_simulation__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Simulation Status",
+        "tags": [
+          "Simulation"
+        ]
+      }
+    },
+    "/api/v1/simulation/predict": {
+      "post": {
+        "description": "Predict a judicial outcome for the petitioner based on a\nStructuredCaseProfile, optional precedents, and optional graph stats.\n\nReturns an explainable score breakdown — every component is transparent.",
+        "operationId": "predict_api_v1_simulation_predict_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Predict",
+        "tags": [
+          "Simulation"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Health check endpoint.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    }
+  }
+}
