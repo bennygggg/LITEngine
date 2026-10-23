@@ -80,6 +80,19 @@ and the committed model artifact together when deploying.
    may be delayed and can be disabled after 60 days without activity in a
    public repository, so this is best effort rather than an uptime guarantee.
 
+**Deploying without GitHub Actions.** The Space is a git repository, so the same
+subtree can be pushed to it directly from a checkout. Log in once with a token
+that has write access to the Space (`hf auth login --add-to-git-credential`, run
+in a real terminal), then from the monorepo root:
+
+```bash
+SPLIT=$(git subtree split -q --prefix=lit-backend main)
+git push https://huggingface.co/spaces/thebenmerlin/lit-backend "${SPLIT}:refs/heads/main"
+```
+
+Use `${SPLIT}` with braces — in zsh, `$SPLIT:refs` is parsed as a modifier.
+Add `--dry-run` first to check the credentials without changing the Space.
+
 Verify once the Space reports **Running**:
 
 ```bash
