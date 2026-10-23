@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 # One command to check the whole monorepo (there is no CI while GitHub is suspended).
 #   scripts/verify.sh          full: backend tests + OpenAPI drift + frontend typecheck/lint/tests/build
-#   scripts/verify.sh --fast   skip the frontend production build (used by the pre-push hook)
+#   scripts/verify.sh --fast   skip the frontend production build and e2e (used by the pre-push hook)
+#   scripts/verify.sh --e2e    also run the Playwright end-to-end + accessibility suite (starts its own servers)
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-FAST=0; [ "${1:-}" = "--fast" ] && FAST=1
+FAST=0; E2E=0
+[ "${1:-}" = "--fast" ] && FAST=1
+[ "${1:-}" = "--e2e" ] && E2E=1
 
 echo "== backend (Python 3.11, production pins)"
 cd "$ROOT/lit-backend"
@@ -24,5 +27,6 @@ cd "$ROOT/lit-frontend"
 npm run --silent typecheck
 npm run --silent lint
 npm run --silent test
-if [ "$FAST" -eq 0 ]; then npm run --silent build; fi
+if [ "$FAST" -eq 0 ]; then npm run --silent build && npm run --silent check:bundle; fi
+if [ "$E2E" -eq 1 ]; then npm run e2e; fi
 echo "verify: OK"

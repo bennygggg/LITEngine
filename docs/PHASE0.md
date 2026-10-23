@@ -47,7 +47,11 @@ macOS note: faiss + torch in one process need `OMP_NUM_THREADS=1 TOKENIZERS_PARA
 - Hygiene: 16 tracked `.pyc` files untracked; `requirements-dev.txt`, `pytest.ini`.
 - State: backend 13 tests pass; frontend typecheck, lint (0 errors), 3 tests, production build pass. Initial JS (no Cytoscape yet) 43.6 kB + 159 kB vendor, gzip 13.7 + 51.8 kB.
 
-## 4. Not done yet — each needs your OK because it touches something outside this laptop
-1. **Private HF dataset repo** to host the precedent artifact (create + upload 62 MB; the Space downloads it at start).
-2. **SSE-through-HF-proxy spike**: a 2-minute test stream with pings from a Vercel origin. Needs a throwaway endpoint on a Space — either a new staging Space (`lit-backend-staging`, free CPU) or briefly on the live one. I recommend the staging Space.
-3. Confirm the model choice above (and whether DeepInfra as fallback is acceptable).
+## 4. Decisions and outcomes (all three resolved)
+
+1. **Models** — approved: `openai/gpt-oss-120b:cerebras` for planning and narration, `Qwen/Qwen2.5-72B-Instruct` as fallback, then deterministic mode.
+2. **Private dataset repo** — created: `thebenmerlin/lit-precedent-index` (revision `d8c79aaab64f316d9c1557ea8a6836ec6f312902`, files under `v1/`). The inference key `litengine-chat-2` could not read it (404), so the **key needs Read access on that repo** before the Space can load the library (`docs/RUNBOOK.md`).
+3. **SSE through the Hugging Face proxy** — verified on a private staging Space (`thebenmerlin/lit-backend-staging`): events arrive in real time (no buffering), a 150 s stream with 10 s pings survives, 80 s of silence between events survives, and the CORS preflight from the Vercel origin passes. Client stall threshold is 25 s; ping cadence 10 s.
+
+Later phases built on these results: the agent and scenario engine, the cards and canvas, the recorded sample session, and
+hardening (end-to-end, accessibility, CSP, bundle budget). See `CHANGELOG.md` and `ARCHITECTURE.md`.
