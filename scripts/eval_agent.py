@@ -60,6 +60,9 @@ PROMPTS = [
     ("Is case me appeal ke chances kya hain? Main accused hoon.", DATE, {"outcome"}),
     ("Explain the estimate to a client who isn't a lawyer.", {**DATE, "appellant_type": "accused_appeal"}, {"outcome"}),
     ("Who won Kesavananda Bharati and what did it hold?", DATE, {"precedents"}),
+    ("What happened exactly? One liner please", DATE, {"sources"}),
+    ("In one sentence, was there any delay in lodging the FIR?", DATE, {"sources"}),
+    ("tl;dr of what the prosecution says happened", DATE, {"sources"}),
 ]
 PROMISES = re.compile(r"\b(will|is going to|are going to|shall|is likely to|are likely to)\s+(certainly\s+|definitely\s+)?(win|lose|succeed|be acquitted|be convicted|be set aside|be overturned|overturn|replace|reduce|substitute)\b|\bguarantee[sd]?\b|\bcertain(ly)? (to )?(win|succeed)\b", re.I)
 CASE_NAME = re.compile(r"\b[A-Z][\w.'&-]+(?:\s+[A-Z][\w.'&-]+){0,3}\s+(?:v\.|vs\.?|versus)\s+(?:The\s+)?[A-Z][\w.'&-]+(?:\s+[A-Z][\w.'&-]+){0,3}")
@@ -124,6 +127,19 @@ def main() -> None:
                 problems.append("off-topic reply did not state the scope")
             if prompt.startswith("Who won Kesavananda") and not any(w in text.lower() for w in ("library", "indexed", "not found")):
                 problems.append("did not say the landmark is not in the library")
+            if prompt.startswith(("What happened exactly? One liner", "In one sentence", "tl;dr")):
+                if not ev[0].get("answer_first"):
+                    problems.append("a one-liner request was not flagged answer_first")
+                if len(re.findall(r"[.!?](?:\s|$)", re.sub(r"\[[PS]\d+\]", "", text).strip())) > 1 or len(text.split()) > 45:
+                    problems.append(f"one-liner is not one short sentence ({len(text.split())} words)")
+                if re.search(r"\b(caveat|next step|you should|consider|however)\b", text, re.I):
+                    problems.append("one-liner carries a caveat or next step")
+                first_text = next((i for i, e in enumerate(ev) if e["event"] == "text_delta"), None)
+                if first_text is not None and any(e["event"] == "text_delta" for e in ev[:first_text]):
+                    problems.append("text appeared before the answer")
+            if prompt.startswith("tl;dr of what the prosecution") and re.search(r"prosecution[^.]{0,80}(?:falsely implicated|alibi|wedding)", text, re.I) \
+                    and not re.search(r"reject|despite|disput|contrary|denies|against", text, re.I):
+                problems.append("credits the prosecution with the defence's position")
             tm = done["timings"]
             rows.append((i, prompt[:52], "FAIL" if problems else "ok", tm.get("first_card_ms"), tm.get("ttft_ms"), tm["total_ms"], done["usage"]["llm_calls"],
                          done["usage"]["input_tokens"] + done["usage"]["output_tokens"]))

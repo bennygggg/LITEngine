@@ -2401,6 +2401,12 @@
       },
       "MessageStartEvent": {
         "properties": {
+          "answer_first": {
+            "default": false,
+            "description": "The user asked for a short answer: the client shows the text before any cards",
+            "title": "Answer First",
+            "type": "boolean"
+          },
           "case_known": {
             "default": true,
             "title": "Case Known",
@@ -4978,7 +4984,7 @@
   "info": {
     "description": "AI-powered legal intelligence system for Indian law",
     "title": "Legal Intelligence Terminal",
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "openapi": "3.1.0",
   "paths": {
