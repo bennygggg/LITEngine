@@ -13,7 +13,7 @@ from services.outcome_model import is_model_loaded
 from services.case_chat import case_chat_service
 
 # Routers
-from routers import precedent, facts, graph, simulation, chat, landing
+from routers import precedent, facts, graph, simulation, chat, landing, agent, spike
 
 logger = get_logger(__name__)
 
@@ -135,6 +135,9 @@ def create_app() -> FastAPI:
     app.include_router(graph.router, prefix="/api/v1")
     app.include_router(simulation.router, prefix="/api/v1")
     app.include_router(chat.router, prefix="/api/v1")
+    app.include_router(agent.router, prefix="/api/v1")
+    if settings.SPIKE_ENABLED:
+        app.include_router(spike.router, prefix="/api/v1")
 
     return app
 
