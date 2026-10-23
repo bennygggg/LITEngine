@@ -222,3 +222,17 @@ def test_outcome_card_flags_ai_improved_profiles():
     assert any("less reliable" in c for c in card.caveats)
     plain = cards.outcome_card("k", scored, "accused_appeal", date(2021, 4, 12), "rules")
     assert not any("less reliable" in c for c in plain.caveats)
+
+
+def test_fixture_index_returns_a_real_cosine():
+    """The legacy fixture vectors were unnormalised, so search reported cosines like -174; they must stay within [-1, 1]."""
+    import numpy as np
+    from services.embedder import embedder_service
+
+    if embedder_service.index_source != "fixture" or embedder_service.is_empty:
+        embedder_service.load_index()
+    if embedder_service.index_source != "fixture":
+        return  # a real artifact is configured in this environment; nothing to check
+    rng = np.random.default_rng(0)
+    for hit in embedder_service.search(rng.normal(size=384).tolist(), 3):
+        assert -1.0 <= hit["cosine"] <= 1.0

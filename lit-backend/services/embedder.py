@@ -583,6 +583,9 @@ class EmbedderService:
 
             self._index = faiss.IndexFlatL2(dimension)
             vectors_np = np.array(vectors, dtype=np.float32)
+            # The checked-in fixture vectors are unnormalised (norm ~19) while queries are normalised, which made distances
+            # meaningless (cosine in the hundreds, negative). The real artifact is already normalised and unaffected.
+            faiss.normalize_L2(vectors_np)
             self._index.add(vectors_np)
             self._metadata = metadata
             self.index_source = "fixture"
