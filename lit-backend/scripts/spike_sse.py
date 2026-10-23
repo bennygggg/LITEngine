@@ -17,11 +17,21 @@ import time
 import httpx
 
 
-def cors_check(base: str, origin: str) -> bool:
+def _auth_headers(enabled: bool) -> dict:
+    """Private Spaces need the owner's HF token; it is read from the local login and never printed."""
+    if not enabled:
+        return {}
+    from huggingface_hub import get_token
+    token = get_token()
+    return {"Authorization": f"Bearer {token}"} if token else {}
+
+
+def cors_check(base: str, origin: str, auth: bool = False) -> bool:
     url = f"{base}/api/v1/agent/schema"
     pre = httpx.options(url, headers={
         "Origin": origin, "Access-Control-Request-Method": "POST",
         "Access-Control-Request-Headers": "content-type,x-client-version,last-event-id",
+        **_auth_headers(auth),
     }, timeout=30)
     allow_origin = pre.headers.get("access-control-allow-origin")
     allow_headers = pre.headers.get("access-control-allow-headers", "")
@@ -29,8 +39,8 @@ def cors_check(base: str, origin: str) -> bool:
     return pre.status_code in (200, 204) and allow_origin in (origin, "*")
 
 
-def run_stream(base: str, params: dict, origin: str | None) -> bool:
-    headers = {"Accept": "text/event-stream"}
+def run_stream(base: str, params: dict, origin: str | None, auth: bool = False) -> bool:
+    headers = {"Accept": "text/event-stream", **_auth_headers(auth)}
     if origin:
         headers["Origin"] = origin
     t0 = time.monotonic()
@@ -83,12 +93,13 @@ def main() -> None:
     ap.add_argument("--silent-for", type=int, default=0)
     ap.add_argument("--origin", default=None, help="send this Origin header on the stream request")
     ap.add_argument("--cors", default=None, help="run only a CORS preflight check for this origin")
+    ap.add_argument("--hf-auth", action="store_true", help="send the local HF token (needed for private Spaces)")
     args = ap.parse_args()
     base = args.base.rstrip("/")
     if args.cors:
-        sys.exit(0 if cors_check(base, args.cors) else 1)
+        sys.exit(0 if cors_check(base, args.cors, args.hf_auth) else 1)
     ok = run_stream(base, dict(seconds=args.seconds, tick=args.tick, ping=args.ping,
-                               silent_from=args.silent_from, silent_for=args.silent_for), args.origin)
+                               silent_from=args.silent_from, silent_for=args.silent_for), args.origin, args.hf_auth)
     print("VERDICT:", "real-time, survived" if ok else "PROBLEM (buffered, delayed, or cut)")
     sys.exit(0 if ok else 1)
 

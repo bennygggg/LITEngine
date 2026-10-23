@@ -13,3 +13,4 @@ data/outcome_dataset/*
 !data/outcome_dataset/model/
 data/outcome_dataset/model/*
 !data/outcome_dataset/model/outcome_classifier_binary.joblib
+!data/outcome_dataset/model/model_card.json

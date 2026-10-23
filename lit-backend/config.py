@@ -34,7 +34,7 @@ class Settings(BaseSettings):
 
     # App Metadata
     APP_NAME: str = "Legal Intelligence Terminal"
-    APP_VERSION: str = "0.1.0"
+    APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
 
     # Environment
@@ -42,6 +42,35 @@ class Settings(BaseSettings):
 
     # Use fixtures (offline dev mode)
     USE_FIXTURES: bool = False
+
+    # Precedent library artifact (vectors.npy + meta.jsonl + manifest.json). Resolution order:
+    #   1. PRECEDENT_ARTIFACT_DIR  — a local directory (dev, or pre-baked)
+    #   2. PRECEDENT_ARTIFACT_REPO — a private HF dataset repo, downloaded at startup into data/precedent_artifacts
+    #   3. the 3-case fixture index (graceful fallback — the app still starts, /health/ready says so)
+    # HF_DATASET_TOKEN falls back to HUGGINGFACE_API_KEY; the key needs read access to the dataset repo.
+    PRECEDENT_ARTIFACT_DIR: str = ""
+    PRECEDENT_ARTIFACT_REPO: str = ""
+    PRECEDENT_ARTIFACT_REVISION: str = "main"
+    PRECEDENT_ARTIFACT_SUBDIR: str = "v1"
+    HF_DATASET_TOKEN: str = ""
+
+    # Chat agent (POST /api/v1/agent/chat). LLM_PROVIDER: "hf_router" | "fake" | "none".
+    # "none" runs the whole product with deterministic routing and templated narration (no text leaves the Space).
+    AGENT_ENABLED: bool = True
+    LLM_PROVIDER: str = "hf_router"
+    # Pin the provider with the router's "model:provider" form (see docs/PHASE0.md for why Cerebras).
+    PLANNER_MODEL: str = "openai/gpt-oss-120b:cerebras"
+    NARRATION_MODEL: str = "openai/gpt-oss-120b:cerebras"
+    FALLBACK_MODEL: str = "Qwen/Qwen2.5-72B-Instruct"
+    LLM_REASONING_EFFORT: str = "low"
+    AGENT_MAX_ITERATIONS: int = 4
+    AGENT_MAX_TOKENS: int = 1500
+    AGENT_RUN_TIMEOUT_S: int = 90
+    AGENT_PING_S: float = 10.0  # keep-alive cadence; the HF proxy and browsers need bytes during CPU work
+    AGENT_MAX_CONCURRENT: int = 4  # protects the 2-vCPU Space (stability, not access control)
+    AGENT_ORPHAN_CANCEL_S: int = 15  # cancel a run this long after its last reader disconnects
+    AGENT_TOOL_TIMEOUT_S: int = 20
+    LLM_DAILY_TOKEN_CAP: int = 0  # 0 = unlimited; when exceeded the agent degrades to deterministic mode
 
     # Throwaway streaming test endpoint (/api/v1/spike/stream) used to prove SSE survives the HF proxy.
     # Off everywhere except the staging Space.

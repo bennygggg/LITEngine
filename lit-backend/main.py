@@ -1,3 +1,4 @@
+import asyncio
 import os
 from contextlib import asynccontextmanager
 
@@ -13,7 +14,7 @@ from services.outcome_model import is_model_loaded
 from services.case_chat import case_chat_service
 
 # Routers
-from routers import precedent, facts, graph, simulation, chat, landing, agent, spike
+from routers import precedent, facts, graph, simulation, chat, landing, agent, cases, spike
 
 logger = get_logger(__name__)
 
@@ -62,11 +63,26 @@ async def lifespan(app: FastAPI):
     except Exception as exc:
         logger.warning(f"Embedding model warm-up failed, will retry on first use: {exc}")
 
+    # The extractor keeps async-task results in memory and never pruned them; sweep every minute.
+    async def _sweep_extraction_tasks() -> None:
+        from services.extractor import cleanup_old_tasks
+        while True:
+            await asyncio.sleep(60)
+            try:
+                cleanup_old_tasks()
+            except Exception as exc:  # noqa: BLE001
+                logger.warning(f"extraction task sweep failed: {exc}")
+
+    sweeper = asyncio.create_task(_sweep_extraction_tasks())
+
     yield
+
+    sweeper.cancel()
 
     # ---- Shutdown -------------------------------------------------------
     logger.info("Shutting down")
-    if not settings.PRECEDENT_INDEX_PATH:
+    if not settings.PRECEDENT_INDEX_PATH and embedder_service.index_source == "fixture" and not settings.IS_PRODUCTION:
+        # Only the dev fixture index is mutable; the real library is read-only and a production disk is ephemeral.
         logger.info("Saving mutable FAISS index")
         embedder_service.save_index()
     cache.clear()
@@ -117,13 +133,21 @@ def create_app() -> FastAPI:
     # Readiness endpoint
     @app.get("/api/v1/health/ready")
     async def health_ready():
-        """Readiness probe — returns readiness of all subsystems."""
+        """Readiness probe — real state of each subsystem (the old version always said ready)."""
+        embedder_ok = embedder_service._fake or embedder_service._use_hf_api or embedder_service._local_model is not None
+        outcome_ok = is_model_loaded()
+        index = embedder_service.index_info()
         return {
-            "ready": True,
+            "ready": bool(_index_loaded and embedder_ok and outcome_ok),
             "index_loaded": _index_loaded,
+            "index": index,
+            "embedder_ready": embedder_ok,
+            "outcome_model_loaded": outcome_ok,
             "hf_key_set": settings.hf_key_set,
-            "outcome_model_loaded": is_model_loaded(),
+            "llm": {"provider": settings.LLM_PROVIDER, "configured": settings.hf_key_set if settings.LLM_PROVIDER == "hf_router" else settings.LLM_PROVIDER == "fake"},
+            "agent_enabled": settings.AGENT_ENABLED,
             "dated_precedent_index_configured": bool(settings.PRECEDENT_INDEX_PATH),
+            "version": settings.APP_VERSION,
         }
 
     # Landing page at the bare URL (no prefix)
@@ -136,6 +160,7 @@ def create_app() -> FastAPI:
     app.include_router(simulation.router, prefix="/api/v1")
     app.include_router(chat.router, prefix="/api/v1")
     app.include_router(agent.router, prefix="/api/v1")
+    app.include_router(cases.router, prefix="/api/v1")
     if settings.SPIKE_ENABLED:
         app.include_router(spike.router, prefix="/api/v1")
 

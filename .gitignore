@@ -11,6 +11,7 @@
 !/lit-backend/data/outcome_dataset/model/
 /lit-backend/data/outcome_dataset/model/*
 !/lit-backend/data/outcome_dataset/model/outcome_classifier_binary.joblib
+!/lit-backend/data/outcome_dataset/model/model_card.json
 
 /lit-frontend/node_modules/
 /lit-frontend/dist/
@@ -30,3 +31,5 @@
 *.orig
 /lit-backend/.venv311/
 /lit-backend/.cache/
+/lit-frontend/test-results/
+/lit-frontend/playwright-report/

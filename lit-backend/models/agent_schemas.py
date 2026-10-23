@@ -312,6 +312,39 @@ class ScenarioBase(BaseModel):
     features: Dict[str, float] = Field(default_factory=dict)
 
 
+class ScenarioChanges(BaseModel):
+    """Levers a user can pull. Each maps onto a real input of the outcome model (see services/scenario.py)."""
+    appellant_type: Optional[AppellantType] = None
+    resolved_weak_claim_ids: List[str] = Field(default_factory=list, description="Node ids to treat as now supported; only meaningful if the map has weak claims")
+    extra_supporting_facts: int = Field(0, ge=0, le=5)
+    add_sections: List[str] = Field(default_factory=list, max_length=6)
+    remove_sections: List[str] = Field(default_factory=list, max_length=12)
+    exclude_precedent_refs: List[str] = Field(default_factory=list, description="P1..Pn: drop these precedents from the support set")
+    court_level: Optional[Literal["Supreme Court", "High Court", "District Court"]] = None
+
+
+class ScenarioSpec(BaseModel):
+    id: str = ""
+    label: str = Field(..., max_length=120)
+    changes: ScenarioChanges
+
+
+class ScenarioRequest(BaseModel):
+    case_profile: StructuredCaseProfile
+    precedents: List[Dict[str, Any]] = Field(default_factory=list, max_length=10, description="SearchResult-shaped; P1..Pn refer to this order")
+    graph_stats: Optional[Dict[str, Any]] = None
+    appellant_type: AppellantType = "unclear"
+    scenarios: List[ScenarioSpec] = Field(..., min_length=1, max_length=5)
+    include_sensitivity: bool = True
+
+
+class ScenarioResponse(BaseModel):
+    model: ModelFacts
+    base: ScenarioBase
+    scenarios: List[ScenarioOutcome]
+    sensitivity: List[SensitivityRow] = Field(default_factory=list)
+
+
 class ScenarioCard(CardBase):
     type: Literal["scenario"] = "scenario"
     model: ModelFacts
@@ -440,6 +473,7 @@ class StepEvent(EventBase):
     origin: Literal["llm", "forced", "dependency"] = "forced"
     depends_on: List[str] = Field(default_factory=list)
     args_preview: Dict[str, Any] = Field(default_factory=dict)
+    produces_card: bool = Field(False, description="On `start`: a card event for this step will follow — lets the UI show a skeleton in the card's final shape")
     message: Optional[str] = None
     pct: Optional[float] = None
     status: Optional[Literal["ok", "cached", "skipped", "error"]] = None
@@ -482,6 +516,8 @@ class MetaEvent(EventBase):
     event: Literal["meta"] = "meta"
     conversation_title: Optional[str] = None
     suggestions: List[Suggestion] = Field(default_factory=list)
+    case_inputs: Optional[CaseInputs] = Field(
+        None, description="Effective appellant_type/filing_date after this run (from the form or an explicit user statement); the client persists them on the case")
 
 
 class PingEvent(EventBase):

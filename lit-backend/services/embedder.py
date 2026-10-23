@@ -11,11 +11,13 @@ Provides:
 """
 
 import asyncio
+import hashlib
 import json
 import math
 import os
 import re
 import sys
+import threading
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -64,6 +66,17 @@ INDEX_FILE = (
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+def fake_embedding(text: str, dim: int = EMBEDDING_DIM) -> List[float]:
+    """Deterministic hashed bag-of-words vector (L2-normalised). Test-only (EMBEDDING_BACKEND=fake): similar texts
+    share tokens, so retrieval behaves sensibly without loading torch."""
+    v = np.zeros(dim, dtype=np.float32)
+    for tok in re.findall(r"[a-z0-9]+", text.lower()):
+        h = int(hashlib.md5(tok.encode()).hexdigest(), 16)
+        v[h % dim] += 1.0 if (h >> 24) & 1 else -1.0
+    n = float(np.linalg.norm(v))
+    return (v / n).tolist() if n else v.tolist()
 
 
 def _l2_distance_to_similarity(distance: float) -> float:
@@ -154,6 +167,7 @@ class EmbedderService:
         wants_hf_api = self.settings.EMBEDDING_BACKEND.strip().lower() == "hf_api"
         key_valid = bool(self.api_key and not self.api_key.startswith("hf_your_"))
         self._use_hf_api = wants_hf_api and key_valid
+        self._fake = self.settings.EMBEDDING_BACKEND.strip().lower() == "fake"
         self._local_model = None
         if wants_hf_api and not key_valid:
             logger.warning(
@@ -166,6 +180,11 @@ class EmbedderService:
         # FAISS state
         self._index: Optional[faiss.IndexFlatL2] = None
         self._metadata: List[Dict[str, Any]] = []  # parallel to FAISS vectors
+        # Where the loaded index came from: "artifact" (the real library), "fixture" (the 3-case file) or "none"
+        self.index_source: str = "none"
+        self.index_version: str = "none"
+        # One encode at a time: torch on 2 vCPUs oversubscribes badly when two requests encode concurrently
+        self._encode_lock = threading.Lock()
 
         # HTTP client (lazy, only needed for HF API mode)
         self._client: Optional[httpx.AsyncClient] = None
@@ -187,15 +206,22 @@ class EmbedderService:
 
     async def warm_up(self) -> None:
         """Load the local model now so the first request doesn't pay for it."""
-        if self._use_hf_api:
+        if self._use_hf_api or self._fake:
             return
         await asyncio.to_thread(self._get_local_model)
 
-    async def _get_embedding_local(self, text: str) -> List[float]:
-        """Generate embedding using local SentenceTransformer model."""
+    def _encode_one(self, text: str) -> List[float]:
         model = self._get_local_model()
-        embedding = model.encode(text, normalize_embeddings=True)
-        return embedding.tolist()
+        with self._encode_lock:
+            return model.encode(text, normalize_embeddings=True).tolist()
+
+    async def _get_embedding_local(self, text: str) -> List[float]:
+        """Generate embedding using local SentenceTransformer model (off the event loop)."""
+        return await asyncio.to_thread(self._encode_one, text)
+
+    async def embed_query(self, text: str) -> List[float]:
+        """Public single-text embedding for search queries (local or HF API, never blocks the loop)."""
+        return await self._get_embedding(text)
 
     # -- HTTP client ------------------------------------------------------------
 
@@ -225,6 +251,8 @@ class EmbedderService:
         Local SentenceTransformer model by default; HF Inference API with
         retry + backoff when EMBEDDING_BACKEND=hf_api and the key is valid.
         """
+        if self._fake:
+            return fake_embedding(text, self.dimension)
         if not self._use_hf_api:
             return await self._get_embedding_local(text)
 
@@ -312,6 +340,8 @@ class EmbedderService:
         """Batch local inference; keep API calls sequential for free-tier limits."""
         if not texts:
             return []
+        if self._fake:
+            return [fake_embedding(t, self.dimension) for t in texts]
         if not self._use_hf_api:
             model = self._get_local_model()
             vectors = await asyncio.to_thread(
@@ -406,6 +436,9 @@ class EmbedderService:
                 "metadata": meta,
                 "distance": float(dist),
                 "similarity_score": round(_l2_distance_to_similarity(float(dist)), 6),
+                # Vectors are L2-normalised, so squared distance d = 2 - 2cos. This is the true cosine; the legacy
+                # similarity_score above is kept unchanged because the outcome model was trained on it.
+                "cosine": round(1.0 - float(dist) / 2.0, 6),
             })
 
         logger.debug(f"FAISS search returned {len(results)} results (top_k={top_k})")
@@ -498,11 +531,31 @@ class EmbedderService:
         size_kb = path.stat().st_size / 1024
         logger.info(f"Saved FAISS index ({n} vectors) to {path} ({size_kb:.1f} KB)")
 
+    def load_artifact_index(self) -> bool:
+        """Load the real precedent library from the configured artifact (dir or private HF dataset repo)."""
+        from services.retrieval.artifact import resolve_artifact
+
+        artifact = resolve_artifact()
+        if artifact is None:
+            return False
+        self._index = faiss.IndexFlatL2(artifact.vectors.shape[1])
+        self._index.add(artifact.vectors.astype(np.float32, copy=False))
+        self._metadata = artifact.metadata
+        self.index_source = "artifact"
+        self.index_version = artifact.version
+        logger.info(
+            f"Precedent library: {artifact.counts.get('docs')} judgments, {len(artifact.metadata)} chunks "
+            f"(artifact {artifact.version})"
+        )
+        return True
+
     def load_index(self, path: Optional[Path] = None) -> bool:
-        """Load FAISS index from a JSON file.
+        """Load the precedent index: the real artifact if configured, else the fixture JSON.
 
         Returns True if loaded successfully, False if file not found or invalid.
         """
+        if path is None and self.load_artifact_index():
+            return True
         path = path or INDEX_FILE
 
         if not path.exists():
@@ -532,6 +585,8 @@ class EmbedderService:
             vectors_np = np.array(vectors, dtype=np.float32)
             self._index.add(vectors_np)
             self._metadata = metadata
+            self.index_source = "fixture"
+            self.index_version = "fixture"
 
             logger.info(
                 f"Loaded FAISS index from {path}: "
@@ -542,6 +597,23 @@ class EmbedderService:
         except (json.JSONDecodeError, KeyError, ValueError) as exc:
             logger.error(f"Failed to load index from {path}: {exc}")
             return False
+
+    def index_info(self) -> Dict[str, Any]:
+        """Name/version/size of the loaded library, shown on the Precedents card and /health/ready."""
+        return {
+            "name": "LIT precedent library" if self.index_source == "artifact" else "Fixture index (3 judgments)",
+            "source": self.index_source,
+            "version": self.index_version,
+            "docs": self._doc_count(),
+            "chunks": self.total_vectors,
+        }
+
+    def _doc_count(self) -> int:
+        cached = getattr(self, "_doc_count_cache", None)
+        if cached is None or cached[0] != len(self._metadata):
+            cached = (len(self._metadata), len(self.get_unique_doc_ids()))
+            self._doc_count_cache = cached
+        return cached[1]
 
     def get_unique_doc_ids(self) -> List[str]:
         """Return sorted list of unique doc_ids currently in the index."""
