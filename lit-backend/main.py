@@ -55,6 +55,13 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("FAISS index not loaded — semantic search will use Kanoon fallback")
 
+    # Load the local embedding model now so the first search or chat after a
+    # wake isn't the one that pays for it. Non-fatal: it lazy-loads on use.
+    try:
+        await embedder_service.warm_up()
+    except Exception as exc:
+        logger.warning(f"Embedding model warm-up failed, will retry on first use: {exc}")
+
     yield
 
     # ---- Shutdown -------------------------------------------------------

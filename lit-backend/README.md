@@ -10,7 +10,7 @@ pinned: false
 
 # Legal Intelligence Terminal (LIT) — Backend
 
-AI-powered legal intelligence system for Indian courts. This FastAPI backend provides semantic precedent search, automated fact extraction from case text, argument graph construction, and judicial outcome simulation. It integrates with Indian Kanoon for live judgment scraping and uses Hugging Face's Inference API for embeddings and legal NLP.
+AI-powered legal intelligence system for Indian courts. This FastAPI backend provides semantic precedent search, automated fact extraction from case text, argument graph construction, and judicial outcome simulation. It integrates with Indian Kanoon for live judgment scraping, computes embeddings locally with MiniLM, and uses Hugging Face's Inference Providers for case-chat generation.
 
 ---
 
@@ -149,7 +149,8 @@ data outside the Space before relying on it.
 
 | Variable | Default | Description |
 |---|---|---|
-| `HUGGINGFACE_API_KEY` | *(empty)* | HF Inference API token for embeddings |
+| `HUGGINGFACE_API_KEY` | *(empty)* | HF Inference Providers token for case-chat generation (and embeddings when `EMBEDDING_BACKEND=hf_api`) |
+| `EMBEDDING_BACKEND` | `local` | `local` runs MiniLM in-process; `hf_api` calls the HF Inference API and needs a funded key. Same 384-dim vectors either way |
 | `KANOON_BASE_URL` | `https://api.kanoon.example.com/v1` | Base URL for Indian Kanoon scraper |
 | `ALLOWED_ORIGINS` | `*` | Comma-separated list of allowed CORS origins |
 | `PORT` | `8000` | Server port |
@@ -164,6 +165,8 @@ data outside the Space before relying on it.
 
 Spaces on free hardware are suspended after a period of inactivity (Hugging
 Face's docs give two days as an example) and start again on the next visit, so
-the first request after a wake waits for the container to boot. The monorepo's
+the first request after a wake waits for the container to boot. The embedding
+model is pre-cached in the image and loaded at startup, so requests are not
+delayed by it once the container is up. The monorepo's
 `keep-alive.yml` workflow calls `/health` every six hours to keep the Space
 awake; see the deployment section above for its caveats.
