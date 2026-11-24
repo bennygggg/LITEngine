@@ -49,7 +49,7 @@ def main() -> None:
               "| Test cases | Joint model AUC | With the State-specific model | Joint Brier | With the State-specific model |", "|---|---|---|---|---|",
               f"| State appeals ({t['n_state_test']:,}; {pc(t['state_test_succeeds_share'], 0)} succeed) | {a['auc']:.3f} | **{b['auc']:.3f}** | {a['brier']:.3f} | {b['brier']:.3f} |",
               f"| All cases | {c['auc']:.3f} | {d['auc']:.3f} | {c['brier']:.3f} | {d['brier']:.3f} |", "",
-              "Accuracy is unchanged (State appeals are almost always dismissed, so the model still says so); what improves is the ranking within State appeals, which the shipped joint model could not do. It is a validated candidate, **not yet shipped**.", ""]
+              "Accuracy is unchanged (State appeals are almost always dismissed, so the model still says so); what improves is the ranking within State appeals, which the shipped joint model could not do. It is now **shipped**: Juris scores State appeals with this model and every other appeal with the joint model.", ""]
     n = R["neural_probe_val2022"]
     key = [k for k in n if k.startswith("embeddings_plus")][0]
     L += ["## Neural baseline (frozen InLegalBERT, local, validation year)", "",

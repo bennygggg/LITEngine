@@ -196,7 +196,7 @@ data outside the Space before relying on it.
 | `LOG_LEVEL` | `INFO` | Log level (DEBUG, INFO, WARNING, ERROR) |
 | `CACHE_TTL` | `3600` | In-memory cache TTL in seconds |
 | `PRECEDENT_ARTIFACT_DIR` | *(empty)* | Local directory holding the precedent library (`vectors.npy`, `meta.jsonl`, `manifest.json`) |
-| `JURIS_ARTIFACT_SUBDIR` / `JURIS_ARTIFACT_REVISION` | `juris/v1` / `main` | Where Juris is downloaded from inside `PRECEDENT_ARTIFACT_REPO` (same key, same Read access) |
+| `JURIS_ARTIFACT_SUBDIR` / `JURIS_ARTIFACT_REVISION` | `juris/v2` / `main` | Where Juris is downloaded from inside `PRECEDENT_ARTIFACT_REPO` (same key, same Read access) |
 | `PRECEDENT_ARTIFACT_REPO` / `_REVISION` / `_SUBDIR` | *(empty)* / `main` / `v1` | Private HF dataset repo the library is downloaded from at start (the key needs Read on it); pin the revision |
 | `LLM_PROVIDER` | `hf_router` | `hf_router`, `fake` (tests) or `none` (deterministic routing and templated narration; nothing leaves the server) |
 | `PLANNER_MODEL` / `NARRATION_MODEL` | `openai/gpt-oss-120b:cerebras` | Router models; `model:provider` pins the provider |

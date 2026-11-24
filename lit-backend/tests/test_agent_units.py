@@ -9,6 +9,7 @@ import pytest
 
 from models.agent_schemas import ScenarioChanges, ScenarioSpec
 from models.schemas import Parties, StructuredCaseProfile
+from services import juris as juris_service
 from services.agent import cards
 from services.agent.doc_index import chunk_with_offsets
 from services.agent.library import clean_snippet, clean_title, court_tier, statutes_mentioned
@@ -214,7 +215,7 @@ def test_centred_contributions_sum_to_logit_minus_baseline(appellant):
     total = sum(c.contribution for c in cards.centred_contributions(scored.juris))
     p = scored.juris.probabilities["succeeds"]
     logit = math.log(p / (1 - p))
-    assert card["baseline_logit"] + total == pytest.approx(logit, abs=0.02)
+    assert juris_service.baseline_logit(appellant) + total == pytest.approx(logit, abs=0.02)
 
 
 def test_drivers_summary_names_appeal_type_as_a_driver():
@@ -223,11 +224,13 @@ def test_drivers_summary_names_appeal_type_as_a_driver():
     assert "who is appealing" in text and "the accused" in text
 
 
-def test_state_appeals_carry_a_base_rate_caveat():
+def test_state_appeals_are_scored_by_their_own_model_and_say_so():
     scored = score_case(profile(), [], GRAPH, "state_appeal", CASE)
     caveats = cards.outcome_card("k", scored, "state_appeal", None, "rules").caveats
-    assert any("base rate" in c for c in caveats)
-    assert not any("base rate" in c for c in cards.outcome_card("k", score_case(profile(), [], GRAPH, "accused_appeal", CASE), "accused_appeal", None, "rules").caveats)
+    assert any("separate model" in c for c in caveats)
+    assert not any("separate model" in c for c in cards.outcome_card("k", score_case(profile(), [], GRAPH, "accused_appeal", CASE), "accused_appeal", None, "rules").caveats)
+    assert scored.juris.probabilities["succeeds"] < 0.25            # State appeals rarely succeed; the State route knows its own base rate
+    assert juris_service.baseline_p("state_appeal") < 0.2 < juris_service.baseline_p("accused_appeal")
 
 
 def test_outcome_card_flags_a_thin_profile_summary_and_carries_the_model_facts():

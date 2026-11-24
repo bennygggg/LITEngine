@@ -23,6 +23,7 @@ from models.agent_schemas import (
 )
 from models.schemas import GraphBuildResponse, StructuredCaseProfile
 from services.agent.library import LibrarySearch
+from services import juris as juris_service
 
 ENGINE_VERSION = "1"
 MODEL_CARD_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "juris" / "model" / "model_card.json"
@@ -199,11 +200,12 @@ def outcome_card(card_id: str, scored: Any, appellant: AppellantType, filing_dat
         "Trained on High Court criminal-appeal judgments; outcome labels come from court records and were checked against the order text, so some label noise remains.",
     ]
     if appellant == "state_appeal":
-        caveats.append("Appeals by the State or a complainant rarely succeed in the training data, and Juris cannot tell such appeals apart beyond that "
-                       "base rate: read this figure as the base rate for such appeals, not as a judgment of this particular one.")
+        caveats.append("Appeals by the State or a complainant rarely succeed in the training data (about 9 % in the test period). Juris scores them with a separate "
+                       "model trained only on such appeals, which ranks them well above chance but from far fewer cases, so this figure is less certain than "
+                       "one for the accused's own appeal.")
     if juris.input_basis == "profile_summary":
         caveats.append("Only a short structured summary was available, not the full document, so this estimate is less reliable.")
-    base = model_card()["baseline_p"] if model_card() else None
+    base = juris_service.baseline_p(appellant) or (model_card()["baseline_p"] if model_card() else None)
     disclaimer_text = "Indicative research estimate"
     if base is not None:
         disclaimer_text += f" — a typical case in the training data sits near {round5(base)}%"

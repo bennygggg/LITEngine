@@ -1,7 +1,7 @@
 """
 Publish or fetch the Juris artifact through the private HF dataset repo (the Space rejects binary files in git).
 
-    .venv-juris/bin/python -m scripts.juris.publish_artifact publish    # upload juris.joblib to <repo>/juris/v1/ (checks the sha256 against the card)
+    .venv-juris/bin/python -m scripts.juris.publish_artifact publish    # upload juris.joblib to <repo>/juris/v2/ (checks the sha256 against the card)
     .venv-juris/bin/python -m scripts.juris.publish_artifact fetch      # fresh clone: download it and verify it against the committed card
 
 The repo defaults to the one the Space already reads (PRECEDENT_ARTIFACT_REPO / docs/RUNBOOK.md).
@@ -16,7 +16,7 @@ import sys
 from scripts.juris import paths
 
 DEFAULT_REPO = "thebenmerlin/lit-precedent-index"
-SUBDIR = "juris/v1"
+SUBDIR = "juris/v2"
 
 
 def sha256(path) -> str:

@@ -110,6 +110,26 @@ def test_too_little_text_returns_a_marked_stub_not_a_guess(loaded):
     assert not r.model_loaded and "too little text" in r.explanation_sentences[0].lower()
 
 
+def test_a_side_model_scores_its_own_side_and_nothing_else(loaded, synthetic, monkeypatch):
+    import copy
+    side = copy.deepcopy(loaded)
+    side.a, side.b, side.baseline_p_ = loaded.a, loaded.b + 3.0, 0.9      # a visibly different calibration
+    loaded.side_models = {"state_appeal": side}
+    monkeypatch.setattr(loaded, "baseline_p_", 0.5, raising=False)
+    text = synthetic[1][0, 0]
+    base = juris.predict_juris(text, "accused_appeal").probabilities["succeeds"]
+    routed = juris.predict_juris(text, "state_appeal").probabilities["succeeds"]
+    plain = loaded.predict_proba(np.array([[juris.prepare_text(text)[0], "state_appeal", juris.prepare_text(text)[1]]], dtype=object))[0][1]
+    assert routed != pytest.approx(plain, abs=1e-6) and routed > plain                 # the State route (shifted by +3 logits) was used
+    assert juris.predict_juris(text, "accused_appeal").probabilities["succeeds"] == pytest.approx(base)
+    assert juris.baseline_p("state_appeal") == 0.9
+    juris._validate(loaded)
+    loaded.side_models = {"nonsense": side}
+    with pytest.raises(ValueError, match="unknown appeal side"):
+        juris._validate(loaded)
+    loaded.side_models = {}
+
+
 def test_not_loaded_falls_back_cleanly(monkeypatch):
     monkeypatch.setattr(juris, "_model", None)
     r = juris.predict_juris("anything " * 100, "accused_appeal")

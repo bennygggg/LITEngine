@@ -116,6 +116,16 @@ def _validate(model: Any) -> None:
     meta = getattr(model, "meta", None) or {}
     if meta.get("schema") != ARTIFACT_SCHEMA:
         raise ValueError(f"artifact schema {meta.get('schema')!r} != {ARTIFACT_SCHEMA!r}")
+    _validate_one(model)
+    for side, sub in (getattr(model, "side_models", None) or {}).items():
+        if side not in APPELLANT_TYPE_CATEGORIES:
+            raise ValueError(f"side model for unknown appeal side {side!r}")
+        if not isinstance(sub, CalibratedJuris):
+            raise ValueError(f"side model {side!r} is not a CalibratedJuris")
+        _validate_one(sub)
+
+
+def _validate_one(model: CalibratedJuris) -> None:
     if list(model.classes_) != EXPECTED_CLASSES:
         raise ValueError(f"unexpected classes_ {list(model.classes_)}")
     clf = model.pipeline.named_steps["clf"]
@@ -159,6 +169,21 @@ def is_juris_loaded() -> bool:
 
 def juris_meta() -> Dict[str, Any]:
     return dict(_model.meta) if _model is not None else {}
+
+
+def _pick(appellant_type: str) -> CalibratedJuris:
+    """The model that scores this appeal side: a side-specific model if the artifact carries one (State appeals), else the joint model."""
+    assert _model is not None
+    return (getattr(_model, "side_models", None) or {}).get(appellant_type, _model)
+
+
+def baseline_logit(appellant_type: str) -> Optional[float]:
+    """Where 'a typical training case' sits for the model that scores this side (the contributions add up to logit - this)."""
+    return _pick(appellant_type).baseline_logit if _model is not None else None
+
+
+def baseline_p(appellant_type: str) -> Optional[float]:
+    return getattr(_pick(appellant_type), "baseline_p_", None) if _model is not None else None
 
 
 # ---------------------------------------------------------------------------
@@ -289,9 +314,10 @@ def predict_juris(text: str, appellant_type: str, input_basis: str = "case_text"
         logger.warning(f"predict_juris: only {n_words} words to read — not enough for a text model")
         return _fallback_result("There is too little text to estimate from — Juris needs the facts and grounds of the case.")
     X = np.array([[read_text, appellant_type, n_words]], dtype=object)   # column order: text, side, n_words
+    active_model = _pick(appellant_type)
     try:
-        proba = _model.predict_proba(X)[0]
-        _, contributions = _contributions(_model, X)
+        proba = active_model.predict_proba(X)[0]
+        _, contributions = _contributions(active_model, X)
     except Exception as exc:  # noqa: BLE001
         logger.error(f"predict_juris: inference failed, falling back: {exc}")
         return _fallback_result()

@@ -95,7 +95,7 @@ The wording carries almost all the signal: removing the explicit appeal-type inp
 | State appeals (2,377; 9 % succeed) | 0.502 | **0.730** | 0.089 | 0.080 |
 | All cases | 0.795 | 0.796 | 0.169 | 0.169 |
 
-Accuracy is unchanged (State appeals are almost always dismissed, so the model still says so); what improves is the ranking within State appeals, which the shipped joint model could not do. It is a validated candidate, **not yet shipped**.
+Accuracy is unchanged (State appeals are almost always dismissed, so the model still says so); what improves is the ranking within State appeals, which the shipped joint model could not do. It is now **shipped**: Juris scores State appeals with this model and every other appeal with the joint model.
 
 ## Neural baseline (frozen InLegalBERT, local, validation year)
 

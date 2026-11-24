@@ -4,8 +4,8 @@
   "seq": 1,
   "t": 0,
   "event": "message_start",
-  "run_id": "r_73a7fd33",
-  "message_id": "m_c3b8935f4e",
+  "run_id": "r_c34f9246",
+  "message_id": "m_bc40e4e32c",
   "conversation_id": "fx2",
   "mode": "forced",
   "model": null,
@@ -20,7 +20,7 @@
   "seq": 2,
   "t": 0,
   "event": "step",
-  "step_id": "s_767a84d438",
+  "step_id": "s_a6df471760",
   "phase": "start",
   "tool": "extract_case_facts",
   "label": "Reading the case",
@@ -41,7 +41,7 @@
   "seq": 3,
   "t": 0,
   "event": "step",
-  "step_id": "s_767a84d438",
+  "step_id": "s_a6df471760",
   "phase": "end",
   "tool": "extract_case_facts",
   "label": "Reading the case",
@@ -60,13 +60,13 @@
   "seq": 4,
   "t": 0,
   "event": "card",
-  "card_id": "card_bebfb6ee9a",
+  "card_id": "card_b319e2345d",
   "part_id": "p1",
-  "step_id": "s_767a84d438",
+  "step_id": "s_a6df471760",
   "schema_ver": 1,
   "supersedes": null,
   "payload": {
-   "card_id": "card_bebfb6ee9a",
+   "card_id": "card_b319e2345d",
    "schema_ver": 1,
    "title": "Ramesh Kumar v. State of Maharashtra",
    "subtitle": "High Court \u00b7 Criminal",
@@ -142,7 +142,7 @@
   "event": "artifact_update",
   "kind": "profile",
   "key": "709296643bf215cc",
-  "card_id": "card_bebfb6ee9a",
+  "card_id": "card_b319e2345d",
   "implicit": true
  },
  {
@@ -150,7 +150,7 @@
   "seq": 6,
   "t": 0,
   "event": "step",
-  "step_id": "s_9ef63368cd",
+  "step_id": "s_9db6ef9a88",
   "phase": "start",
   "tool": "search_precedents",
   "label": "Searching the precedent library",
@@ -170,9 +170,9 @@
  {
   "v": 1,
   "seq": 7,
-  "t": 35,
+  "t": 34,
   "event": "step",
-  "step_id": "s_9ef63368cd",
+  "step_id": "s_9db6ef9a88",
   "phase": "end",
   "tool": "search_precedents",
   "label": "Searching the precedent library",
@@ -183,21 +183,21 @@
   "message": null,
   "pct": null,
   "status": "ok",
-  "duration_ms": 35,
+  "duration_ms": 34,
   "summary": "5 judgments"
  },
  {
   "v": 1,
   "seq": 8,
-  "t": 35,
+  "t": 34,
   "event": "card",
-  "card_id": "card_434a7f5ddc",
+  "card_id": "card_c628e0e06e",
   "part_id": "p2",
-  "step_id": "s_9ef63368cd",
+  "step_id": "s_9db6ef9a88",
   "schema_ver": 1,
   "supersedes": null,
   "payload": {
-   "card_id": "card_434a7f5ddc",
+   "card_id": "card_c628e0e06e",
    "schema_ver": 1,
    "title": "Closest matches in the library",
    "subtitle": "Decided before 12 Apr 2021",
@@ -206,7 +206,7 @@
     "engine": "faiss-minilm",
     "engine_version": "1",
     "index_version": "v1",
-    "computed_ms": 35,
+    "computed_ms": 34,
     "inputs": {},
     "cached": false
    },
@@ -319,26 +319,26 @@
  {
   "v": 1,
   "seq": 9,
-  "t": 35,
+  "t": 34,
   "event": "artifact_update",
   "kind": "precedents",
   "key": "8b705866e2ee286d",
-  "card_id": "card_434a7f5ddc",
+  "card_id": "card_c628e0e06e",
   "implicit": false
  },
  {
   "v": 1,
   "seq": 10,
-  "t": 35,
+  "t": 34,
   "event": "text_delta",
-  "message_id": "m_c3b8935f4e",
+  "message_id": "m_bc40e4e32c",
   "part_id": "p3",
   "delta": "Closest matches in the library are listed above \u2014 start with [P1] and [P2]. They are the nearest judgments by meaning among 505 indexed, not a finding that any of them supports the appeal."
  },
  {
   "v": 1,
   "seq": 11,
-  "t": 35,
+  "t": 34,
   "event": "meta",
   "conversation_title": null,
   "suggestions": [
@@ -369,19 +369,19 @@
  {
   "v": 1,
   "seq": 12,
-  "t": 35,
+  "t": 34,
   "event": "done",
   "status": "complete",
-  "message_id": "m_c3b8935f4e",
+  "message_id": "m_bc40e4e32c",
   "usage": {
    "input_tokens": 0,
    "output_tokens": 0,
    "llm_calls": 0
   },
   "timings": {
-   "ttft_ms": 35,
+   "ttft_ms": 34,
    "first_card_ms": 0,
-   "total_ms": 35
+   "total_ms": 34
   },
   "warnings": []
  }

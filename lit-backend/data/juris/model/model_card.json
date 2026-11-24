@@ -1,8 +1,8 @@
 {
   "model_name": "Juris",
-  "version": "juris-20261124-406c9136",
+  "version": "juris-20261124-5d72af41",
   "artifact": "juris.joblib",
-  "artifact_sha256": "e71e79d053c295b3f633ac85a04e8511068572348801dd2362ef875ba7727275",
+  "artifact_sha256": "fc2a3519b73d4e1749605e5787ad0c5a24651c0948f43003e315af67d08149cd",
   "schema": "juris-text-v1",
   "scope": "Criminal appeals (trained on Indian High Court criminal-appeal judgments)",
   "target": "succeeds = the appeal was allowed in whole or in part (the appellant obtained relief); dismissed = dismissed on the merits",
@@ -42,6 +42,27 @@
     "Appellant type is entered by the user; a private complainant appealing an acquittal is not distinguished from the State.",
     "Outcome labels come from court records and may contain residual noise.",
     "About one training appeal in nine concerns bail or a sentence suspension inside the appeal (for example under section 14A of the SC/ST Act). These succeed more often (about 75% against 57% for the rest) and Juris reads them like any other appeal.",
-    "Success rates differ widely between benches in the source records (one bench's records show about 95%). Juris does not take the court as an input, but wording correlates with it; per-bench results are in the model card document."
+    "Success rates differ widely between benches in the source records (one bench's records show about 95%). Juris does not take the court as an input, but wording correlates with it; per-bench results are in the model card document.",
+    "Appeals by the State or a complainant are scored by a separate model trained only on such appeals (about 9% succeed). It ranks them well above chance (AUC 0.73 on the test period) but from far fewer cases, so its estimates are less certain than those for the accused's own appeal."
+  ],
+  "routes": [
+    {
+      "side": "state_appeal",
+      "trained_on_n": 11497,
+      "class_balance": {
+        "succeeds": 938,
+        "dismissed": 10559
+      },
+      "evaluation": {
+        "status": "chosen on validation data, then evaluated once on the test period (a disclosed second look at the test split)",
+        "n_test": 2377,
+        "succeeds_share_test": 0.0938,
+        "auc_within_state_appeals": 0.7304,
+        "joint_model_auc_within_state_appeals": 0.5022,
+        "brier": 0.08,
+        "joint_model_brier": 0.0889,
+        "accuracy": 0.9045
+      }
+    }
   ]
 }

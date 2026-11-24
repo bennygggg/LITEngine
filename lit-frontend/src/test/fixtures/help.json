@@ -4,8 +4,8 @@
   "seq": 1,
   "t": 0,
   "event": "message_start",
-  "run_id": "r_2f9d2e46",
-  "message_id": "m_c565f9b522",
+  "run_id": "r_d1cac180",
+  "message_id": "m_0b9c9e2b11",
   "conversation_id": "fx8",
   "mode": "deterministic",
   "model": null,
@@ -20,7 +20,7 @@
   "seq": 2,
   "t": 0,
   "event": "text_delta",
-  "message_id": "m_c565f9b522",
+  "message_id": "m_0b9c9e2b11",
   "part_id": "p1",
   "delta": "I can help you work through a criminal appeal. Attach a matter with **+**, then ask me to:\n\n- **Read the case** \u2014 parties, issues, statutes, key facts\n- **Find precedents** \u2014 the closest judgments in the library\n- **Map the arguments** \u2014 how claims, evidence and law connect, and where support is thin\n- **Assess the outcome** \u2014 an indicative estimate, with what drives it\n- **Explore scenarios** \u2014 how that estimate moves if an input changes\n- **Answer from the document** \u2014 with the passages that support each answer\n\nYou can also pick any of these from the **+** menu."
  },
@@ -39,7 +39,7 @@
   "t": 0,
   "event": "done",
   "status": "complete",
-  "message_id": "m_c565f9b522",
+  "message_id": "m_0b9c9e2b11",
   "usage": {
    "input_tokens": 0,
    "output_tokens": 0,

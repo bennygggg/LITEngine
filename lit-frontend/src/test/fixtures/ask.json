@@ -4,8 +4,8 @@
   "seq": 1,
   "t": 0,
   "event": "message_start",
-  "run_id": "r_5c0cf7b7",
-  "message_id": "m_7d11cc4d9e",
+  "run_id": "r_07fbabbb",
+  "message_id": "m_ad5575989d",
   "conversation_id": "fx6",
   "mode": "deterministic",
   "model": null,
@@ -20,7 +20,7 @@
   "seq": 2,
   "t": 0,
   "event": "step",
-  "step_id": "s_c27d38a134",
+  "step_id": "s_fc45a17b0d",
   "phase": "start",
   "tool": "ask_case",
   "label": "Searching the document",
@@ -39,9 +39,9 @@
  {
   "v": 1,
   "seq": 3,
-  "t": 26,
+  "t": 28,
   "event": "step",
-  "step_id": "s_c27d38a134",
+  "step_id": "s_fc45a17b0d",
   "phase": "end",
   "tool": "ask_case",
   "label": "Searching the document",
@@ -52,21 +52,21 @@
   "message": null,
   "pct": null,
   "status": "ok",
-  "duration_ms": 25,
+  "duration_ms": 28,
   "summary": "2 passages"
  },
  {
   "v": 1,
   "seq": 4,
-  "t": 26,
+  "t": 29,
   "event": "card",
-  "card_id": "card_cdc2ccfa15",
+  "card_id": "card_da45b6c743",
   "part_id": "p1",
-  "step_id": "s_c27d38a134",
+  "step_id": "s_fc45a17b0d",
   "schema_ver": 1,
   "supersedes": null,
   "payload": {
-   "card_id": "card_cdc2ccfa15",
+   "card_id": "card_da45b6c743",
    "schema_ver": 1,
    "title": "Sources in the document",
    "subtitle": "2 excerpts",
@@ -107,26 +107,26 @@
  {
   "v": 1,
   "seq": 5,
-  "t": 26,
+  "t": 29,
   "event": "artifact_update",
   "kind": "excerpts",
   "key": "3f22ce52588affc0",
-  "card_id": "card_cdc2ccfa15",
+  "card_id": "card_da45b6c743",
   "implicit": false
  },
  {
   "v": 1,
   "seq": 6,
-  "t": 26,
+  "t": 29,
   "event": "text_delta",
-  "message_id": "m_7d11cc4d9e",
+  "message_id": "m_ad5575989d",
   "part_id": "p2",
   "delta": "The most relevant passage [S1]: \u201cThe FIR was lodged with a delay of eleven hours without satisfactory explanation. The recovery of the weapon under Section 27 of the Indian Evidence Act was not corroborated by an independent panch witness. The trial court failed to consider the accused's defence of grave and sudden provocation arising from the land dispute. The Sessions Court convicted the accused and sentenced him to life imprisonment under\u2026\u201d\n\n1 more passage is listed under the sources."
  },
  {
   "v": 1,
   "seq": 7,
-  "t": 26,
+  "t": 29,
   "event": "meta",
   "conversation_title": null,
   "suggestions": [
@@ -152,19 +152,19 @@
  {
   "v": 1,
   "seq": 8,
-  "t": 26,
+  "t": 29,
   "event": "done",
   "status": "complete",
-  "message_id": "m_7d11cc4d9e",
+  "message_id": "m_ad5575989d",
   "usage": {
    "input_tokens": 0,
    "output_tokens": 0,
    "llm_calls": 0
   },
   "timings": {
-   "ttft_ms": 26,
-   "first_card_ms": 26,
-   "total_ms": 26
+   "ttft_ms": 29,
+   "first_card_ms": 29,
+   "total_ms": 29
   },
   "warnings": []
  }

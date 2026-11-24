@@ -58,7 +58,7 @@ def hub(tmp_path, monkeypatch):
     (model_dir / "model_card.json").write_text(json.dumps({"artifact_sha256": hashlib.sha256(good.read_bytes()).hexdigest()}))
     monkeypatch.setattr(juris, "MODEL_PATH", model_dir / "juris.joblib")
     monkeypatch.setattr(juris, "get_settings", lambda: SimpleNamespace(
-        JURIS_MODEL_PATH="", PRECEDENT_ARTIFACT_REPO="owner/repo", JURIS_ARTIFACT_SUBDIR="juris/v1", JURIS_ARTIFACT_REVISION="main",
+        JURIS_MODEL_PATH="", PRECEDENT_ARTIFACT_REPO="owner/repo", JURIS_ARTIFACT_SUBDIR="juris/v2", JURIS_ARTIFACT_REVISION="main",
         HF_DATASET_TOKEN="", HUGGINGFACE_API_KEY="k"))
     calls = []
 
@@ -77,7 +77,7 @@ def hub(tmp_path, monkeypatch):
 def test_a_missing_artifact_is_fetched_and_installed_when_its_hash_matches(hub):
     juris._ensure_artifact()
     assert juris.MODEL_PATH.read_bytes() == hub.good.read_bytes()
-    assert hub.calls == [("owner/repo", "dataset", "juris/v1/juris.joblib", "main")]
+    assert hub.calls == [("owner/repo", "dataset", "juris/v2/juris.joblib", "main")]
 
 
 def test_a_download_with_the_wrong_hash_is_refused(hub):

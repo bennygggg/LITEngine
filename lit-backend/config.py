@@ -86,7 +86,7 @@ class Settings(BaseSettings):
     PRECEDENT_INDEX_PATH: str = ""  # Optional dated precedent index used by live search
     # Juris ships through the same private HF dataset repo as the precedent library (HF Spaces reject binary files in git):
     # <PRECEDENT_ARTIFACT_REPO>/<JURIS_ARTIFACT_SUBDIR>/juris.joblib, verified against the sha256 in the committed model_card.json.
-    JURIS_ARTIFACT_SUBDIR: str = "juris/v1"
+    JURIS_ARTIFACT_SUBDIR: str = "juris/v2"
     JURIS_ARTIFACT_REVISION: str = "main"
 
     # Case chat — instruction-tuned generation model, called through HF's

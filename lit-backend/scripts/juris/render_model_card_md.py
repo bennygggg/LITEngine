@@ -31,7 +31,14 @@ def main() -> None:
     side, meta, maj = b["side_only"], b["meta_only(bench,year,ctype,side)"], b["majority"]
     sides = {r["side"]: r for r in final["by_side"]}
     weak = ""
-    if "state_appeal" in sides:
+    route = next((r for r in card.get("routes", []) if r["side"] == "state_appeal"), None)
+    if "state_appeal" in sides and route:
+        st, ev2 = sides["state_appeal"], route["evaluation"]
+        weak = (f"Appeals by the State or a complainant ({st['n']:,} test cases, {p(st['succeeds_share'], 0)} succeeded): the joint model could not rank them "
+                f"(AUC {st['auc']:.2f}), so Juris scores them with a separate model trained only on such appeals ({route['trained_on_n']:,} cases). On the test period that model "
+                f"reaches AUC {ev2['auc_within_state_appeals']:.2f} within State appeals (Brier {ev2['brier']:.3f} against {ev2['joint_model_brier']:.3f}). It was chosen on validation data and "
+                f"then evaluated once on the test split, a disclosed second look; its estimates are still less certain than those for the accused's own appeal.")
+    elif "state_appeal" in sides:
         st = sides["state_appeal"]
         weak = (f"For appeals by the State or a complainant ({st['n']:,} test cases, {p(st['succeeds_share'], 0)} succeeded) Juris is right {p(st['acc'], 0)} of the time "
                 f"but cannot rank such appeals against each other (AUC {st['auc']:.2f}): it returns the base rate, and the card says so.")
@@ -106,7 +113,7 @@ Juris ships on the last row: it is the only input that exists for a live case.
 
 ## Known limitations
 
-""" + "\n".join(f"{i}. {x}" for i, x in enumerate(card["limits"] + extras, 1)) + """
+""" + "\n".join(f"{i}. {x}" for i, x in enumerate([x for x in card["limits"] if not x.startswith("Appeals by the State")] + extras, 1)) + """
 
 ## Changing it
 

@@ -26,7 +26,7 @@ court's own reasoning or order, so it cannot read the answer off a judgment, and
 | Court, year, case type and appeal type, no text | 73.1 % accuracy, AUC 0.678 |
 | Calibration (test) | Brier 0.169, expected calibration error 0.050 |
 | Scope | Criminal appeals. Civil and other matters get facts, precedents and the argument map, and no estimate. |
-| Artifact | `juris.joblib` (sha256 `e71e79d0…`, version `juris-20261124-406c9136`): published to the private dataset repo and downloaded by the Space at start, which accepts it only if the sha256 pinned in the committed card matches. |
+| Artifact | `juris.joblib` (sha256 `fc2a3519…`, version `juris-20261124-5d72af41`): published to the private dataset repo and downloaded by the Space at start, which accepts it only if the sha256 pinned in the committed card matches. |
 
 ### Why the leakage tiers matter
 
@@ -77,7 +77,7 @@ Juris ships on the last row: it is the only input that exists for a live case.
 4. Outcome labels come from court records and may contain residual noise.
 5. About one training appeal in nine concerns bail or a sentence suspension inside the appeal (for example under section 14A of the SC/ST Act). These succeed more often (about 75% against 57% for the rest) and Juris reads them like any other appeal.
 6. Success rates differ widely between benches in the source records (one bench's records show about 95%). Juris does not take the court as an input, but wording correlates with it; per-bench results are in the model card document.
-7. For appeals by the State or a complainant (2,377 test cases, 9 % succeeded) Juris is right 90 % of the time but cannot rank such appeals against each other (AUC 0.50): it returns the base rate, and the card says so.
+7. Appeals by the State or a complainant (2,377 test cases, 9 % succeeded): the joint model could not rank them (AUC 0.50), so Juris scores them with a separate model trained only on such appeals (11,497 cases). On the test period that model reaches AUC 0.73 within State appeals (Brier 0.080 against 0.089). It was chosen on validation data and then evaluated once on the test split, a disclosed second look; its estimates are still less certain than those for the accused's own appeal.
 8. The share of appeals that succeed drifts upward with decision year in the source records (55 % in training, 66 % in the test period); the temporal split and the test-period baseline account for that, and calibration was slightly under-confident in the test period (expected calibration error 5.0 %).
 9. In the training data the appellant was read from the case title's party order; at serving it is whatever the user states.
 10. Not legal advice. Not validated for any use that affects a person's liberty or rights.

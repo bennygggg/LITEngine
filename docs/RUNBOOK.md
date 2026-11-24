@@ -38,7 +38,7 @@ repository under *Repositories → Read*. Until then the Space starts, falls bac
 `/api/v1/health/ready` reports `index.source: "fixture"`. Treat that as not ready for a demo.
 
 **Juris** (the outcome model, 4.4 MB) ships the same way, because Spaces reject binary files in git: `juris.joblib` lives in the same
-dataset repo under `juris/v1/` and the Space downloads it at start. The committed `data/juris/model/model_card.json` pins its
+dataset repo under `juris/v2/` and the Space downloads it at start. The committed `data/juris/model/model_card.json` pins its
 `artifact_sha256`; a download that does not match is not installed, and the app then runs on the earlier heuristic (`/api/v1/health/ready`
 reports `juris_loaded: false`). After retraining: `scripts/juris/export_artifact.py`, then `scripts/juris/publish_artifact.py publish`, then
 commit the new card and deploy. `JURIS_ARTIFACT_REVISION` (default `main`) can pin the dataset commit. Rollback: publish the previous

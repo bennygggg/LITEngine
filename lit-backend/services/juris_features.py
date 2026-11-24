@@ -84,6 +84,7 @@ class CalibratedJuris:
         self.a = float(a)
         self.b = float(b)
         self.meta = dict(meta or {})
+        self.side_models = {}          # appeal side -> a CalibratedJuris trained only on that side (e.g. 'state_appeal')
 
     def finalize(self, X_fit) -> "CalibratedJuris":
         pre = self.pipeline.named_steps["preprocess"]

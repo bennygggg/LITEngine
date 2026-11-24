@@ -24,6 +24,7 @@ $PY -m scripts.juris.export_artifact                             # 7. refit on e
 $PY -m scripts.juris.paper_tables                                # 8. LaTeX/CSV tables for the paper and the black book
 $PY -m scripts.juris.render_model_card_md                        # 9. docs/MODEL_CARD.md from the card and the reports
 $PY -m scripts.juris.publish_artifact publish                     # 10. upload juris.joblib to the private dataset repo (the Space downloads it; binaries are not committed)
+$PY -m scripts.juris.routes attach                               # (after export) add the State-appeal route, then re-run publish_artifact
 ```
 
 Helpers: `corpus_accounting` (exact per-gate drop rates and label agreement on a random sample of the fetched documents),
