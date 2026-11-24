@@ -8,9 +8,8 @@ __pycache__/
 **/*.pyc
 tests/
 data/*
-!data/outcome_dataset/
-data/outcome_dataset/*
-!data/outcome_dataset/model/
-data/outcome_dataset/model/*
-!data/outcome_dataset/model/outcome_classifier_binary.joblib
-!data/outcome_dataset/model/model_card.json
+!data/juris/
+data/juris/*
+!data/juris/model/
+data/juris/model/*
+!data/juris/model/model_card.json

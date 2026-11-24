@@ -6,7 +6,7 @@ Convert the 188 MB JSON precedent index into a compact, hash-verified artifact.
             <out>/meta.jsonl      one JSON object per chunk (same fields as the old metadata, ints coerced)
             <out>/manifest.json   version, counts, sha256 per file, embedder/chunker identity, score transform
 
-The vectors are NOT re-embedded: the outcome model's `precedent_alignment` input was computed from exactly these
+The vectors are NOT re-embedded: the (retired) prototype's `precedent_alignment` input was computed from exactly these
 vectors with this embedder and chunking, so changing any of them silently shifts the model's inputs (see plan §5.7).
 
 Usage (from lit-backend/):

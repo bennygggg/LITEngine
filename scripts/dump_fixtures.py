@@ -1,5 +1,5 @@
 """
-Run real agent flows (deterministic mode, real precedent library, real outcome model) and save the SSE event streams as
+Run real agent flows (deterministic mode, real precedent library, real Juris model) and save the SSE event streams as
 JSON fixtures for the frontend: reducer tests, card development and Playwright's mock server all consume these.
 
     python scripts/dump_fixtures.py        # writes ../lit-frontend/src/test/fixtures/*.json

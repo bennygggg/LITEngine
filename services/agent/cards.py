@@ -25,7 +25,7 @@ from models.schemas import GraphBuildResponse, StructuredCaseProfile
 from services.agent.library import LibrarySearch
 
 ENGINE_VERSION = "1"
-MODEL_CARD_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "outcome_dataset" / "model" / "model_card.json"
+MODEL_CARD_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "juris" / "model" / "model_card.json"
 
 APPELLANT_LABELS = {
     "accused_appeal": "the accused (appealing a conviction)",
@@ -54,11 +54,12 @@ def model_card() -> Optional[Dict[str, Any]]:
 def model_facts(loaded: bool = True, version: Optional[str] = None) -> ModelFacts:
     card = model_card()
     if not card:
-        return ModelFacts(name="Logistic regression (binary)", version=version, loaded=loaded)
+        return ModelFacts(name="Juris", version=version, loaded=loaded)
+    ev = card.get("evaluation", {})
     return ModelFacts(
-        name=card["model_name"], version=version or card["artifact_sha256"][:8], loaded=loaded,
-        n_train=card["trained_on"]["n"], cv_accuracy=card["cv"]["accuracy"],
-        baseline_accuracy=card["cv"]["baseline_accuracy"], scope=card["scope"],
+        name=card["model_name"], version=version or card.get("version") or card["artifact_sha256"][:8], loaded=loaded,
+        n_train=card["trained_on"]["n"], eval_accuracy=ev.get("accuracy"), eval_auc=ev.get("auc"), n_eval=ev.get("n_test"),
+        eval_period=ev.get("period"), baseline_accuracy=ev.get("baseline_accuracy"), reads=card.get("reads"), scope=card["scope"],
     )
 
 
@@ -151,28 +152,14 @@ def tier_for(p: float) -> tuple:
     return "unfavorable", "Well below even odds"
 
 
-def centred_contributions(ml: Any) -> List[OutcomeContribution]:
-    """Signed log-odds contributions relative to a typical training case: coef * (x - training mean).
-
-    The raw model contributions are relative to zero, which makes a common feature (e.g. 'argument completeness' = 1.0
-    for nearly every case) look influential when it is just ordinary. Centring shows what is unusual about THIS case.
-    """
-    card = model_card()
+def centred_contributions(juris: Any) -> List[OutcomeContribution]:
+    """Signed log-odds contributions relative to a typical training case (Juris centres them on the training mean itself,
+    so a common feature does not look influential just because it is present; bars show what is unusual about THIS case)."""
     out: List[OutcomeContribution] = []
-    for fc in ml.feature_contributions:
-        contribution = fc.contribution
-        if card:
-            if fc.feature in card["features"]:
-                f = card["features"][fc.feature]
-                contribution = f["coef"] * (fc.value - f["mean"])
-            elif fc.feature.startswith("appellant_type="):
-                key = fc.feature.split("=", 1)[1]
-                a = card["appellant"].get(key)
-                if a:
-                    contribution = a["coef"] * (fc.value - a["share"])
+    for fc in juris.feature_contributions:
         out.append(OutcomeContribution(
             feature=fc.feature, display_name=fc.display_name, value=round(fc.value, 3),
-            contribution=round(contribution, 3), explanation=fc.explanation,
+            contribution=round(fc.contribution, 3), explanation=fc.explanation,
         ))
     # The three appellant one-hots are one decision for the user; show them as a single "Appeal type" bar.
     appellant_rows = [r for r in out if r.feature.startswith("appellant_type=")]
@@ -183,7 +170,9 @@ def centred_contributions(ml: Any) -> List[OutcomeContribution]:
             contribution=round(sum(r.contribution for r in appellant_rows), 3), explanation=active.explanation,
         )
         out = [r for r in out if not r.feature.startswith("appellant_type=")] + [merged]
-    out.sort(key=lambda c: abs(c.contribution), reverse=True)
+    # "All other wording" is the sum of hundreds of tiny terms (and the offset of absent phrases): it keeps the bars adding up, but it is
+    # never a driver a reader can act on, so it is listed last and never named in the headline.
+    out.sort(key=lambda c: (c.feature == "phrase:other", -abs(c.contribution)))
     return out
 
 
@@ -191,43 +180,50 @@ def drivers_summary(contribs: List[OutcomeContribution], appellant: AppellantTyp
     if not contribs:
         return ""
     top = contribs[0]
+    who = {"accused_appeal": "the accused", "state_appeal": "the State or complainant", "unclear": "an unspecified appellant"}[appellant]
     if top.feature == "appellant_type":
-        who = {"accused_appeal": "the accused", "state_appeal": "the State or complainant", "unclear": "an unspecified appellant"}[appellant]
-        return f"This estimate mostly reflects who is appealing ({who}); the facts extracted from the case move it by only a few points."
+        return f"The biggest single push is who is appealing ({who}); the wording of the case text moves the estimate further, but no single phrase dominates."
     direction = "up" if top.contribution > 0 else "down"
-    return f"The biggest single push is {top.display_name.lower()}, moving the estimate {direction}; who is appealing still matters more than any case-specific input."
+    return f"The biggest single push is {top.display_name.lower()}, moving the estimate {direction}; who is appealing ({who}) is also a major input."
 
 
 def outcome_card(card_id: str, scored: Any, appellant: AppellantType, filing_date: Optional[date],
                  profile_method: Optional[str], ms: int = 0, cached: bool = False, appellant_source: str = "user_input") -> OutcomeCard:
-    ml = scored.ml
-    p = float(ml.probabilities.get("succeeds", 0.0))
+    juris = scored.juris
+    p = float(juris.probabilities.get("succeeds", 0.0))
     tier, label = tier_for(p)
-    contribs = centred_contributions(ml)
-    facts = model_facts(ml.model_loaded, ml.model_version)
+    contribs = centred_contributions(juris)
+    facts = model_facts(juris.model_loaded, juris.model_version)
     caveats = [
-        "Appeal type is the dominant input; the other inputs are counts and averages from the case profile, not legal merit.",
-        "Trained on judgments whose outcome labels were derived from text, so label noise is part of the accuracy figure.",
+        "Juris reads the facts and grounds in the document and who is appealing. It does not weigh legal merit, and it never sees the appellate court's reasoning.",
+        "Trained on High Court criminal-appeal judgments; outcome labels come from court records and were checked against the order text, so some label noise remains.",
     ]
-    if profile_method and profile_method != "rules":
-        caveats.append("The profile was improved with AI extraction; the model was trained on rule-extracted profiles, so treat this as less reliable.")
+    if appellant == "state_appeal":
+        caveats.append("Appeals by the State or a complainant rarely succeed in the training data, and Juris cannot tell such appeals apart beyond that "
+                       "base rate: read this figure as the base rate for such appeals, not as a judgment of this particular one.")
+    if juris.input_basis == "profile_summary":
+        caveats.append("Only a short structured summary was available, not the full document, so this estimate is less reliable.")
     base = model_card()["baseline_p"] if model_card() else None
+    disclaimer_text = "Indicative research estimate"
+    if base is not None:
+        disclaimer_text += f" — a typical case in the training data sits near {round5(base)}%"
+    if facts.n_train:
+        disclaimer_text += f". Trained on {facts.n_train:,} appellate judgments"
+        if facts.eval_accuracy is not None and facts.n_eval and facts.baseline_accuracy is not None:
+            disclaimer_text += (f"; on {facts.n_eval:,} later cases it was right {facts.eval_accuracy:.0%} of the time, against "
+                                f"{facts.baseline_accuracy:.0%} for always guessing the more common outcome")
+    disclaimer_text += ". Not legal advice."
     return OutcomeCard(
         card_id=card_id, title="Indicative outcome estimate",
         subtitle=f"Appeal by {APPELLANT_LABELS[appellant]}" if appellant != "unclear" else "Appeal type not specified",
         estimate=OutcomeEstimate(p_succeeds=round(p, 4), p_rounded=round5(p), tier=tier, tier_label=label),  # type: ignore[arg-type]
         inputs=OutcomeInputs(appellant_type=appellant, filing_date=filing_date, appellant_source=appellant_source),  # type: ignore[arg-type]
         model=facts, contributions=contribs, drivers_summary=drivers_summary(contribs, appellant),
-        strengths=list(ml.key_strengths[:3]), weaknesses=list(ml.key_weaknesses[:3]),
+        strengths=list(juris.key_strengths[:3]), weaknesses=list(juris.key_weaknesses[:3]),
         legacy=LegacyHeuristic(p=round(scored.heuristic.win_probability, 4)),
         caveats=caveats, profile_method=profile_method,
-        disclaimer=Disclaimer(
-            level="caution",
-            text=("Indicative research estimate" + (f" — a typical case in the training data sits near {round5(base)}%" if base else "")
-                  + (f". Trained on {facts.n_train} appellate judgments; cross-validated accuracy {facts.cv_accuracy:.0%} against a {facts.baseline_accuracy:.0%} base rate." if facts.n_train else "")
-                  + " Not legal advice."),
-        ),
-        provenance=prov("logreg-binary", ms, cached, appellant_type=appellant),
+        disclaimer=Disclaimer(level="caution", text=disclaimer_text),
+        provenance=prov("juris", ms, cached, appellant_type=appellant),
     )
 
 
@@ -241,9 +237,9 @@ def scenario_card(card_id: str, base: ScenarioBase, scenarios: List[ScenarioOutc
         model=model_facts(), base=base, scenarios=scenarios, sensitivity=sensitivity,
         disclaimer=Disclaimer(
             level="caution",
-            text="This shows how the research model responds to changed inputs. It is not a prediction that changing these facts would change the real outcome.",
+            text="This shows how Juris responds to changed inputs. It is not a prediction that changing these facts would change the real outcome.",
         ),
-        provenance=prov("logreg-binary", ms),
+        provenance=prov("juris", ms),
     )
 
 
@@ -275,7 +271,7 @@ def needs_input_card(pending: ForcedTool, need_appellant: bool, need_date: bool,
     return NeedsInputCard(
         card_id=new_id("input"), title="Two details needed" if len(fields) == 2 else "One detail needed",
         reason=reason, pending=pending, fields=fields,
-        hint="We never infer the appeal type — it is the strongest factor in the model. The filing date sets the precedent cutoff: only judgments decided before it are used.",
+        hint="We never infer the appeal type — it is the strongest factor in Juris. The filing date sets the precedent cutoff: only judgments decided before it are used.",
     )
 
 

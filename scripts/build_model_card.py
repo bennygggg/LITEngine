@@ -1,5 +1,7 @@
 """
-Generate data/outcome_dataset/model/model_card.json for the shipped binary outcome model.
+Generate data/juris/model/model_card.json for the Juris prototype (187 judgments, logistic regression).
+
+The large-corpus Juris card is written by scripts/juris/export_artifact.py instead.
 
 The card feeds three things: the Outcome card's honesty panel (N, CV accuracy vs base rate), centred feature
 contributions (`coef * (x - training_mean)`, so bars read relative to a typical case instead of zero) and the
@@ -22,9 +24,9 @@ sys.path.insert(0, str(ROOT))
 
 from scripts.outcome_dataset.train_model import FEATURE_COLUMNS, load_usable_rows  # noqa: E402
 
-MODEL_DIR = ROOT / "data" / "outcome_dataset" / "model"
-MODEL_PATH = MODEL_DIR / "outcome_classifier_binary.joblib"
-REPORT = MODEL_DIR / "training_report_binary.json"
+MODEL_DIR = ROOT / "data" / "juris" / "model"
+MODEL_PATH = MODEL_DIR / "juris.joblib"
+REPORT = ROOT / "data" / "outcome_dataset" / "model" / "training_report_binary.json"  # prototype training report (local)
 OUT = MODEL_DIR / "model_card.json"
 
 DISPLAY = {
@@ -73,7 +75,7 @@ def main() -> None:
     )
     cv = report["cv_summary"]
     card = {
-        "model_name": "Logistic regression (binary: dismissed vs succeeds)",
+        "model_name": "Juris",
         "artifact": MODEL_PATH.name,
         "artifact_sha256": hashlib.sha256(MODEL_PATH.read_bytes()).hexdigest(),
         "scope": "Criminal appeals",

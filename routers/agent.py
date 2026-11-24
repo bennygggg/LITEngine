@@ -19,7 +19,7 @@ from services.agent.events import RunLog, encode_sse, registry
 from services.agent.orchestrator import orchestrator
 from services.agent.workspace import workspaces
 from services.embedder import embedder_service
-from services.outcome_model import is_model_loaded
+from services.juris import is_juris_loaded
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -46,7 +46,7 @@ async def status():
     return {
         "schema_version": SCHEMA_VERSION, "server_version": get_settings().APP_VERSION, "agent_enabled": get_settings().AGENT_ENABLED,
         "llm": llm_status(), "deterministic_only": not llm_status()["configured"],
-        "library": embedder_service.index_info(), "outcome_model_loaded": is_model_loaded(),
+        "library": embedder_service.index_info(), "juris_loaded": is_juris_loaded(),
         "active_runs": registry.active_count(),
     }
 

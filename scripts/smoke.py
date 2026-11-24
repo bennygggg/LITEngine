@@ -5,7 +5,7 @@ Post-deploy smoke test for a running LIT backend (staging or production).
     python scripts/smoke.py https://<private-space>.hf.space --token hf_xxx     # private Spaces need an Authorization header
     python scripts/smoke.py http://localhost:8000 --allow-fixture-index         # local run without the real library
 
-Checks, in order: health, readiness (library loaded from the artifact, outcome model, embedder), registering the demo matter,
+Checks, in order: health, readiness (library loaded from the artifact, Juris, embedder), registering the demo matter,
 and a forced "Find precedents" run whose stream must satisfy the protocol invariants. The LLM is NOT required: the run
 uses deterministic narration, so this works with LLM_PROVIDER=none and costs nothing. Exit code 0 only if every check passes.
 """
@@ -62,7 +62,7 @@ def main() -> int:
         ready = http.get(f"{base}/api/v1/health/ready").json()
         index = ready.get("index", {})
         check("ready", bool(ready.get("ready")))
-        check("outcome model loaded", bool(ready.get("outcome_model_loaded")))
+        check("Juris loaded", bool(ready.get("juris_loaded")))
         check("embedder ready", bool(ready.get("embedder_ready")))
         if args.allow_fixture_index:
             check("precedent library present", index.get("docs", 0) > 0, f"{index.get('source')}, {index.get('docs')} judgments")

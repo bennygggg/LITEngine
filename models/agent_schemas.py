@@ -132,7 +132,7 @@ class CasePreview(BaseModel):
 # ---------------------------------------------------------------------------
 
 class Provenance(BaseModel):
-    engine: str = Field(..., description="Which engine produced this (e.g. 'rules', 'faiss-minilm', 'logreg-binary')")
+    engine: str = Field(..., description="Which engine produced this (e.g. 'rules', 'faiss-minilm', 'juris')")
     engine_version: str
     index_version: Optional[str] = None
     computed_ms: int = 0
@@ -235,8 +235,12 @@ class ModelFacts(BaseModel):
     version: Optional[str] = None
     loaded: bool = True
     n_train: Optional[int] = None
-    cv_accuracy: Optional[float] = None
-    baseline_accuracy: Optional[float] = None
+    eval_accuracy: Optional[float] = Field(None, description="Accuracy on held-out cases decided after the training period")
+    eval_auc: Optional[float] = None
+    n_eval: Optional[int] = None
+    eval_period: Optional[str] = Field(None, description="Decision years of the held-out cases, e.g. '2023-2025'")
+    baseline_accuracy: Optional[float] = Field(None, description="Accuracy of always guessing the more common outcome on the same cases")
+    reads: Optional[str] = Field(None, description="What the model reads, in plain words")
     scope: str = "Criminal appeals"
 
 
@@ -334,6 +338,7 @@ class ScenarioRequest(BaseModel):
     precedents: List[Dict[str, Any]] = Field(default_factory=list, max_length=10, description="SearchResult-shaped; P1..Pn refer to this order")
     graph_stats: Optional[Dict[str, Any]] = None
     appellant_type: AppellantType = "unclear"
+    case_text: Optional[str] = Field(None, max_length=2_000_000, description="The case document Juris reads; if omitted, a thin summary of the profile is used")
     scenarios: List[ScenarioSpec] = Field(..., min_length=1, max_length=5)
     include_sensitivity: bool = True
 

@@ -1,5 +1,5 @@
 """
-Record the sample session: drive the REAL agent (real precedent library, real outcome model, real LLM narration) through a
+Record the sample session: drive the REAL agent (real precedent library, real Juris model, real LLM narration) through a
 scripted conversation on the fictional demo matter and freeze every event stream to JSON for the frontend's replay.
 
     python scripts/record_demo.py              # records and writes lit-frontend/src/features/demo/recordings/lit-demo-v1.json

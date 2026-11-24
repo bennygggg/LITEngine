@@ -140,12 +140,14 @@ def test_outcome_card_is_rounded_labelled_and_carries_the_model_facts(client):
     events = run(client, forced("assess_outcome"), sha, ACCUSED_INPUTS)
     card = next(e["payload"] for e in events if e["event"] == "card" and e["payload"]["type"] == "outcome")
     assert card["estimate"]["p_rounded"] % 5 == 0 and 5 <= card["estimate"]["p_rounded"] <= 95
-    assert card["model"]["n_train"] == 187 and card["model"]["baseline_accuracy"] < card["model"]["cv_accuracy"]
+    m = card["model"]
+    assert m["name"] == "Juris" and m["n_train"] > 187                      # no longer the 187-judgment prototype
+    assert m["eval_accuracy"] is not None and m["baseline_accuracy"] is not None and m["n_eval"]
     assert "Indicative research estimate" in card["disclaimer"]["text"] and card["disclaimer"]["level"] == "caution"
     assert card["legacy"] is not None and "Uncalibrated" in card["legacy"]["note"]
     names = [c["feature"] for c in card["contributions"]]
     assert names.count("appellant_type") == 1 and not any(n.startswith("appellant_type=") for n in names)
-    assert card["contributions"][0]["feature"] == "appellant_type"          # the dominant, honest driver
+    assert any("never sees the appellate court" in c for c in card["caveats"])      # says what Juris reads and does not read
 
 
 def test_non_criminal_matter_declines_the_outcome_but_still_reads_the_case(client):
@@ -163,10 +165,11 @@ def test_scenario_text_splits_levers_and_reports_effect_classes(client):
     events = run(client, {"text": "What if the State were the appellant and we had two more supporting facts?"}, sha, ACCUSED_INPUTS)
     card = next(e["payload"] for e in events if e["event"] == "card" and e["payload"]["type"] == "scenario")
     by_label = {s["label"]: s for s in card["scenarios"]}
-    assert by_label["If the State were the appellant"]["effect_class"] == "large"
-    assert by_label["If the State were the appellant"]["delta_pp"] < -20
-    assert by_label["With 2 more supporting facts"]["effect_class"] == "negligible"
-    assert card["sensitivity"][0]["feature"] == "appellant_type"
+    assert by_label["If the State were the appellant"]["delta_pp"] < -5
+    extra = by_label["With 2 more supporting facts"]                       # not an input to Juris: reported, never silently ignored
+    assert extra["effect_class"] == "negligible" and extra["applied"][0]["status"] == "rejected"
+    assert "does not use" in extra["applied"][0]["note"]
+    assert any(r["feature"] == "appellant_type" for r in card["sensitivity"])
     assert "not a prediction" in card["disclaimer"]["text"].lower()
 
 
@@ -234,7 +237,7 @@ def test_busy_server_says_so_instead_of_queueing(client, monkeypatch):
 
 def test_status_endpoint_reports_deterministic_mode(client):
     s = client.get("/api/v1/agent/status").json()
-    assert s["deterministic_only"] is True and s["library"]["source"] == "artifact" and s["outcome_model_loaded"] is True
+    assert s["deterministic_only"] is True and s["library"]["source"] == "artifact" and s["juris_loaded"] is True
 
 
 def test_stop_endpoint_404s_for_unknown_run(client):
@@ -260,3 +263,21 @@ def test_forced_scenario_reads_levers_from_the_typed_text(client):
     events = run(client, forced("run_scenario", text="if the State were the appellant"), sha, ACCUSED_INPUTS)
     card = next(e["payload"] for e in events if e["event"] == "card" and e["payload"]["type"] == "scenario")
     assert [s["label"] for s in card["scenarios"]] == ["If the State were the appellant"]
+
+
+# --- legacy endpoint ---------------------------------------------------------
+
+def test_legacy_simulation_predict_reads_the_case_text_with_juris_and_reports_both(client):
+    from models.schemas import Parties, StructuredCaseProfile
+    prof = StructuredCaseProfile(parties=Parties(petitioner="A", respondent="State"), case_type="criminal", court_level="High Court",
+                                 ipc_sections=["Section 302"], legal_issues=["Whether the conviction is sustainable?"])
+    body = {"case_profile": prof.model_dump(mode="json"), "appellant_type": "accused_appeal", "case_text": case_text()}
+    r = client.post("/api/v1/simulation/predict", json=body)
+    assert r.status_code == 200, r.text
+    cmp_ = r.json()["comparison"]
+    assert cmp_["primary"] == "juris" and cmp_["juris"]["model_loaded"] and cmp_["juris"]["input_basis"] == "case_text"
+    assert cmp_["juris"]["words_read"] > 40 and 0 < cmp_["juris"]["probabilities"]["succeeds"] < 1
+    assert set(cmp_) == {"primary", "heuristic", "juris"}
+    # without the text, only a thin summary of the profile exists: the response must say so rather than pretend otherwise
+    thin = client.post("/api/v1/simulation/predict", json={k: v for k, v in body.items() if k != "case_text"}).json()["comparison"]
+    assert thin["juris"]["input_basis"] in ("profile_summary", None)

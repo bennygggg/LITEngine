@@ -52,13 +52,25 @@ uvicorn main:app --reload
 
 ---
 
+## Juris (the outcome model)
+
+Juris estimates the chance that a criminal appeal gets any appellate relief. It reads the pre-reasoning part of the case text
+(facts, trial-court findings, grounds) and the appeal type the user states; it never infers the appellant. The served artifact is
+`data/juris/model/juris.joblib` (4.4 MB), which is **not committed**: Hugging Face Spaces reject binary files in git, so it is published to the
+private dataset repo (`scripts/juris/publish_artifact.py publish`) and the Space downloads it at start, installing it only if its sha256 matches
+the committed `model_card.json`. On a fresh clone run `scripts/juris/publish_artifact.py fetch`. Environment: `JURIS_PRIMARY`
+(`juris` | `heuristic`, default `juris`; forced to `heuristic` if the model fails to load) and `JURIS_MODEL_PATH` (optional
+override). The model card, its numbers and its limits: `../docs/MODEL_CARD.md`. How it is built and evaluated, step by step:
+`scripts/juris/README.md`. Serving code: `services/juris.py` (+ `juris_text.py`, `juris_features.py`). The 187-judgment prototype
+that preceded it lives on in `scripts/outcome_dataset/`.
+
 ## Deploy to Hugging Face Spaces (Docker)
 
 The Space repository is the contents of this `lit-backend/` directory. This
 README (its frontmatter sets `sdk: docker` and `app_port: 7860`) and the
 `Dockerfile` must appear at its root. The image runs the FastAPI app, including
 `/health`, `/docs`, and `/api/v1/...`, with uvicorn on port 7860. The backend is
-CPU-only. The image uses Python 3.11 because the trained outcome model needs
+CPU-only. The image uses Python 3.11 because the trained Juris model needs
 scikit-learn 1.8.0, which requires Python 3.11 or newer. Keep that dependency
 and the committed model artifact together when deploying.
 
@@ -104,7 +116,7 @@ curl --fail-with-body --show-error --max-time 30 \
 # Expect JSON containing "status":"healthy".
 curl --fail-with-body --show-error --max-time 30 \
   "${HF_SPACE_URL}/api/v1/health/ready"
-# Check outcome_model_loaded and index.source == "artifact" (505 judgments) before testing model endpoints.
+# Check juris_loaded and index.source == "artifact" (505 judgments) before testing model endpoints.
 python scripts/smoke.py "${HF_SPACE_URL}"   # health, readiness, library, and a streamed precedents run (no LLM needed)
 ```
 
@@ -122,7 +134,7 @@ data outside the Space before relying on it.
 | Method | Path | Description |
 |---|---|---|
 | GET | `/health` | Basic health check — returns app name, version, status |
-| GET | `/api/v1/health/ready` | Readiness — `ready`, library (`index.source`, judgments, version), embedder, outcome model, LLM configured (boolean) |
+| GET | `/api/v1/health/ready` | Readiness — `ready`, library (`index.source`, judgments, version), embedder, Juris, LLM configured (boolean) |
 
 ### Chat agent
 
@@ -132,7 +144,7 @@ data outside the Space before relying on it.
 | DELETE | `/api/v1/agent/runs/{run_id}` | Stop a run |
 | GET | `/api/v1/agent/status` | LLM, library and model state |
 | PUT | `/api/v1/cases/{sha256}` | Register a matter's text in the RAM-only case cache |
-| POST | `/api/v1/simulation/scenario` | Compare scenarios by re-scoring the real outcome model |
+| POST | `/api/v1/simulation/scenario` | Compare scenarios by re-scoring the real Juris model |
 
 ### Precedent Search
 
@@ -184,6 +196,7 @@ data outside the Space before relying on it.
 | `LOG_LEVEL` | `INFO` | Log level (DEBUG, INFO, WARNING, ERROR) |
 | `CACHE_TTL` | `3600` | In-memory cache TTL in seconds |
 | `PRECEDENT_ARTIFACT_DIR` | *(empty)* | Local directory holding the precedent library (`vectors.npy`, `meta.jsonl`, `manifest.json`) |
+| `JURIS_ARTIFACT_SUBDIR` / `JURIS_ARTIFACT_REVISION` | `juris/v1` / `main` | Where Juris is downloaded from inside `PRECEDENT_ARTIFACT_REPO` (same key, same Read access) |
 | `PRECEDENT_ARTIFACT_REPO` / `_REVISION` / `_SUBDIR` | *(empty)* / `main` / `v1` | Private HF dataset repo the library is downloaded from at start (the key needs Read on it); pin the revision |
 | `LLM_PROVIDER` | `hf_router` | `hf_router`, `fake` (tests) or `none` (deterministic routing and templated narration; nothing leaves the server) |
 | `PLANNER_MODEL` / `NARRATION_MODEL` | `openai/gpt-oss-120b:cerebras` | Router models; `model:provider` pins the provider |

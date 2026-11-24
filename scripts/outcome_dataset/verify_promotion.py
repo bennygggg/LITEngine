@@ -24,9 +24,9 @@ def verify(data_dir: Path, deployed_precedent_index: Path):
     if hashlib.sha256((data_dir / "review_queue.csv").read_bytes()).hexdigest() != evaluation["review_queue_sha256"]:
         raise ValueError("Audit signoff changed after holdout evaluation")
     return {
-        "OUTCOME_MODEL_PATH": str(artifact),
+        "JURIS_MODEL_PATH": str(artifact),
         "PRECEDENT_INDEX_PATH": str(deployed_precedent_index.resolve()),
-        "OUTCOME_MODEL_PRIMARY": "new_model",
+        "JURIS_PRIMARY": "juris",
     }
 
 

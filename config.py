@@ -77,13 +77,17 @@ class Settings(BaseSettings):
     SPIKE_ENABLED: bool = False
 
     # Outcome model — which prediction populates the top-level
-    # SimulationResponse.result: "new_model" (trained binary classifier)
-    # or "old_heuristic" (hand-picked weights). Automatically forced to
-    # "old_heuristic" if the trained model fails to load, regardless of
+    # SimulationResponse.result: "juris" (trained binary classifier)
+    # or "heuristic" (hand-picked weights). Automatically forced to
+    # "heuristic" if the trained model fails to load, regardless of
     # this setting. Flip via env var for a fast, code-free revert.
-    OUTCOME_MODEL_PRIMARY: str = "new_model"
-    OUTCOME_MODEL_PATH: str = ""  # Optional gated, versioned artifact path
+    JURIS_PRIMARY: str = "juris"
+    JURIS_MODEL_PATH: str = ""  # Optional gated, versioned artifact path
     PRECEDENT_INDEX_PATH: str = ""  # Optional dated precedent index used by live search
+    # Juris ships through the same private HF dataset repo as the precedent library (HF Spaces reject binary files in git):
+    # <PRECEDENT_ARTIFACT_REPO>/<JURIS_ARTIFACT_SUBDIR>/juris.joblib, verified against the sha256 in the committed model_card.json.
+    JURIS_ARTIFACT_SUBDIR: str = "juris/v1"
+    JURIS_ARTIFACT_REVISION: str = "main"
 
     # Case chat — instruction-tuned generation model, called through HF's
     # OpenAI-compatible chat-completions router (multi-provider, generally

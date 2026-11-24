@@ -1,0 +1,47 @@
+{
+  "model_name": "Juris",
+  "version": "juris-20261124-406c9136",
+  "artifact": "juris.joblib",
+  "artifact_sha256": "e71e79d053c295b3f633ac85a04e8511068572348801dd2362ef875ba7727275",
+  "schema": "juris-text-v1",
+  "scope": "Criminal appeals (trained on Indian High Court criminal-appeal judgments)",
+  "target": "succeeds = the appeal was allowed in whole or in part (the appellant obtained relief); dismissed = dismissed on the merits",
+  "reads": "the facts, trial-court findings and grounds in the document (never the appellate court's own reasoning) plus who is appealing",
+  "trained_on": {
+    "n": 107847,
+    "class_balance": {
+      "succeeds": 63404,
+      "dismissed": 44443
+    },
+    "period": "2008-2026",
+    "courts": 41,
+    "note": "Public High Court judgments (Dattam Labs open data, CC-BY-4.0); labels from court disposal records cross-checked against the order text"
+  },
+  "evaluation": {
+    "status": "final",
+    "split": "trained on decisions up to 2021, calibrated on 2022, tested once on 2023 onward",
+    "period": "2023-2026",
+    "n_test": 32573,
+    "accuracy": 0.7530470021183189,
+    "accuracy_ci": [
+      0.7482270592208271,
+      0.757593712584042
+    ],
+    "auc": 0.794968262024621,
+    "macro_f1": 0.7191991329164482,
+    "balanced_accuracy": 0.7141728721704705,
+    "brier": 0.16940167029232972,
+    "ece": 0.04963604995043246,
+    "baseline_accuracy": 0.6556350351518129
+  },
+  "baseline_p": 0.5849914451871859,
+  "baseline_logit": 0.46896994094033706,
+  "limits": [
+    "Reads wording, not legal merit; an estimate, not a prediction of what a court will do.",
+    "Trained on High Court appeals; not validated for the Supreme Court or for trial-court matters.",
+    "Appellant type is entered by the user; a private complainant appealing an acquittal is not distinguished from the State.",
+    "Outcome labels come from court records and may contain residual noise.",
+    "About one training appeal in nine concerns bail or a sentence suspension inside the appeal (for example under section 14A of the SC/ST Act). These succeed more often (about 75% against 57% for the rest) and Juris reads them like any other appeal.",
+    "Success rates differ widely between benches in the source records (one bench's records show about 95%). Juris does not take the court as an input, but wording correlates with it; per-bench results are in the model card document."
+  ]
+}

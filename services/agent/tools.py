@@ -32,7 +32,7 @@ from services.agent.library import LibrarySearch, search_library
 from services.agent.routing import retrieval_query, parse_explicit_appellant
 from services.agent.workspace import CaseWorkspace, artifact_key
 from services.graph_builder import build_argument_graph
-from services.outcome_model import is_model_loaded
+from services.juris import is_juris_loaded
 from services.outcome_pipeline import ScoredCase, score_case
 from services.scenario import run_scenarios
 from utils.logger import get_logger
@@ -290,10 +290,10 @@ class Tools:
     def _guard_outcome(self, profile: StructuredCaseProfile, tool: str) -> None:
         if profile.case_type != "criminal":
             raise ToolError("outcome_out_of_scope",
-                            "Outcome analysis is only available for criminal appeals — that is what the model was trained on. "
+                            "Outcome analysis is only available for criminal appeals — that is what Juris was trained on. "
                             "I can still extract the facts, find closest precedents and map the arguments for this matter.")
-        if not is_model_loaded():
-            raise ToolError("model_unavailable", "The trained outcome model isn't loaded right now, so I can't produce an estimate.", retryable=True)
+        if not is_juris_loaded():
+            raise ToolError("model_unavailable", "Juris isn't loaded right now, so I can't produce an estimate.", retryable=True)
 
     async def outcome(self, origin: str, args: Dict[str, Any], show: bool = False) -> ScoredCase:
         ctx = self.ctx
@@ -312,13 +312,13 @@ class Tools:
         precs = [h.as_search_result() for h in search.hits[:5]]
 
         async def compute() -> Tuple[Any, bool]:
-            return await ws.get_or_compute(key, lambda: asyncio.to_thread(score_case, profile, precs, graph_stats, appellant, True))
+            return await ws.get_or_compute(key, lambda: asyncio.to_thread(score_case, profile, precs, graph_stats, appellant, ws.text))
 
         scored, step_id = await self._step("assess_outcome", origin, compute,
-                                           summarize=lambda s: f"{round(s.ml.probabilities.get('succeeds', 0) * 100)}% (indicative)", card=show)
+                                           summarize=lambda s: f"{round(s.juris.probabilities.get('succeeds', 0) * 100)}% (indicative)", card=show)
         ctx.scored = scored
-        if not scored.ml.model_loaded:
-            raise ToolError("model_unavailable", "The trained outcome model isn't loaded right now, so I can't produce an estimate.", retryable=True)
+        if not scored.juris.model_loaded:
+            raise ToolError("model_unavailable", "Juris isn't loaded right now, so I can't produce an estimate.", retryable=True)
         if show:
             card = cards.outcome_card(cards.new_id("card"), scored, appellant, ctx.inputs.filing_date,  # type: ignore[arg-type]
                                       profile.metadata.extraction_method if profile.metadata else None,
@@ -345,7 +345,7 @@ class Tools:
         started = time.perf_counter()
 
         async def compute() -> Tuple[Any, bool]:
-            return await asyncio.to_thread(run_scenarios, profile, precs, graph_stats, appellant, specs, True), False
+            return await asyncio.to_thread(run_scenarios, profile, precs, graph_stats, appellant, specs, True, self.ctx.ws.text), False
 
         (base, outcomes, sensitivity, _), step_id = await self._step(
             "run_scenario", origin, compute, args_preview={"scenarios": [s.label for s in specs]},
@@ -367,7 +367,7 @@ class Tools:
         if specs:
             return specs
         # No explicit levers ("compare outcomes", "what if things were different"): show the appeal-type comparison,
-        # which is the one lever that genuinely moves this model.
+        # which is the one lever that genuinely moves Juris.
         others = [("state_appeal", "If the State were the appellant"), ("accused_appeal", "If the accused were the appellant")]
         return [ScenarioSpec(id=f"s{i + 1}", label=label, changes=ScenarioChanges(appellant_type=a))  # type: ignore[arg-type]
                 for i, (a, label) in enumerate(o for o in others if o[0] != appellant)] or [

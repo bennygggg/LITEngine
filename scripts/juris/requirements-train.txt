@@ -1,0 +1,12 @@
+# Training/evaluation environment for Juris (NOT the serving image: requirements.txt gets no new dependencies).
+# scikit-learn is pinned to the serving version so the pickled pipeline loads identically in production.
+#   uv venv --python 3.11 .venv-juris && uv pip install --python .venv-juris/bin/python -r scripts/juris/requirements-train.txt
+scikit-learn==1.8.0
+joblib==1.5.3
+numpy
+scipy
+pandas
+pyarrow
+lightgbm
+httpx
+jinja2
