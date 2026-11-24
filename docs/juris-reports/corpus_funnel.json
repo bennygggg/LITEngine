@@ -1,0 +1,19 @@
+{
+  "candidates_with_label_or_neutral": 302061,
+  "text_docs_seen": 299240,
+  "dropped_by_reason_this_run": {
+    "neutral_unresolved": 6472,
+    "too_short": 3680,
+    "procedural_ending": 5506,
+    "label_contradiction": 435,
+    "unreadable": 2074
+  },
+  "after_quality_and_label_filters": 193158,
+  "near_duplicate_removed": 12817,
+  "duplicate_label_conflict_removed": 1373,
+  "final_cases": 178968,
+  "final_label_counts": {
+    "succeeds": 113702,
+    "dismissed": 65266
+  }
+}

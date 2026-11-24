@@ -1,0 +1,16 @@
+{
+  "partitions_with_appeals": 674,
+  "appeal_order_rows": 402197,
+  "unique_cases": 372529,
+  "label_counts": {
+    "succeeds": 131201,
+    "dismissed": 93311,
+    "neutral": 77549,
+    "none": 70468
+  },
+  "label_rules_for_none": {
+    "none": 45990,
+    "blank": 19665,
+    "unmapped": 4813
+  }
+}

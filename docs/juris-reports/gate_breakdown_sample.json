@@ -1,0 +1,20 @@
+{
+  "sample_documents": 20000,
+  "share_by_outcome": {
+    "kept": 0.6512,
+    "neutral_unresolved": 0.1206,
+    "procedural_ending": 0.1066,
+    "too_short": 0.0727,
+    "unreadable": 0.0413,
+    "label_contradiction": 0.0076
+  },
+  "agreement_where_metadata_and_text_both_decisive": 0.9815,
+  "n_both_decisive": 9600,
+  "kept_label_source": {
+    "meta+text": 8293,
+    "meta": 3655,
+    "text": 1077
+  },
+  "kept_interlocutory_tail_share": 0.1934,
+  "kept_under_800_words_share": 0.3255
+}
