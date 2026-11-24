@@ -18,14 +18,14 @@ TEXT, SIDE, NWORDS = 0, 1, 2   # column order of the model input: [text, side, n
 
 def make_juris(C: float = 4.0, max_features: int = 150_000, min_df: int = 5, use_sections: bool = True,
                use_text: bool = True, use_side: bool = True, class_weight: Optional[str] = "balanced",
-               stop_words: Optional[list] = None) -> Pipeline:
+               stop_words: Optional[list] = None, ngram_range: tuple = (1, 2)) -> Pipeline:
     """TF-IDF (word 1-2grams) + appellant side + cited sections + length -> logistic regression.
 
     Linear on purpose: every coefficient is a word, phrase or input a reader can inspect, which is what the card shows."""
     parts = []
     if use_text:
         parts.append(("tfidf", TfidfVectorizer(
-            ngram_range=(1, 2), min_df=min_df, max_df=0.6, max_features=max_features, sublinear_tf=True, strip_accents="unicode",
+            ngram_range=ngram_range, min_df=min_df, max_df=0.6, max_features=max_features, sublinear_tf=True, strip_accents="unicode",
             token_pattern=TOKEN_PATTERN, dtype=np.float32, stop_words=stop_words), TEXT))
     if use_side:
         parts.append(("side", OneHotEncoder(categories=[SIDES], handle_unknown="ignore", sparse_output=True), [SIDE]))

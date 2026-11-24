@@ -48,7 +48,7 @@ def main() -> None:
 
 Machine-readable source: `lit-backend/data/juris/model/model_card.json` (written by `scripts/juris/export_artifact.py`; the app reads it
 at runtime so the UI never states a number the model does not have). This file is rendered from that card and
-`data/juris/reports/final.json` by `scripts/juris/render_model_card_md.py`. Pipeline and guardrails: `lit-backend/scripts/juris/README.md`.
+`data/juris/reports/final.json` by `scripts/juris/render_model_card_md.py`. Pipeline and guardrails: `lit-backend/scripts/juris/README.md`. Robustness, sensitivity and ablation results: `JURIS_ROBUSTNESS.md`. Corpus datasheet: `JURIS_DATASHEET.md`.
 
 ## What it is
 
