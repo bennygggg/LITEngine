@@ -14,7 +14,7 @@ from sklearn.metrics import (
 )
 
 from scripts.outcome_dataset.train_predecision import frame, load_features, review_queue_hash
-from services.outcome_model import DEFAULT_MODEL_PATH
+from services.juris import DEFAULT_MODEL_PATH
 
 CLASSES = ["dismissed", "succeeds"]
 

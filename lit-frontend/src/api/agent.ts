@@ -30,7 +30,7 @@ export interface AgentStatus {
   llm: { provider: string; configured: boolean; planner_model: string | null; narration_model: string | null }
   deterministic_only: boolean
   library: { name: string; source: string; version: string; docs: number; chunks: number }
-  outcome_model_loaded: boolean
+  juris_loaded: boolean
   active_runs: number
 }
 

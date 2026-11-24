@@ -76,12 +76,12 @@ export function OutcomeCardView({ card }: { card: Card }) {
       </button>
       {open && (
         <div className="mt-3 space-y-3 rounded-lg border border-border bg-sunken p-4 text-sm leading-relaxed">
-          <p><strong className="font-medium">Model.</strong> {m.name}{m.n_train ? `, trained on ${m.n_train} Indian criminal appeals` : ''}. It scores five inputs derived from the case profile plus who is appealing, and it answers one question: any appellate relief, or none.</p>
-          {m.cv_accuracy != null && m.baseline_accuracy != null && (
-            <p><strong className="font-medium">How good is it?</strong> In cross-validation it was right <span className="tnum">{Math.round(m.cv_accuracy * 100)}%</span> of the time; always guessing “dismissed” would be right <span className="tnum">{Math.round(m.baseline_accuracy * 100)}%</span>. That is a modest edge, and most of it comes from the appeal type.</p>
+          <p><strong className="font-medium">Model.</strong> {m.name}{m.n_train ? `, trained on ${m.n_train.toLocaleString('en-IN')} Indian High Court criminal appeals` : ''}. {m.reads ? `It reads ${m.reads}.` : 'It reads the facts and grounds in the document plus who is appealing.'} It answers one question: any appellate relief, or none.</p>
+          {m.eval_accuracy != null && m.baseline_accuracy != null && (
+            <p><strong className="font-medium">How good is it?</strong> On {m.n_eval ? `${m.n_eval.toLocaleString('en-IN')} ` : ''}later cases{m.eval_period ? ` (${m.eval_period})` : ''} that it had not seen, it was right <span className="tnum">{Math.round(m.eval_accuracy * 100)}%</span> of the time; always guessing the more common outcome would be right <span className="tnum">{Math.round(m.baseline_accuracy * 100)}%</span>.{m.eval_auc != null ? <> Its ranking quality (AUC) was <span className="tnum">{m.eval_auc.toFixed(2)}</span>.</> : null} It estimates; it does not decide.</p>
           )}
           <p><strong className="font-medium">Inputs used.</strong> {card.inputs.appellant_type === 'accused_appeal' ? 'Appeal by the accused' : card.inputs.appellant_type === 'state_appeal' ? 'Appeal by the State or complainant' : 'Appeal type not specified'}
-            {card.inputs.filing_date ? `, filed ${formatDate(card.inputs.filing_date)}` : ''}. Both were supplied by you; nothing was inferred from the case text.</p>
+            {card.inputs.filing_date ? `, filed ${formatDate(card.inputs.filing_date)}` : ''}. Both were supplied by you; the appeal type is never inferred from the case text.</p>
           <ul className="list-disc space-y-1 pl-5 text-ink-muted">{(card.caveats ?? []).map((c) => <li key={c}>{c}</li>)}</ul>
           {card.legacy && <p className="text-xs text-ink-subtle">Earlier rule-based score: <span className="tnum">{Math.round(card.legacy.p * 100)}%</span>. {card.legacy.note}.</p>}
         </div>

@@ -74,10 +74,11 @@ def outro(ctx: RunContext) -> str:
 
     if "outcome" in kinds:
         card = next(c for c in cards if c.type == "outcome")
-        parts.append(f"Treat this as a base-rate indicator learned from {card.model.n_train or 'a small number of'} past appeals: it mostly reflects who is appealing, not the strength of this case.")
+        n_train = f"{card.model.n_train:,}" if card.model.n_train else "past"
+        parts.append(f"Treat this as an indicative estimate from Juris, learned from {n_train} appeals: it reflects who is appealing and the wording of the facts and grounds, not the legal strength of this case.")
 
     if "scenario" in kinds:
-        parts.append("Appeal type is the only input that moves this model materially; the others barely register, so treat small differences as noise.")
+        parts.append("Appeal type, and the sections cited in the text, are the only inputs Juris responds to; treat differences of a point or two as noise.")
 
     if "sources" in kinds:
         card = next(c for c in cards if c.type == "sources")

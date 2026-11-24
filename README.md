@@ -6,7 +6,7 @@ estimate for criminal appeals, and compares scenarios — each as an inline card
 
 | | |
 |---|---|
-| `lit-backend/` | FastAPI service (Hugging Face Docker Space): streaming agent, precedent search, extraction, argument graph, outcome model |
+| `lit-backend/` | FastAPI service (Hugging Face Docker Space): streaming agent, precedent search, extraction, argument graph, Juris (the outcome model) |
 | `lit-frontend/` | React + Vite + TypeScript client (Vercel) |
 | `docs/` | `ARCHITECTURE`, `PROTOCOL`, `MODEL_CARD`, `DEMO`, `RUNBOOK`, Phase 0 findings |
 | `scripts/verify.sh` | One command for every check (there is no CI): `scripts/verify.sh [--fast] [--e2e]` |
@@ -15,4 +15,4 @@ estimate for criminal appeals, and compares scenarios — each as an inline card
 recorded run on a fictional matter. See `lit-frontend/README.md` and `lit-backend/README.md` for local setup, and
 `CHANGELOG.md` for what 1.0.0 contains and what it does not.
 
-The outcome estimate is an indicative research aid, not legal advice; see `docs/MODEL_CARD.md` for what it is and is not.
+The outcome estimate (Juris) is an indicative research aid, not legal advice; see `docs/MODEL_CARD.md` for what it is and is not.

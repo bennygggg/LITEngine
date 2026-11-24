@@ -16,7 +16,7 @@ results render as typed cards inline in the conversation.
  └──────────────────────────────────────────┘            │   resolver → tools → cards, narration           │
                                                          │ tools run in-process on the existing services:  │
               HF router ◀── planner + narration only ──  │   extractor · embedder+FAISS · graph_builder ·  │
-        (gpt-oss-120b on Cerebras,                       │   outcome model · scenario engine · doc index   │
+        (gpt-oss-120b on Cerebras,                       │   Juris · scenario engine · doc index           │
          Qwen2.5-72B fallback)                           └─────────────────────────────────────────────────┘
 ```
 
@@ -32,7 +32,7 @@ results render as typed cards inline in the conversation.
 | Workspace | `services/agent/workspace.py`, `doc_index.py` | Content-addressed case cache and artifact cache. The document index chunks ~180 words (inside MiniLM's 256-token window) with character offsets for the source viewer. |
 | LLM runtime | `services/agent/llm/`, `llm_runtime.py`, `sanitize.py` | OpenAI-compatible client, fake and null clients, fallback chain, circuit breaker (3 failures → 60 s), daily token cap, a stream sanitiser that drops citation handles no tool issued. |
 | Narration | `prompts.py`, `narration.py` | Versioned system prompt (`PROMPT_VERSION`), per-card narration hints (≤ 80 words, three parts), templated fallback in the same voice. |
-| Engines | `services/{extractor,embedder,graph_builder,outcome_model,outcome_pipeline,scenario}.py` | The pre-existing pipeline, now called in-process. Blocking work runs in `asyncio.to_thread`. |
+| Engines | `services/{extractor,embedder,graph_builder,juris,juris_text,juris_features,outcome_pipeline,scenario}.py` | The pre-existing pipeline, now called in-process. Blocking work runs in `asyncio.to_thread`. |
 | Library | `services/retrieval/artifact.py` | Verified loader (sha256 per file) for the precedent artifact: from a local directory or a private HF dataset repo; falls back to the 3-case fixture index and says so in `/health/ready`. |
 
 ### Design decisions worth knowing
@@ -46,8 +46,8 @@ results render as typed cards inline in the conversation.
   read-only, tool arguments are validated, and the client renders markdown with no raw HTML and no images.
 - **Soft-stateful server.** The cache is recomputable from the client's copy of the text (a restart gives a 409, the
   client re-`PUT`s and retries). Conversations and matters live in the browser's IndexedDB, not on the server.
-- **Embedder and chunking are frozen for 1.0.** The outcome model's `precedent_alignment` input is derived from the
-  current MiniLM similarity; changing either shifts model inputs. See `MODEL_CARD.md`.
+- **Embedder and chunking are frozen for 1.0.** The precedent library and its search depend on them. Juris itself no longer reads
+  precedent similarity: it reads the pre-reasoning case text and who is appealing. See `MODEL_CARD.md`.
 - **Privacy in logs.** Logs carry lengths, hashes and counts, never case text, queries or file names (a log-capture
   test enforces it).
 

@@ -269,6 +269,10 @@ class SimulationRequest(BaseModel):
         ),
     )
     filing_date: Optional[date] = Field(None, description="Date the appeal was filed; used to bound precedent retrieval upstream")
+    case_text: Optional[str] = Field(
+        None, max_length=2_000_000,
+        description="The case document text Juris should read. If omitted, a thin summary built from the profile is used and the estimate is less reliable.",
+    )
 
 
 class SimulationResult(BaseModel):
@@ -281,7 +285,7 @@ class SimulationResult(BaseModel):
     recommendation: str = Field(..., description="1-2 sentence plain-English recommendation")
 
 
-class MLFeatureContribution(BaseModel):
+class JurisContribution(BaseModel):
     """One feature's signed contribution to the trained model's
     prediction — unlike ScoreComponent's fixed a-priori weights, this is
     specific to this one prediction (coefficient x this case's value)."""
@@ -294,14 +298,14 @@ class MLFeatureContribution(BaseModel):
     explanation: str = Field(..., description="Plain-language explanation of this feature's effect")
 
 
-class MLModelResult(BaseModel):
+class JurisResult(BaseModel):
     """Outcome prediction from the trained logistic regression model
-    (outcome_classifier_binary.joblib), returned alongside the
+    (juris.joblib), returned alongside the
     hand-picked heuristic for side-by-side comparison."""
     predicted_class: str = Field(..., description="'dismissed' or 'succeeds' (or 'unknown' if the model failed to load)")
     probability: float = Field(..., ge=0.0, le=1.0, description="Model's probability for predicted_class")
     probabilities: Dict[str, float] = Field(..., description="Full class probability distribution")
-    feature_contributions: List[MLFeatureContribution] = Field(
+    feature_contributions: List[JurisContribution] = Field(
         default_factory=list, description="All feature contributions, ranked by |contribution| descending"
     )
     explanation_sentences: List[str] = Field(
@@ -312,25 +316,27 @@ class MLModelResult(BaseModel):
     recommendation: str = Field("", description="1-2 sentence plain-English recommendation")
     model_loaded: bool = Field(..., description="False if the trained model failed to load and this is a fallback stub")
     model_version: Optional[str] = Field(None, description="Path/identifier of the loaded model artifact")
+    words_read: Optional[int] = Field(None, description="Words of the case text Juris actually read (the pre-reasoning part)")
+    input_basis: Optional[str] = Field(None, description="'case_text' (a real document) or 'profile_summary' (a thin summary built from a structured profile)")
 
 
-class OldVsNewComparison(BaseModel):
+class JurisComparison(BaseModel):
     """Both prediction approaches side by side, for a live before/after
     comparison. `primary` reflects which one populates the top-level
-    SimulationResponse.result — controlled by the OUTCOME_MODEL_PRIMARY
-    env var, or forced to 'old_heuristic' if the new model failed to load."""
-    primary: Literal["old_heuristic", "new_model"] = Field(
+    SimulationResponse.result — controlled by the JURIS_PRIMARY
+    env var, or forced to 'heuristic' if the new model failed to load."""
+    primary: Literal["heuristic", "juris"] = Field(
         ..., description="Which of the two is currently populating SimulationResponse.result"
     )
-    old_heuristic: SimulationResult
-    new_model: MLModelResult
+    heuristic: SimulationResult
+    juris: JurisResult
 
 
 class SimulationResponse(BaseModel):
     result: SimulationResult
     processing_time_ms: float
     timestamp: datetime
-    old_vs_new: Optional[OldVsNewComparison] = Field(
+    comparison: Optional[JurisComparison] = Field(
         None,
         description=(
             "Both the old heuristic and new trained-model predictions side by side. "

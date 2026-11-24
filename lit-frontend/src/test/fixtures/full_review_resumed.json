@@ -4,22 +4,23 @@
   "seq": 1,
   "t": 0,
   "event": "message_start",
-  "run_id": "r_f4638fa0",
-  "message_id": "m_0eb948a97f",
+  "run_id": "r_b089bca4",
+  "message_id": "m_b12a15638a",
   "conversation_id": "fx1",
   "mode": "forced",
   "model": null,
   "prompt_version": null,
   "schema_version": 1,
-  "server_version": "0.2.0",
-  "case_known": true
+  "server_version": "1.0.1",
+  "case_known": true,
+  "answer_first": false
  },
  {
   "v": 1,
   "seq": 2,
   "t": 0,
   "event": "step",
-  "step_id": "s_0d056d87fa",
+  "step_id": "s_35576e37ce",
   "phase": "start",
   "tool": "extract_case_facts",
   "label": "Reading the case",
@@ -40,7 +41,7 @@
   "seq": 3,
   "t": 0,
   "event": "step",
-  "step_id": "s_0d056d87fa",
+  "step_id": "s_35576e37ce",
   "phase": "end",
   "tool": "extract_case_facts",
   "label": "Reading the case",
@@ -69,7 +70,7 @@
   "seq": 5,
   "t": 0,
   "event": "step",
-  "step_id": "s_fbab67bd19",
+  "step_id": "s_b68fb4afee",
   "phase": "start",
   "tool": "search_precedents",
   "label": "Searching the precedent library",
@@ -89,9 +90,9 @@
  {
   "v": 1,
   "seq": 6,
-  "t": 1068,
+  "t": 465,
   "event": "step",
-  "step_id": "s_fbab67bd19",
+  "step_id": "s_b68fb4afee",
   "phase": "end",
   "tool": "search_precedents",
   "label": "Searching the precedent library",
@@ -102,21 +103,21 @@
   "message": null,
   "pct": null,
   "status": "ok",
-  "duration_ms": 1067,
+  "duration_ms": 464,
   "summary": "5 judgments"
  },
  {
   "v": 1,
   "seq": 7,
-  "t": 1068,
+  "t": 465,
   "event": "card",
-  "card_id": "card_0ecc65748f",
+  "card_id": "card_a72921a10f",
   "part_id": "p1",
-  "step_id": "s_fbab67bd19",
+  "step_id": "s_b68fb4afee",
   "schema_ver": 1,
   "supersedes": null,
   "payload": {
-   "card_id": "card_0ecc65748f",
+   "card_id": "card_a72921a10f",
    "schema_ver": 1,
    "title": "Closest matches in the library",
    "subtitle": "Decided before 12 Apr 2021",
@@ -125,7 +126,7 @@
     "engine": "faiss-minilm",
     "engine_version": "1",
     "index_version": "v1",
-    "computed_ms": 1067,
+    "computed_ms": 464,
     "inputs": {},
     "cached": false
    },
@@ -240,19 +241,19 @@
  {
   "v": 1,
   "seq": 8,
-  "t": 1068,
+  "t": 465,
   "event": "artifact_update",
   "kind": "precedents",
   "key": "125bd249b8e076c6",
-  "card_id": "card_0ecc65748f",
+  "card_id": "card_a72921a10f",
   "implicit": false
  },
  {
   "v": 1,
   "seq": 9,
-  "t": 1068,
+  "t": 465,
   "event": "step",
-  "step_id": "s_d971d1baa4",
+  "step_id": "s_8787956e42",
   "phase": "start",
   "tool": "build_argument_map",
   "label": "Mapping the arguments",
@@ -269,9 +270,9 @@
  {
   "v": 1,
   "seq": 10,
-  "t": 1069,
+  "t": 466,
   "event": "step",
-  "step_id": "s_d971d1baa4",
+  "step_id": "s_8787956e42",
   "phase": "end",
   "tool": "build_argument_map",
   "label": "Mapping the arguments",
@@ -288,15 +289,15 @@
  {
   "v": 1,
   "seq": 11,
-  "t": 1069,
+  "t": 466,
   "event": "card",
-  "card_id": "card_d0696fa62b",
+  "card_id": "card_664ddf88f8",
   "part_id": "p2",
-  "step_id": "s_d971d1baa4",
+  "step_id": "s_8787956e42",
   "schema_ver": 1,
   "supersedes": null,
   "payload": {
-   "card_id": "card_d0696fa62b",
+   "card_id": "card_664ddf88f8",
    "schema_ver": 1,
    "title": "Argument map",
    "subtitle": "25 elements \u00b7 67 links \u00b7 0 claims lacking evidence",
@@ -1130,19 +1131,19 @@
  {
   "v": 1,
   "seq": 12,
-  "t": 1069,
+  "t": 466,
   "event": "artifact_update",
   "kind": "graph",
   "key": "72f277ca2c87f781",
-  "card_id": "card_d0696fa62b",
+  "card_id": "card_664ddf88f8",
   "implicit": false
  },
  {
   "v": 1,
   "seq": 13,
-  "t": 1069,
+  "t": 466,
   "event": "step",
-  "step_id": "s_3753eac75c",
+  "step_id": "s_66885a244f",
   "phase": "start",
   "tool": "assess_outcome",
   "label": "Scoring the appeal",
@@ -1159,9 +1160,9 @@
  {
   "v": 1,
   "seq": 14,
-  "t": 1071,
+  "t": 477,
   "event": "step",
-  "step_id": "s_3753eac75c",
+  "step_id": "s_66885a244f",
   "phase": "end",
   "tool": "assess_outcome",
   "label": "Scoring the appeal",
@@ -1172,30 +1173,30 @@
   "message": null,
   "pct": null,
   "status": "ok",
-  "duration_ms": 1,
-  "summary": "75% (indicative)"
+  "duration_ms": 10,
+  "summary": "45% (indicative)"
  },
  {
   "v": 1,
   "seq": 15,
-  "t": 1071,
+  "t": 477,
   "event": "card",
-  "card_id": "card_e40100d248",
+  "card_id": "card_aa17db4d6a",
   "part_id": "p3",
-  "step_id": "s_3753eac75c",
+  "step_id": "s_66885a244f",
   "schema_ver": 1,
   "supersedes": null,
   "payload": {
-   "card_id": "card_e40100d248",
+   "card_id": "card_aa17db4d6a",
    "schema_ver": 1,
    "title": "Indicative outcome estimate",
    "subtitle": "Appeal by the accused (appealing a conviction)",
    "artifact_key": null,
    "provenance": {
-    "engine": "logreg-binary",
+    "engine": "juris",
     "engine_version": "1",
     "index_version": null,
-    "computed_ms": 1,
+    "computed_ms": 10,
     "inputs": {
      "appellant_type": "accused_appeal"
     },
@@ -1203,14 +1204,14 @@
    },
    "disclaimer": {
     "level": "caution",
-    "text": "Indicative research estimate \u2014 a typical case in the training data sits near 50%. Trained on 187 appellate judgments; cross-validated accuracy 72% against a 60% base rate. Not legal advice."
+    "text": "Indicative research estimate \u2014 a typical case in the training data sits near 60%. Trained on 107,847 appellate judgments; on 32,573 later cases it was right 75% of the time, against 66% for always guessing the more common outcome. Not legal advice."
    },
    "type": "outcome",
    "estimate": {
-    "p_succeeds": 0.7466,
-    "p_rounded": 75,
-    "tier": "favorable",
-    "tier_label": "Leans toward relief",
+    "p_succeeds": 0.4467,
+    "p_rounded": 45,
+    "tier": "unfavorable",
+    "tier_label": "Below even odds",
     "definition": "Chance of any appellate relief, including partial relief"
    },
    "inputs": {
@@ -1219,75 +1220,150 @@
     "appellant_source": "user_input"
    },
    "model": {
-    "name": "Logistic regression (binary: dismissed vs succeeds)",
-    "version": "outcome_classifier_binary.joblib",
+    "name": "Juris",
+    "version": "juris-20261124-406c9136",
     "loaded": true,
-    "n_train": 187,
-    "cv_accuracy": 0.7159,
-    "baseline_accuracy": 0.6043,
-    "scope": "Criminal appeals"
+    "n_train": 107847,
+    "eval_accuracy": 0.7530470021183189,
+    "eval_auc": 0.794968262024621,
+    "n_eval": 32573,
+    "eval_period": "2023-2026",
+    "baseline_accuracy": 0.6556350351518129,
+    "reads": "the facts, trial-court findings and grounds in the document (never the appellate court's own reasoning) plus who is appealing",
+    "scope": "Criminal appeals (trained on Indian High Court criminal-appeal judgments)"
    },
    "contributions": [
     {
      "feature": "appellant_type",
      "display_name": "Appeal type",
      "value": 1.0,
-     "contribution": 1.11,
+     "contribution": 0.334,
      "explanation": "This is the accused's own appeal against conviction, which pushed toward 'succeeds'."
     },
     {
-     "feature": "case_complexity",
-     "display_name": "Case Complexity",
-     "value": 0.65,
-     "contribution": 0.012,
-     "explanation": "Moderate case complexity (0.65) pushed toward 'succeeds'."
-    },
-    {
-     "feature": "court_level",
-     "display_name": "Court Level",
-     "value": 0.6,
-     "contribution": -0.01,
-     "explanation": "Moderate court level (0.60) pushed toward 'dismissed'."
-    },
-    {
-     "feature": "precedent_alignment",
-     "display_name": "Precedent Alignment",
-     "value": 0.557,
-     "contribution": 0.009,
-     "explanation": "Moderate precedent alignment (0.56) pushed toward 'dismissed'."
-    },
-    {
-     "feature": "statutory_strength",
-     "display_name": "Statutory Strength",
-     "value": 0.9,
-     "contribution": 0.003,
-     "explanation": "High statutory strength (0.90) pushed toward 'succeeds'."
-    },
-    {
-     "feature": "argument_completeness",
-     "display_name": "Argument Completeness",
+     "feature": "section_302",
+     "display_name": "Section 302 cited",
      "value": 1.0,
-     "contribution": 0.0,
-     "explanation": "High argument completeness (1.00) pushed toward 'succeeds'."
+     "contribution": -0.275,
+     "explanation": "Section 302 is cited in the case text, which pushed toward 'dismissed'."
+    },
+    {
+     "feature": "phrase:independent",
+     "display_name": "\u201cindependent\u201d",
+     "value": 0.089,
+     "contribution": -0.196,
+     "explanation": "The wording \u201cindependent\u201d appears in the case text and pushed toward 'dismissed'."
+    },
+    {
+     "feature": "section_374",
+     "display_name": "Section 374 cited",
+     "value": 1.0,
+     "contribution": 0.169,
+     "explanation": "Section 374 is cited in the case text, which pushed toward 'succeeds'."
+    },
+    {
+     "feature": "phrase:interested",
+     "display_name": "\u201cinterested\u201d",
+     "value": 0.054,
+     "contribution": -0.155,
+     "explanation": "The wording \u201cinterested\u201d appears in the case text and pushed toward 'dismissed'."
+    },
+    {
+     "feature": "phrase:eyewitnesses",
+     "display_name": "\u201ceyewitnesses\u201d",
+     "value": 0.107,
+     "contribution": -0.146,
+     "explanation": "The wording \u201ceyewitnesses\u201d appears in the case text and pushed toward 'dismissed'."
+    },
+    {
+     "feature": "section_304",
+     "display_name": "Section 304 cited",
+     "value": 1.0,
+     "contribution": 0.137,
+     "explanation": "Section 304 is cited in the case text, which pushed toward 'succeeds'."
+    },
+    {
+     "feature": "phrase:delay",
+     "display_name": "\u201cdelay\u201d",
+     "value": 0.079,
+     "contribution": -0.126,
+     "explanation": "The wording \u201cdelay\u201d appears in the case text and pushed toward 'dismissed'."
+    },
+    {
+     "feature": "phrase:conviction under",
+     "display_name": "\u201cconviction under\u201d",
+     "value": 0.057,
+     "contribution": 0.121,
+     "explanation": "The wording \u201cconviction under\u201d appears in the case text and pushed toward 'succeeds'."
+    },
+    {
+     "feature": "phrase:court convicted",
+     "display_name": "\u201ccourt convicted\u201d",
+     "value": 0.049,
+     "contribution": 0.114,
+     "explanation": "The wording \u201ccourt convicted\u201d appears in the case text and pushed toward 'succeeds'."
+    },
+    {
+     "feature": "phrase:corroborated",
+     "display_name": "\u201ccorroborated\u201d",
+     "value": 0.049,
+     "contribution": -0.111,
+     "explanation": "The wording \u201ccorroborated\u201d appears in the case text and pushed toward 'dismissed'."
+    },
+    {
+     "feature": "section_34",
+     "display_name": "Section 34 cited",
+     "value": 1.0,
+     "contribution": 0.107,
+     "explanation": "Section 34 is cited in the case text, which pushed toward 'succeeds'."
+    },
+    {
+     "feature": "phrase:the conviction",
+     "display_name": "\u201cthe conviction\u201d",
+     "value": 0.037,
+     "contribution": 0.099,
+     "explanation": "The wording \u201cthe conviction\u201d appears in the case text and pushed toward 'succeeds'."
+    },
+    {
+     "feature": "section_27",
+     "display_name": "Section 27 cited",
+     "value": 1.0,
+     "contribution": -0.06,
+     "explanation": "Section 27 is cited in the case text, which pushed toward 'dismissed'."
+    },
+    {
+     "feature": "length",
+     "display_name": "Length of text read",
+     "value": 8.074,
+     "contribution": 0.024,
+     "explanation": "The length of the text read pushed slightly toward 'succeeds'."
+    },
+    {
+     "feature": "phrase:other",
+     "display_name": "All other wording",
+     "value": 250.0,
+     "contribution": -0.719,
+     "explanation": "All the remaining wording together pushed toward 'dismissed'."
     }
    ],
-   "drivers_summary": "This estimate mostly reflects who is appealing (the accused); the facts extracted from the case move it by only a few points.",
+   "drivers_summary": "The biggest single push is who is appealing (the accused); the wording of the case text moves the estimate further, but no single phrase dominates.",
    "strengths": [
-    "This is the accused's own appeal against conviction, which pushed toward 'succeeds'.",
-    "Moderate case complexity (0.65) pushed toward 'succeeds'.",
-    "High statutory strength (0.90) pushed toward 'succeeds'."
+    "This is a State/complainant appeal against acquittal, which pushed toward 'succeeds'.",
+    "Section 374 is cited in the case text, which pushed toward 'succeeds'.",
+    "This is the accused's own appeal against conviction, which pushed toward 'succeeds'."
    ],
    "weaknesses": [
-    "Moderate court level (0.60) pushed toward 'dismissed'.",
-    "Moderate precedent alignment (0.56) pushed toward 'dismissed'."
+    "All the remaining wording together pushed toward 'dismissed'.",
+    "Section 302 is cited in the case text, which pushed toward 'dismissed'.",
+    "The wording \u201cindependent\u201d appears in the case text and pushed toward 'dismissed'."
    ],
    "legacy": {
     "p": 0.7449,
     "note": "Uncalibrated rule score; it predicted 'succeeds' for every training case"
    },
    "caveats": [
-    "Appeal type is the dominant input; the other inputs are counts and averages from the case profile, not legal merit.",
-    "Trained on judgments whose outcome labels were derived from text, so label noise is part of the accuracy figure."
+    "Juris reads the facts and grounds in the document and who is appealing. It does not weigh legal merit, and it never sees the appellate court's reasoning.",
+    "Trained on High Court criminal-appeal judgments; outcome labels come from court records and were checked against the order text, so some label noise remains."
    ],
    "profile_method": "rules"
   }
@@ -1295,26 +1371,26 @@
  {
   "v": 1,
   "seq": 16,
-  "t": 1071,
+  "t": 477,
   "event": "artifact_update",
   "kind": "outcome",
   "key": "08778f3adbd6d748",
-  "card_id": "card_e40100d248",
+  "card_id": "card_aa17db4d6a",
   "implicit": false
  },
  {
   "v": 1,
   "seq": 17,
-  "t": 1071,
+  "t": 477,
   "event": "text_delta",
-  "message_id": "m_0eb948a97f",
+  "message_id": "m_b12a15638a",
   "part_id": "p4",
-  "delta": "Closest matches in the library: [P1] Dalpatsinh vs State (HC, 2008); [P2] Sk. Aziz vs The State (HC, 2010); [P3] Dukhmochan Pandey & Ors., Shamsul Mian & ... vs Stat (SC, 1997). These are the nearest judgments by meaning among 505 indexed \u2014 they are not a finding that any of them supports the appeal.\n\nThe map has 25 elements and 67 links. Every claim has at least one evidence link, so the map doesn't flag a weak point \u2014 that says nothing about how strong the evidence is.\n\n**Leans toward relief** \u2014 about 75%, as an indicative research estimate. This estimate mostly reflects who is appealing (the accused); the facts extracted from the case move it by only a few points. This is a base-rate indicator learned from 187 past appeals, not advice on this case."
+  "delta": "Closest matches in the library are listed above \u2014 start with [P1] and [P2]. They are the nearest judgments by meaning among 505 indexed, not a finding that any of them supports the appeal.\n\nNo claim is flagged as lacking an evidence link \u2014 but that says nothing about how strong the evidence is.\n\nTreat this as an indicative estimate from Juris, learned from 107,847 appeals: it reflects who is appealing and the wording of the facts and grounds, not the legal strength of this case."
  },
  {
   "v": 1,
   "seq": 18,
-  "t": 1071,
+  "t": 477,
   "event": "meta",
   "conversation_title": null,
   "suggestions": [
@@ -1340,19 +1416,19 @@
  {
   "v": 1,
   "seq": 19,
-  "t": 1071,
+  "t": 477,
   "event": "done",
   "status": "complete",
-  "message_id": "m_0eb948a97f",
+  "message_id": "m_b12a15638a",
   "usage": {
    "input_tokens": 0,
    "output_tokens": 0,
    "llm_calls": 0
   },
   "timings": {
-   "ttft_ms": 1071,
-   "first_card_ms": 1068,
-   "total_ms": 1071
+   "ttft_ms": 477,
+   "first_card_ms": 465,
+   "total_ms": 477
   },
   "warnings": []
  }

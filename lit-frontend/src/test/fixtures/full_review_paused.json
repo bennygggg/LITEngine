@@ -4,31 +4,32 @@
   "seq": 1,
   "t": 0,
   "event": "message_start",
-  "run_id": "r_6829b965",
-  "message_id": "m_7182aeb329",
+  "run_id": "r_e66d8561",
+  "message_id": "m_07dfda290b",
   "conversation_id": "fx1",
   "mode": "forced",
   "model": null,
   "prompt_version": null,
   "schema_version": 1,
-  "server_version": "0.2.0",
-  "case_known": true
+  "server_version": "1.0.1",
+  "case_known": true,
+  "answer_first": false
  },
  {
   "v": 1,
   "seq": 2,
-  "t": 1,
+  "t": 0,
   "event": "text_delta",
-  "message_id": "m_7182aeb329",
+  "message_id": "m_07dfda290b",
   "part_id": "p1",
   "delta": "I'll read the matter, search the precedent library, map the arguments and score the appeal \u2014 each step appears as it completes."
  },
  {
   "v": 1,
   "seq": 3,
-  "t": 1,
+  "t": 0,
   "event": "step",
-  "step_id": "s_16eaa5cfaf",
+  "step_id": "s_5f92530a93",
   "phase": "start",
   "tool": "extract_case_facts",
   "label": "Reading the case",
@@ -47,9 +48,9 @@
  {
   "v": 1,
   "seq": 4,
-  "t": 1,
+  "t": 0,
   "event": "step",
-  "step_id": "s_16eaa5cfaf",
+  "step_id": "s_5f92530a93",
   "phase": "end",
   "tool": "extract_case_facts",
   "label": "Reading the case",
@@ -66,15 +67,15 @@
  {
   "v": 1,
   "seq": 5,
-  "t": 1,
+  "t": 0,
   "event": "card",
-  "card_id": "card_2b5eba659a",
+  "card_id": "card_b597b0cc09",
   "part_id": "p2",
-  "step_id": "s_16eaa5cfaf",
+  "step_id": "s_5f92530a93",
   "schema_ver": 1,
   "supersedes": null,
   "payload": {
-   "card_id": "card_2b5eba659a",
+   "card_id": "card_b597b0cc09",
    "schema_ver": 1,
    "title": "Ramesh Kumar v. State of Maharashtra",
    "subtitle": "High Court \u00b7 Criminal",
@@ -146,22 +147,22 @@
  {
   "v": 1,
   "seq": 6,
-  "t": 1,
+  "t": 0,
   "event": "artifact_update",
   "kind": "profile",
   "key": "709296643bf215cc",
-  "card_id": "card_2b5eba659a",
+  "card_id": "card_b597b0cc09",
   "implicit": false
  },
  {
   "v": 1,
   "seq": 7,
-  "t": 1,
+  "t": 0,
   "event": "needs_input",
-  "card_id": "input_a59befbc58",
+  "card_id": "input_1ae447e8d6",
   "part_id": "p3",
   "payload": {
-   "card_id": "input_a59befbc58",
+   "card_id": "input_1ae447e8d6",
    "schema_ver": 1,
    "title": "Two details needed",
    "subtitle": null,
@@ -205,7 +206,7 @@
      "default": null
     }
    ],
-   "hint": "We never infer the appeal type \u2014 it is the strongest factor in the model. The filing date sets the precedent cutoff: only judgments decided before it are used."
+   "hint": "We never infer the appeal type \u2014 it is the strongest factor in Juris. The filing date sets the precedent cutoff: only judgments decided before it are used."
   }
  },
  {
@@ -253,15 +254,15 @@
   "t": 1,
   "event": "done",
   "status": "awaiting_input",
-  "message_id": "m_7182aeb329",
+  "message_id": "m_07dfda290b",
   "usage": {
    "input_tokens": 0,
    "output_tokens": 0,
    "llm_calls": 0
   },
   "timings": {
-   "ttft_ms": 1,
-   "first_card_ms": 1,
+   "ttft_ms": 0,
+   "first_card_ms": 0,
    "total_ms": 1
   },
   "warnings": []

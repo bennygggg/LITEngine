@@ -37,6 +37,13 @@ inference key must be allowed to read that repo: huggingface.co → Settings →
 repository under *Repositories → Read*. Until then the Space starts, falls back to the 3-case fixture index, and
 `/api/v1/health/ready` reports `index.source: "fixture"`. Treat that as not ready for a demo.
 
+**Juris** (the outcome model, 4.4 MB) ships the same way, because Spaces reject binary files in git: `juris.joblib` lives in the same
+dataset repo under `juris/v1/` and the Space downloads it at start. The committed `data/juris/model/model_card.json` pins its
+`artifact_sha256`; a download that does not match is not installed, and the app then runs on the earlier heuristic (`/api/v1/health/ready`
+reports `juris_loaded: false`). After retraining: `scripts/juris/export_artifact.py`, then `scripts/juris/publish_artifact.py publish`, then
+commit the new card and deploy. `JURIS_ARTIFACT_REVISION` (default `main`) can pin the dataset commit. Rollback: publish the previous
+artifact again (the card's hash must match it) or push the previous commit.
+
 ## Deploy the backend
 
 Staging first, always.
@@ -53,7 +60,7 @@ Smoke-test staging (works with no LLM; a private Space needs `--token`):
 cd lit-backend && .venv311/bin/python scripts/smoke.py https://thebenmerlin-lit-backend-staging.hf.space --token "$HF_TOKEN"
 ```
 
-It checks health, readiness, that the library loaded from the artifact (505 judgments), the outcome model, registering a
+It checks health, readiness, that the library loaded from the artifact (505 judgments), Juris, registering a
 matter, and a forced precedents run whose stream starts with `message_start`, ends with `done`, and returns real results.
 Then production (**requires an explicit go-ahead**), and run the same smoke test against it:
 

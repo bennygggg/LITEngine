@@ -131,59 +131,66 @@ def test_artifact_loader_requires_a_manifest(tmp_path):
 
 # --- scenario engine -----------------------------------------------------------------
 
-def run(specs, appellant="accused_appeal", prof=None, graph=GRAPH):
-    return run_scenarios(prof or profile(), [], graph, appellant, specs)
+from pathlib import Path  # noqa: E402
+
+CASE = (Path(__file__).parent / "fixtures" / "criminal_case.txt").read_text(encoding="utf-8")
+
+
+def run(specs, appellant="accused_appeal", prof=None, graph=GRAPH, text=CASE):
+    return run_scenarios(prof or profile(), [], graph, appellant, specs, True, text)
 
 
 def spec(label, **changes):
     return ScenarioSpec(label=label, changes=ScenarioChanges(**changes))
 
 
-def test_appellant_swing_is_large_and_in_the_right_direction():
+def test_appellant_swing_is_in_the_right_direction():
     base, [o], _, loaded = run([spec("state", appellant_type="state_appeal")])
-    assert loaded and o.effect_class == "large" and o.delta_pp < -20 and o.dominant_feature == "appellant_type"
+    assert loaded and o.delta_pp < -5 and o.effect_class in ("large", "small") and o.dominant_feature == "appellant_type"
     base2, [o2], _, _ = run([spec("accused", appellant_type="accused_appeal")], appellant="state_appeal")
-    assert o2.delta_pp > 20
+    assert o2.delta_pp > 5
 
 
-def test_inert_levers_are_reported_negligible_with_an_explanation():
-    _, outs, _, _ = run([spec("facts", extra_supporting_facts=3), spec("sections", add_sections=["Section 201", "Section 120B"])])
-    assert all(o.effect_class == "negligible" for o in outs)
-    assert any("left every model input unchanged" in w or "insensitive" in w for o in outs for w in o.warnings)
+def test_cited_section_levers_edit_what_juris_reads():
+    _, [o], _, _ = run([spec("add", add_sections=["Section 498A"])])
+    assert o.applied[0].status == "applied" and any(w for w in o.warnings if "what-if on the model" in w)
+    _, [o2], _, _ = run([spec("remove", remove_sections=["302"])])
+    assert o2.applied[0].status == "applied"
+
+
+def test_levers_that_juris_does_not_use_are_rejected_with_the_reason():
+    _, [o], _, _ = run([spec("old levers", resolved_weak_claim_ids=["claim:nope"], extra_supporting_facts=3, exclude_precedent_refs=["P1"],
+                             court_level="Supreme Court")])
+    assert {a.status for a in o.applied} == {"rejected"} and all(a.note for a in o.applied)
+    assert any("does not use" in (a.note or "") for a in o.applied)
+    assert o.delta_pp == 0 and o.effect_class == "negligible" and any("could be applied" in w for w in o.warnings)
 
 
 def test_levers_that_cannot_apply_are_rejected_not_silently_ignored():
-    _, [o], _, _ = run([spec("bad", resolved_weak_claim_ids=["claim:nope"], remove_sections=["999"], exclude_precedent_refs=["P9"],
-                             add_sections=["not a section"])])
+    _, [o], _, _ = run([spec("bad", remove_sections=["999"], add_sections=["not a section"])])
     assert {a.status for a in o.applied} == {"rejected"}
     assert o.delta_pp == 0 and any("could be applied" in w for w in o.warnings)
 
 
 def test_section_cap_and_dedupe():
-    prof = profile(ipc_sections=[f"Section {n}" for n in range(300, 312)])
-    _, [o], _, _ = run([spec("more", add_sections=["Section 400"])], prof=prof)
+    crowded = "The appellant was charged under " + ", ".join(f"Section {n}" for n in range(300, 312)) + ". " + CASE
+    _, [o], _, _ = run([spec("more", add_sections=["Section 400"])], text=crowded)
     assert o.applied[0].status == "clamped"
     _, [o2], _, _ = run([spec("dup", add_sections=["302"])])
     assert o2.applied[0].status == "rejected" and "Already" in (o2.applied[0].note or "")
 
 
-def test_court_level_lever_is_flagged_as_confounded():
-    _, [o], _, _ = run([spec("hc", court_level="Supreme Court")])
-    assert any("Confounded" in (a.note or "") for a in o.applied) or any("Confounded" in w for w in o.warnings)
-
-
-def test_sensitivity_table_ranks_appeal_type_first_and_marks_inert_inputs():
-    _, _, sens, _ = run([spec("x", extra_supporting_facts=1)])
-    assert sens[0].feature == "appellant_type" and sens[0].swing_pp > 20
-    completeness = next(r for r in sens if r.feature == "argument_completeness")
-    assert completeness.swing_pp == 0 and "No variation" in (completeness.note or "")
-    assert next(r for r in sens if r.feature == "court_level").confounded
+def test_sensitivity_table_ranks_appeal_type_among_the_inputs():
+    _, _, sens, _ = run([spec("x", appellant_type="state_appeal")])
+    assert sens and sens[0].swing_pp >= sens[-1].swing_pp
+    appeal = next(r for r in sens if r.feature == "appellant_type")
+    assert appeal.swing_pp > 5 and appeal.kind == "categorical"
 
 
 def test_base_estimate_equals_the_simulation_path():
-    scored = score_case(profile(), [], GRAPH, "accused_appeal")
+    scored = score_case(profile(), [], GRAPH, "accused_appeal", CASE)
     base, _, _, _ = run([spec("noop")])
-    assert base.p_succeeds == pytest.approx(scored.ml.probabilities["succeeds"], abs=1e-4)
+    assert base.p_succeeds == pytest.approx(scored.juris.probabilities["succeeds"], abs=1e-4)
 
 
 # --- honesty maths -------------------------------------------------------------------
@@ -203,25 +210,35 @@ def test_centred_contributions_sum_to_logit_minus_baseline(appellant):
     """The bars are only honest if they add up: baseline logit + sum(centred contributions) == the model's logit."""
     card = cards.model_card()
     assert card, "model_card.json must ship with the model"
-    scored = score_case(profile(), [], GRAPH, appellant)
-    total = sum(c.contribution for c in cards.centred_contributions(scored.ml))
-    p = scored.ml.probabilities["succeeds"]
+    scored = score_case(profile(), [], GRAPH, appellant, CASE)
+    total = sum(c.contribution for c in cards.centred_contributions(scored.juris))
+    p = scored.juris.probabilities["succeeds"]
     logit = math.log(p / (1 - p))
     assert card["baseline_logit"] + total == pytest.approx(logit, abs=0.02)
 
 
-def test_drivers_summary_names_appeal_type_as_the_driver():
-    scored = score_case(profile(), [], GRAPH, "accused_appeal")
-    text = cards.drivers_summary(cards.centred_contributions(scored.ml), "accused_appeal")
+def test_drivers_summary_names_appeal_type_as_a_driver():
+    scored = score_case(profile(), [], GRAPH, "accused_appeal", CASE)
+    text = cards.drivers_summary(cards.centred_contributions(scored.juris), "accused_appeal")
     assert "who is appealing" in text and "the accused" in text
 
 
-def test_outcome_card_flags_ai_improved_profiles():
-    scored = score_case(profile(), [], GRAPH, "accused_appeal")
-    card = cards.outcome_card("k", scored, "accused_appeal", date(2021, 4, 12), "llm_assisted")
-    assert any("less reliable" in c for c in card.caveats)
-    plain = cards.outcome_card("k", scored, "accused_appeal", date(2021, 4, 12), "rules")
-    assert not any("less reliable" in c for c in plain.caveats)
+def test_state_appeals_carry_a_base_rate_caveat():
+    scored = score_case(profile(), [], GRAPH, "state_appeal", CASE)
+    caveats = cards.outcome_card("k", scored, "state_appeal", None, "rules").caveats
+    assert any("base rate" in c for c in caveats)
+    assert not any("base rate" in c for c in cards.outcome_card("k", score_case(profile(), [], GRAPH, "accused_appeal", CASE), "accused_appeal", None, "rules").caveats)
+
+
+def test_outcome_card_flags_a_thin_profile_summary_and_carries_the_model_facts():
+    full = score_case(profile(), [], GRAPH, "accused_appeal", CASE)
+    card = cards.outcome_card("k", full, "accused_appeal", date(2021, 4, 12), "rules")
+    assert card.model.name == "Juris" and card.model.n_train and not any("short structured summary" in c for c in card.caveats)
+    assert any("never sees the appellate court" in c for c in card.caveats)
+    thin = score_case(profile(key_facts=["f " * 30] * 3), [], GRAPH, "accused_appeal")      # no case text: a summary built from the profile
+    if thin.juris.model_loaded:
+        assert thin.juris.input_basis == "profile_summary"
+        assert any("short structured summary" in c for c in cards.outcome_card("k", thin, "accused_appeal", None, "rules").caveats)
 
 
 def test_fixture_index_returns_a_real_cosine():

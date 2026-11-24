@@ -504,7 +504,7 @@ export interface paths {
         put?: never;
         /**
          * Scenario
-         * @description Re-score a case under hypothetical changes with the trained model.
+         * @description Re-score a case under hypothetical changes with Juris.
          *
          *     Each scenario perturbs a real model input (appeal type, supporting facts, statutes, precedent support, court level)
          *     and is scored by the same code path as the base estimate. Most levers move the estimate by only a point or two —
@@ -1497,23 +1497,30 @@ export interface components {
             /** Url */
             url: string;
         };
-        /** LegacyHeuristic */
-        LegacyHeuristic: {
+        /**
+         * JurisComparison
+         * @description Both prediction approaches side by side, for a live before/after
+         *     comparison. `primary` reflects which one populates the top-level
+         *     SimulationResponse.result — controlled by the JURIS_PRIMARY
+         *     env var, or forced to 'heuristic' if the new model failed to load.
+         */
+        JurisComparison: {
+            heuristic: components["schemas"]["SimulationResult"];
+            juris: components["schemas"]["JurisResult"];
             /**
-             * Note
-             * @default Uncalibrated rule score; it predicted 'succeeds' for every training case
+             * Primary
+             * @description Which of the two is currently populating SimulationResponse.result
+             * @enum {string}
              */
-            note: string;
-            /** P */
-            p: number;
+            primary: "heuristic" | "juris";
         };
         /**
-         * MLFeatureContribution
+         * JurisContribution
          * @description One feature's signed contribution to the trained model's
          *     prediction — unlike ScoreComponent's fixed a-priori weights, this is
          *     specific to this one prediction (coefficient x this case's value).
          */
-        MLFeatureContribution: {
+        JurisContribution: {
             /**
              * Contribution
              * @description Signed contribution to the 'succeeds' log-odds (coefficient x value)
@@ -1541,12 +1548,12 @@ export interface components {
             value: number;
         };
         /**
-         * MLModelResult
+         * JurisResult
          * @description Outcome prediction from the trained logistic regression model
-         *     (outcome_classifier_binary.joblib), returned alongside the
+         *     (juris.joblib), returned alongside the
          *     hand-picked heuristic for side-by-side comparison.
          */
-        MLModelResult: {
+        JurisResult: {
             /**
              * Explanation Sentences
              * @description Top 2-3 plain-language explanations, most influential first
@@ -1556,7 +1563,12 @@ export interface components {
              * Feature Contributions
              * @description All feature contributions, ranked by |contribution| descending
              */
-            feature_contributions?: components["schemas"]["MLFeatureContribution"][];
+            feature_contributions?: components["schemas"]["JurisContribution"][];
+            /**
+             * Input Basis
+             * @description 'case_text' (a real document) or 'profile_summary' (a thin summary built from a structured profile)
+             */
+            input_basis?: string | null;
             /**
              * Key Strengths
              * @description Top positive-contribution factors
@@ -1600,6 +1612,21 @@ export interface components {
              * @default
              */
             recommendation: string;
+            /**
+             * Words Read
+             * @description Words of the case text Juris actually read (the pre-reasoning part)
+             */
+            words_read?: number | null;
+        };
+        /** LegacyHeuristic */
+        LegacyHeuristic: {
+            /**
+             * Note
+             * @default Uncalibrated rule score; it predicted 'succeeds' for every training case
+             */
+            note: string;
+            /** P */
+            p: number;
         };
         /** MessageStartEvent */
         MessageStartEvent: {
@@ -1690,19 +1717,39 @@ export interface components {
         };
         /** ModelFacts */
         ModelFacts: {
-            /** Baseline Accuracy */
+            /**
+             * Baseline Accuracy
+             * @description Accuracy of always guessing the more common outcome on the same cases
+             */
             baseline_accuracy?: number | null;
-            /** Cv Accuracy */
-            cv_accuracy?: number | null;
+            /**
+             * Eval Accuracy
+             * @description Accuracy on held-out cases decided after the training period
+             */
+            eval_accuracy?: number | null;
+            /** Eval Auc */
+            eval_auc?: number | null;
+            /**
+             * Eval Period
+             * @description Decision years of the held-out cases, e.g. '2023-2025'
+             */
+            eval_period?: string | null;
             /**
              * Loaded
              * @default true
              */
             loaded: boolean;
+            /** N Eval */
+            n_eval?: number | null;
             /** N Train */
             n_train?: number | null;
             /** Name */
             name: string;
+            /**
+             * Reads
+             * @description What the model reads, in plain words
+             */
+            reads?: string | null;
             /**
              * Scope
              * @default Criminal appeals
@@ -1769,23 +1816,6 @@ export interface components {
              * @default 1
              */
             v: number;
-        };
-        /**
-         * OldVsNewComparison
-         * @description Both prediction approaches side by side, for a live before/after
-         *     comparison. `primary` reflects which one populates the top-level
-         *     SimulationResponse.result — controlled by the OUTCOME_MODEL_PRIMARY
-         *     env var, or forced to 'old_heuristic' if the new model failed to load.
-         */
-        OldVsNewComparison: {
-            new_model: components["schemas"]["MLModelResult"];
-            old_heuristic: components["schemas"]["SimulationResult"];
-            /**
-             * Primary
-             * @description Which of the two is currently populating SimulationResponse.result
-             * @enum {string}
-             */
-            primary: "old_heuristic" | "new_model";
         };
         /** OutcomeCard */
         OutcomeCard: {
@@ -2146,7 +2176,7 @@ export interface components {
             computed_ms: number;
             /**
              * Engine
-             * @description Which engine produced this (e.g. 'rules', 'faiss-minilm', 'logreg-binary')
+             * @description Which engine produced this (e.g. 'rules', 'faiss-minilm', 'juris')
              */
             engine: string;
             /** Engine Version */
@@ -2274,6 +2304,11 @@ export interface components {
              */
             appellant_type: "accused_appeal" | "state_appeal" | "unclear";
             case_profile: components["schemas"]["StructuredCaseProfile"];
+            /**
+             * Case Text
+             * @description The case document Juris reads; if omitted, a thin summary of the profile is used
+             */
+            case_text?: string | null;
             /** Graph Stats */
             graph_stats?: Record<string, never> | null;
             /**
@@ -2421,6 +2456,11 @@ export interface components {
             /** @description Structured case profile from fact extraction */
             case_profile: components["schemas"]["StructuredCaseProfile"];
             /**
+             * Case Text
+             * @description The case document text Juris should read. If omitted, a thin summary built from the profile is used and the estimate is less reliable.
+             */
+            case_text?: string | null;
+            /**
              * Filing Date
              * @description Date the appeal was filed; used to bound precedent retrieval upstream
              */
@@ -2439,7 +2479,7 @@ export interface components {
         /** SimulationResponse */
         SimulationResponse: {
             /** @description Both the old heuristic and new trained-model predictions side by side. Additive field — absent/None only if something unexpected prevented computing it, which does not happen in the current implementation but keeps the type honest for any older client that doesn't expect this field. */
-            old_vs_new?: components["schemas"]["OldVsNewComparison"] | null;
+            comparison?: components["schemas"]["JurisComparison"] | null;
             /** Processing Time Ms */
             processing_time_ms: number;
             result: components["schemas"]["SimulationResult"];

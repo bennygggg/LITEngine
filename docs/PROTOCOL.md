@@ -15,7 +15,7 @@ OpenAPI file drifts from the models, so the three cannot disagree silently.
 | `DELETE` | `/api/v1/agent/runs/{run_id}` | Stop a run (companion to aborting the fetch). |
 | `GET` | `/api/v1/agent/status` | LLM on/off, library and model state. |
 | `POST` | `/api/v1/simulation/scenario` | The scenario engine without the chat (same engine the `run_scenario` tool uses). |
-| `GET` | `/api/v1/health/ready` | Real readiness: index, embedder, outcome model, LLM configured (boolean only). |
+| `GET` | `/api/v1/health/ready` | Real readiness: index, embedder, Juris, LLM configured (boolean only). |
 
 ## Request
 
@@ -90,7 +90,7 @@ step's start; nothing follows `done`.
 `appellant_type` and `filing_date` are taken only from (a) the needs-input form, (b) an explicit statement in the
 user's own words (`parse_explicit_appellant`), or (c) a UI-forced call that carries them. Anything the model puts in
 tool arguments is dropped unless one of those holds, and the run instead emits a `needs_input` card. This is enforced
-in code (`Tools.accept_inputs`), not by prompting, because appeal type is the strongest factor in the outcome model.
+in code (`Tools.accept_inputs`), not by prompting, because appeal type is the strongest factor in Juris.
 
 ## Versioning
 

@@ -10,7 +10,7 @@ from fastapi.responses import HTMLResponse
 
 from config import get_settings
 from services.embedder import embedder_service
-from services.outcome_model import is_model_loaded
+from services.juris import is_juris_loaded
 
 router = APIRouter(include_in_schema=False)
 
@@ -120,7 +120,7 @@ def _checks(settings) -> list[tuple[str, bool, str]]:
     return [
         ("API", True, "Online"),
         ("Precedent index", index_loaded, index_detail),
-        ("Outcome model", is_model_loaded(), "Trained classifier loaded" if is_model_loaded() else "Using the fallback heuristic"),
+        ("Juris (outcome model)", is_juris_loaded(), "Juris loaded" if is_juris_loaded() else "Using the fallback heuristic"),
         ("Embeddings", embed_ok, embed_detail),
         ("Case chat", chat_ok, chat_detail),
     ]

@@ -6,12 +6,11 @@
 /lit-backend/venv/
 /lit-backend/.pytest_cache/
 /lit-backend/data/*
-!/lit-backend/data/outcome_dataset/
-/lit-backend/data/outcome_dataset/*
-!/lit-backend/data/outcome_dataset/model/
-/lit-backend/data/outcome_dataset/model/*
-!/lit-backend/data/outcome_dataset/model/outcome_classifier_binary.joblib
-!/lit-backend/data/outcome_dataset/model/model_card.json
+!/lit-backend/data/juris/
+/lit-backend/data/juris/*
+!/lit-backend/data/juris/model/
+/lit-backend/data/juris/model/*
+!/lit-backend/data/juris/model/model_card.json
 
 /lit-frontend/node_modules/
 /lit-frontend/dist/
@@ -30,6 +29,7 @@
 # Git
 *.orig
 /lit-backend/.venv311/
+/lit-backend/.venv-juris/
 /lit-backend/.cache/
 /lit-frontend/test-results/
 /lit-frontend/playwright-report/

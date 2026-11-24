@@ -148,7 +148,7 @@ export default function KitPage() {
         <CardShell
           eyebrow="Outcome"
           title="Indicative research estimate"
-          disclaimer={{ level: 'caution', text: 'Trained on 187 appellate judgments. Treat as a base-rate indicator by appeal type, not advice.' }}
+          disclaimer={{ level: 'caution', text: 'Juris estimate. Treat as an indicative research figure, not advice.' }}
         >
           <p className="font-display text-3xl tracking-tight"><span className="tnum">Below even odds</span> <span className="text-ink-muted">· about 35%</span></p>
         </CardShell>

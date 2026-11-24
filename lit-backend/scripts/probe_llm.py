@@ -79,7 +79,7 @@ TOOLS: List[Dict[str, Any]] = [
             "filing_date": {"type": "string", "description": "YYYY-MM-DD"}}, "additionalProperties": False}}},
     {"type": "function", "function": {
         "name": "run_scenario",
-        "description": "Re-score the outcome model under hypothetical changes (e.g. appellant_type, extra supporting facts).",
+        "description": "Re-score the Juris outcome estimate under hypothetical changes (e.g. appellant_type, extra supporting facts).",
         "parameters": {"type": "object", "properties": {
             "scenarios": {"type": "array", "maxItems": 3, "items": {"type": "object", "properties": {
                 "label": {"type": "string"},

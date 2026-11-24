@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased — Juris
+
+### Changed
+- **The outcome model is now called Juris, everywhere.** Display name, API types (`JurisResult`, `JurisContribution`, `JurisComparison`), the comparison keys (`juris` / `heuristic`, field `comparison`), `JURIS_PRIMARY` and `JURIS_MODEL_PATH` (were `OUTCOME_MODEL_PRIMARY` / `OUTCOME_MODEL_PATH`), the health key `juris_loaded` (was `outcome_model_loaded`), the module `services/juris.py`, the provenance engine `juris`, and the artifact `data/juris/model/juris.joblib`. Tool names, card types and routes are unchanged. The Docker and git whitelists were updated with the move, and a new test fails if they ever stop matching the artifact path.
+- **The black book no longer claims Juris was trained on 1,505 cases.** That figure was wrong: the model served so far is the 187-judgment prototype. Every Juris number in the book now comes from the retrain's reports, and the book was rewritten around the retrained model.
+
+### Added
+- **Juris is retrained at scale: 107,847 Indian High Court criminal-appeal judgments (2008-2026), not 187.** It reads the pre-reasoning part of a case (facts, trial-court findings, grounds and submissions) and the appeal type the user states, and never the appellate court's own reasoning or order. On 32,573 later cases (2023-26) it had never seen, read exactly once, it is right **75.3 %** of the time (95 % CI 74.8-75.8; AUC 0.795), against 65.6 % for always guessing the majority outcome and 73.7 % (AUC 0.643) for the appeal type alone. The full results, the leakage ladder (order stripped 82.7 %, full text 90.7 %: not predictions) and the limits are in `docs/MODEL_CARD.md`, generated from the reports.
+- **A leakage-controlled pipeline, `lit-backend/scripts/juris/`** (README there): index the open High Court archive from metadata, fetch final orders, gate on quality, procedural endings, interim orders and label disagreement, remove near-duplicates, mask names and proper nouns, cut at the court's reasoning (one function shared by training and serving), split by time, choose settings on 2022, read 2023+ once, calibrate, export. A guard refuses a second look at the test split.
+- `case_text` on `POST /simulation/predict` and `/simulation/scenario` (additive); `JurisResult` reports `words_read` and `input_basis`.
+
+### Changed (behaviour)
+- **Scenarios now edit what Juris reads.** The real levers are the appeal type and the cited sections; the earlier five-score levers (weak claims, extra supporting facts, excluded precedents, court level) are reported as rejected, with the reason, never silently ignored.
+- **The outcome card says what Juris reads and does not read**, prints held-out accuracy against the majority baseline instead of cross-validation on 187 cases, and adds a base-rate caveat for appeals by the State (Juris cannot rank them beyond the base rate: AUC 0.50 on 2,377 test cases). `ModelFacts` gained `eval_accuracy`, `eval_auc`, `n_eval`, `eval_period` and `reads` (`cv_accuracy` is gone). `PROMPT_VERSION` is bumped; the recorded sample session predates it and should be re-recorded (`docs/DEMO.md`).
+- `scikit-learn` is still the only new serving dependency; the serving image needs no pandas. The artifact is 4.4 MB and loads in under a second; because Hugging Face Spaces reject binary files in git it is published to the private dataset repo (`juris/v1/`) and downloaded at start, installed only if its sha256 matches the committed `model_card.json` (`scripts/juris/publish_artifact.py`).
+
 ## 1.0.1 — polish
 
 ### Fixed

@@ -6,7 +6,7 @@ is tagged as recorded.
 
 ## How it works
 
-`lit-backend/scripts/record_demo.py` drives the real agent (real precedent library, real outcome model, real LLM
+`lit-backend/scripts/record_demo.py` drives the real agent (real precedent library, real Juris model, real LLM
 narration) through a scripted nine-turn conversation and freezes each turn's event stream to
 `lit-frontend/src/features/demo/recordings/lit-demo-v1.json`. The page feeds those events through the same
 `reduceEvent` reducer and the same message and card components as a live run (`features/demo/useDemoPlayer.ts`), paced
@@ -34,7 +34,7 @@ outcome card carries its "Indicative" disclaimer; there are no run errors; each 
 warnings. It does not judge wording, so read the transcript yourself. `--verify-only --file <path>` re-checks a
 recording without calling the model.
 
-Re-record whenever any of these change: the card schema, the narration prompt (`PROMPT_VERSION`), the outcome model,
+Re-record whenever any of these change: the card schema, the narration prompt (`PROMPT_VERSION`), Juris,
 the precedent library, or the demo matter text (`tests/fixtures/demo_matter.txt` and `features/matters/samples.ts`).
 Run `scripts/eval_agent.py` as well (20 prompts against the live model, hard checks such as "never infers appeal type").
 

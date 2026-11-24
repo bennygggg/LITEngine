@@ -2254,25 +2254,34 @@
         "title": "JudgmentDetail",
         "type": "object"
       },
-      "LegacyHeuristic": {
+      "JurisComparison": {
+        "description": "Both prediction approaches side by side, for a live before/after\ncomparison. `primary` reflects which one populates the top-level\nSimulationResponse.result — controlled by the JURIS_PRIMARY\nenv var, or forced to 'heuristic' if the new model failed to load.",
         "properties": {
-          "note": {
-            "default": "Uncalibrated rule score; it predicted 'succeeds' for every training case",
-            "title": "Note",
-            "type": "string"
+          "heuristic": {
+            "$ref": "#/components/schemas/SimulationResult"
           },
-          "p": {
-            "title": "P",
-            "type": "number"
+          "juris": {
+            "$ref": "#/components/schemas/JurisResult"
+          },
+          "primary": {
+            "description": "Which of the two is currently populating SimulationResponse.result",
+            "enum": [
+              "heuristic",
+              "juris"
+            ],
+            "title": "Primary",
+            "type": "string"
           }
         },
         "required": [
-          "p"
+          "primary",
+          "heuristic",
+          "juris"
         ],
-        "title": "LegacyHeuristic",
+        "title": "JurisComparison",
         "type": "object"
       },
-      "MLFeatureContribution": {
+      "JurisContribution": {
         "description": "One feature's signed contribution to the trained model's\nprediction — unlike ScoreComponent's fixed a-priori weights, this is\nspecific to this one prediction (coefficient x this case's value).",
         "properties": {
           "contribution": {
@@ -2308,11 +2317,11 @@
           "contribution",
           "explanation"
         ],
-        "title": "MLFeatureContribution",
+        "title": "JurisContribution",
         "type": "object"
       },
-      "MLModelResult": {
-        "description": "Outcome prediction from the trained logistic regression model\n(outcome_classifier_binary.joblib), returned alongside the\nhand-picked heuristic for side-by-side comparison.",
+      "JurisResult": {
+        "description": "Outcome prediction from the trained logistic regression model\n(juris.joblib), returned alongside the\nhand-picked heuristic for side-by-side comparison.",
         "properties": {
           "explanation_sentences": {
             "description": "Top 2-3 plain-language explanations, most influential first",
@@ -2325,10 +2334,22 @@
           "feature_contributions": {
             "description": "All feature contributions, ranked by |contribution| descending",
             "items": {
-              "$ref": "#/components/schemas/MLFeatureContribution"
+              "$ref": "#/components/schemas/JurisContribution"
             },
             "title": "Feature Contributions",
             "type": "array"
+          },
+          "input_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "'case_text' (a real document) or 'profile_summary' (a thin summary built from a structured profile)",
+            "title": "Input Basis"
           },
           "key_strengths": {
             "description": "Top positive-contribution factors",
@@ -2388,6 +2409,18 @@
             "description": "1-2 sentence plain-English recommendation",
             "title": "Recommendation",
             "type": "string"
+          },
+          "words_read": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Words of the case text Juris actually read (the pre-reasoning part)",
+            "title": "Words Read"
           }
         },
         "required": [
@@ -2396,7 +2429,25 @@
           "probabilities",
           "model_loaded"
         ],
-        "title": "MLModelResult",
+        "title": "JurisResult",
+        "type": "object"
+      },
+      "LegacyHeuristic": {
+        "properties": {
+          "note": {
+            "default": "Uncalibrated rule score; it predicted 'succeeds' for every training case",
+            "title": "Note",
+            "type": "string"
+          },
+          "p": {
+            "title": "P",
+            "type": "number"
+          }
+        },
+        "required": [
+          "p"
+        ],
+        "title": "LegacyHeuristic",
         "type": "object"
       },
       "MessageStartEvent": {
@@ -2575,9 +2626,10 @@
                 "type": "null"
               }
             ],
+            "description": "Accuracy of always guessing the more common outcome on the same cases",
             "title": "Baseline Accuracy"
           },
-          "cv_accuracy": {
+          "eval_accuracy": {
             "anyOf": [
               {
                 "type": "number"
@@ -2586,12 +2638,47 @@
                 "type": "null"
               }
             ],
-            "title": "Cv Accuracy"
+            "description": "Accuracy on held-out cases decided after the training period",
+            "title": "Eval Accuracy"
+          },
+          "eval_auc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eval Auc"
+          },
+          "eval_period": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Decision years of the held-out cases, e.g. '2023-2025'",
+            "title": "Eval Period"
           },
           "loaded": {
             "default": true,
             "title": "Loaded",
             "type": "boolean"
+          },
+          "n_eval": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Eval"
           },
           "n_train": {
             "anyOf": [
@@ -2607,6 +2694,18 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "reads": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the model reads, in plain words",
+            "title": "Reads"
           },
           "scope": {
             "default": "Criminal appeals",
@@ -2779,33 +2878,6 @@
           "payload"
         ],
         "title": "NeedsInputEvent",
-        "type": "object"
-      },
-      "OldVsNewComparison": {
-        "description": "Both prediction approaches side by side, for a live before/after\ncomparison. `primary` reflects which one populates the top-level\nSimulationResponse.result — controlled by the OUTCOME_MODEL_PRIMARY\nenv var, or forced to 'old_heuristic' if the new model failed to load.",
-        "properties": {
-          "new_model": {
-            "$ref": "#/components/schemas/MLModelResult"
-          },
-          "old_heuristic": {
-            "$ref": "#/components/schemas/SimulationResult"
-          },
-          "primary": {
-            "description": "Which of the two is currently populating SimulationResponse.result",
-            "enum": [
-              "old_heuristic",
-              "new_model"
-            ],
-            "title": "Primary",
-            "type": "string"
-          }
-        },
-        "required": [
-          "primary",
-          "old_heuristic",
-          "new_model"
-        ],
-        "title": "OldVsNewComparison",
         "type": "object"
       },
       "OutcomeCard": {
@@ -3574,7 +3646,7 @@
             "type": "integer"
           },
           "engine": {
-            "description": "Which engine produced this (e.g. 'rules', 'faiss-minilm', 'logreg-binary')",
+            "description": "Which engine produced this (e.g. 'rules', 'faiss-minilm', 'juris')",
             "title": "Engine",
             "type": "string"
           },
@@ -3915,6 +3987,19 @@
           "case_profile": {
             "$ref": "#/components/schemas/StructuredCaseProfile"
           },
+          "case_text": {
+            "anyOf": [
+              {
+                "maxLength": 2000000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The case document Juris reads; if omitted, a thin summary of the profile is used",
+            "title": "Case Text"
+          },
           "graph_stats": {
             "anyOf": [
               {
@@ -4213,6 +4298,19 @@
             ],
             "description": "Structured case profile from fact extraction"
           },
+          "case_text": {
+            "anyOf": [
+              {
+                "maxLength": 2000000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The case document text Juris should read. If omitted, a thin summary built from the profile is used and the estimate is less reliable.",
+            "title": "Case Text"
+          },
           "filing_date": {
             "anyOf": [
               {
@@ -4256,10 +4354,10 @@
       },
       "SimulationResponse": {
         "properties": {
-          "old_vs_new": {
+          "comparison": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/OldVsNewComparison"
+                "$ref": "#/components/schemas/JurisComparison"
               },
               {
                 "type": "null"
@@ -5806,7 +5904,7 @@
     },
     "/api/v1/simulation/scenario": {
       "post": {
-        "description": "Re-score a case under hypothetical changes with the trained model.\n\nEach scenario perturbs a real model input (appeal type, supporting facts, statutes, precedent support, court level)\nand is scored by the same code path as the base estimate. Most levers move the estimate by only a point or two —\nthe response says so via `effect_class` and `warnings`.",
+        "description": "Re-score a case under hypothetical changes with Juris.\n\nEach scenario perturbs a real model input (appeal type, supporting facts, statutes, precedent support, court level)\nand is scored by the same code path as the base estimate. Most levers move the estimate by only a point or two —\nthe response says so via `effect_class` and `warnings`.",
         "operationId": "scenario_api_v1_simulation_scenario_post",
         "requestBody": {
           "content": {

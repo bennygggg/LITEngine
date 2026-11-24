@@ -10,7 +10,7 @@ from utils.logger import setup_logger, get_logger
 from utils.cache import cache
 from services.embedder import embedder_service
 from services.kanoon import kanoon_service
-from services.outcome_model import is_model_loaded
+from services.juris import is_juris_loaded
 from services.case_chat import case_chat_service
 
 # Routers
@@ -135,14 +135,14 @@ def create_app() -> FastAPI:
     async def health_ready():
         """Readiness probe — real state of each subsystem (the old version always said ready)."""
         embedder_ok = embedder_service._fake or embedder_service._use_hf_api or embedder_service._local_model is not None
-        outcome_ok = is_model_loaded()
+        outcome_ok = is_juris_loaded()
         index = embedder_service.index_info()
         return {
             "ready": bool(_index_loaded and embedder_ok and outcome_ok),
             "index_loaded": _index_loaded,
             "index": index,
             "embedder_ready": embedder_ok,
-            "outcome_model_loaded": outcome_ok,
+            "juris_loaded": outcome_ok,
             "hf_key_set": settings.hf_key_set,
             "llm": {"provider": settings.LLM_PROVIDER, "configured": settings.hf_key_set if settings.LLM_PROVIDER == "hf_router" else settings.LLM_PROVIDER == "fake"},
             "agent_enabled": settings.AGENT_ENABLED,

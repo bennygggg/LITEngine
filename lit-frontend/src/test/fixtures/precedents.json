@@ -4,22 +4,23 @@
   "seq": 1,
   "t": 0,
   "event": "message_start",
-  "run_id": "r_ee89616a",
-  "message_id": "m_c157bb09f9",
+  "run_id": "r_73a7fd33",
+  "message_id": "m_c3b8935f4e",
   "conversation_id": "fx2",
   "mode": "forced",
   "model": null,
   "prompt_version": null,
   "schema_version": 1,
-  "server_version": "0.2.0",
-  "case_known": true
+  "server_version": "1.0.1",
+  "case_known": true,
+  "answer_first": false
  },
  {
   "v": 1,
   "seq": 2,
   "t": 0,
   "event": "step",
-  "step_id": "s_763d410a6c",
+  "step_id": "s_767a84d438",
   "phase": "start",
   "tool": "extract_case_facts",
   "label": "Reading the case",
@@ -40,7 +41,7 @@
   "seq": 3,
   "t": 0,
   "event": "step",
-  "step_id": "s_763d410a6c",
+  "step_id": "s_767a84d438",
   "phase": "end",
   "tool": "extract_case_facts",
   "label": "Reading the case",
@@ -59,13 +60,13 @@
   "seq": 4,
   "t": 0,
   "event": "card",
-  "card_id": "card_4ce687c675",
+  "card_id": "card_bebfb6ee9a",
   "part_id": "p1",
-  "step_id": "s_763d410a6c",
+  "step_id": "s_767a84d438",
   "schema_ver": 1,
   "supersedes": null,
   "payload": {
-   "card_id": "card_4ce687c675",
+   "card_id": "card_bebfb6ee9a",
    "schema_ver": 1,
    "title": "Ramesh Kumar v. State of Maharashtra",
    "subtitle": "High Court \u00b7 Criminal",
@@ -141,7 +142,7 @@
   "event": "artifact_update",
   "kind": "profile",
   "key": "709296643bf215cc",
-  "card_id": "card_4ce687c675",
+  "card_id": "card_bebfb6ee9a",
   "implicit": true
  },
  {
@@ -149,7 +150,7 @@
   "seq": 6,
   "t": 0,
   "event": "step",
-  "step_id": "s_4d4423fa2e",
+  "step_id": "s_9ef63368cd",
   "phase": "start",
   "tool": "search_precedents",
   "label": "Searching the precedent library",
@@ -169,9 +170,9 @@
  {
   "v": 1,
   "seq": 7,
-  "t": 97,
+  "t": 35,
   "event": "step",
-  "step_id": "s_4d4423fa2e",
+  "step_id": "s_9ef63368cd",
   "phase": "end",
   "tool": "search_precedents",
   "label": "Searching the precedent library",
@@ -182,21 +183,21 @@
   "message": null,
   "pct": null,
   "status": "ok",
-  "duration_ms": 97,
+  "duration_ms": 35,
   "summary": "5 judgments"
  },
  {
   "v": 1,
   "seq": 8,
-  "t": 97,
+  "t": 35,
   "event": "card",
-  "card_id": "card_0d46d515c7",
+  "card_id": "card_434a7f5ddc",
   "part_id": "p2",
-  "step_id": "s_4d4423fa2e",
+  "step_id": "s_9ef63368cd",
   "schema_ver": 1,
   "supersedes": null,
   "payload": {
-   "card_id": "card_0d46d515c7",
+   "card_id": "card_434a7f5ddc",
    "schema_ver": 1,
    "title": "Closest matches in the library",
    "subtitle": "Decided before 12 Apr 2021",
@@ -205,7 +206,7 @@
     "engine": "faiss-minilm",
     "engine_version": "1",
     "index_version": "v1",
-    "computed_ms": 97,
+    "computed_ms": 35,
     "inputs": {},
     "cached": false
    },
@@ -318,26 +319,26 @@
  {
   "v": 1,
   "seq": 9,
-  "t": 97,
+  "t": 35,
   "event": "artifact_update",
   "kind": "precedents",
   "key": "8b705866e2ee286d",
-  "card_id": "card_0d46d515c7",
+  "card_id": "card_434a7f5ddc",
   "implicit": false
  },
  {
   "v": 1,
   "seq": 10,
-  "t": 97,
+  "t": 35,
   "event": "text_delta",
-  "message_id": "m_c157bb09f9",
+  "message_id": "m_c3b8935f4e",
   "part_id": "p3",
-  "delta": "**Ramesh Kumar v. State of Maharashtra**, High Court. 3 legal issues; sections s.27, s.302, s.304, s.34, s.374.\n\nClosest matches in the library: [P1] Dukhmochan Pandey & Ors., Shamsul Mian & ... vs Stat (SC, 1997); [P2] Raju S/O Vithhalrao Bhadre (In Jail) vs The State Of (HC, 2015); [P3] State Of Gujarat vs Raghu @ Raghavbhai Vashrambhai A (HC, 2002). These are the nearest judgments by meaning among 505 indexed \u2014 they are not a finding that any of them supports the appeal."
+  "delta": "Closest matches in the library are listed above \u2014 start with [P1] and [P2]. They are the nearest judgments by meaning among 505 indexed, not a finding that any of them supports the appeal."
  },
  {
   "v": 1,
   "seq": 11,
-  "t": 97,
+  "t": 35,
   "event": "meta",
   "conversation_title": null,
   "suggestions": [
@@ -368,19 +369,19 @@
  {
   "v": 1,
   "seq": 12,
-  "t": 97,
+  "t": 35,
   "event": "done",
   "status": "complete",
-  "message_id": "m_c157bb09f9",
+  "message_id": "m_c3b8935f4e",
   "usage": {
    "input_tokens": 0,
    "output_tokens": 0,
    "llm_calls": 0
   },
   "timings": {
-   "ttft_ms": 97,
+   "ttft_ms": 35,
    "first_card_ms": 0,
-   "total_ms": 97
+   "total_ms": 35
   },
   "warnings": []
  }
