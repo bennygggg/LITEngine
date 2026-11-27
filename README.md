@@ -10,6 +10,7 @@ indicative outcome estimate back as inline cards — each with its sources and c
 [![Live app](https://img.shields.io/badge/Live_app-lit--ngin.vercel.app-000000?logo=vercel&logoColor=white)](https://lit-ngin.vercel.app)
 [![Sample session](https://img.shields.io/badge/Try-the_sample_session-2563EB)](https://lit-ngin.vercel.app/demo)
 ![Version](https://img.shields.io/badge/version-1.0.1-informational)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
@@ -170,4 +171,7 @@ scripts/verify.sh --e2e      # add the Playwright end-to-end and accessibility s
 
 ## License
 
-No license has been chosen yet, so all rights are reserved by default.
+Released under the [MIT License](LICENSE).
+
+The license covers the code in this repository. The 505-judgment precedent library and the trained Juris artifact are
+published separately (see *What a fresh checkout does not include* above) and are not part of it.
